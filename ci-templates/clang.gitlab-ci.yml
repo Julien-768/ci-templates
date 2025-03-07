@@ -1,0 +1,12 @@
+# clang.gitlab-ci.yml
+
+image: alpine:latest
+
+before_script:
+  - apk add clang18-extra-tools
+
+format:
+  stage: format
+  script:
+    - echo "Running clang-format on files in $CLANG_PATH"
+    - find $CLANG_PATH -type f \( -name '*.c' -or -name '*.h' \) -print0 | xargs -0 clang-format -i

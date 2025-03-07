@@ -1,0 +1,20 @@
+# doxygen.gitlab-ci.yml
+
+image: alpine
+
+before_script:
+  - apk add doxygen
+
+pages:
+  stage: pages
+  script:
+    - echo "Running Doxygen on $DOXYFILE_PATH"
+    - cd $DOXYFILE_PATH
+    - doxygen doxygen/Doxyfile
+    - cd $CI_PROJECT_DIR
+    - mv $DOXYFILE_PATH/doxygen/documentation/html/ public/
+  artifacts:
+    paths:
+      - public/
+  rules:
+    - if: $CI_COMMIT_MESSAGE=~ /publication/

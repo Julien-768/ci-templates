@@ -1,6 +1,6 @@
 # ci-templates
 
-
+> **Note:** This repository is ready for public sharing.
 
 ## Getting started
 
