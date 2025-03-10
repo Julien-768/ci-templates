@@ -2,12 +2,10 @@
 
 image: alpine
 
-before_script:
-  - apk add doxygen
-
 pages:
   stage: pages
   script:
+    - apk add doxygen
     - echo "Running Doxygen on $DOXYFILE_PATH"
     - cd $DOXYFILE_PATH
     - doxygen doxygen/Doxyfile
