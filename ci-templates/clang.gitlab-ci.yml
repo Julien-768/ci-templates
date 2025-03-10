@@ -11,10 +11,10 @@ image: alpine:latest
 format-clang:
   stage: format
   script:
-  - apk update
-  - apk add clang18-extra-tools
-  - ln -s /usr/lib/llvm18/bin/clang-format /usr/local/bin/clang-format
-  - clang-format --version
-  - echo "Running clang-format on files in ${CLANG_PATH:-.} with configuration from ${CLANG_FORMAT_FILE:-.clang-format.yml}"
-  - echo "Using configuration file at $(pwd)/${CLANG_FORMAT_FILE:-.clang-format.yml}"
-  - find ${CLANG_PATH:-.} \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) | xargs --no-run-if-empty clang-format --dry-run --Werror --style=file:${CLANG_FORMAT_FILE:-.clang-format.yml}
+    - apk update
+    - apk add clang18-extra-tools
+    - ln -s /usr/lib/llvm18/bin/clang-format /usr/local/bin/clang-format
+    - clang-format --version
+    - echo "Running clang-format on files in ${CLANG_PATH:-.} with configuration from ${CLANG_FORMAT_FILE:-.clang-format.yml}"
+    - echo "Using configuration file at $(pwd)/${CLANG_FORMAT_FILE:-.clang-format.yml}"
+    - find ${CLANG_PATH:-.} \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) | xargs --no-run-if-empty clang-format --dry-run --Werror --style=file:${CLANG_FORMAT_FILE:-.clang-format.yml}
