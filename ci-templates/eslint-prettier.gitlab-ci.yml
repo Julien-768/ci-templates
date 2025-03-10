@@ -2,7 +2,7 @@
 
 # Ref https://github.com/sanger-pathogens/monocle/blob/master/.gitlab-ci.yml
 
-Check that FE code & non-Python files are formatted & linted:
+Format & lint:
   stage: formatting_and_linting_check
   # Keep this version in sync w/ the one from `./.pre-commit-config.yaml`.
   image: node:18.18.0-alpine3.17

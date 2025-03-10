@@ -1,16 +1,14 @@
 stages:
+  - format
   - lint
   - test
   - pages
-  - format
   - deployment
 
 include:
   - local: 'ci-templates/python.gitlab-ci.yml'
-  - local: 'ci-templates/prettier.gitlab-ci.yml'
   - local: 'ci-templates/mkdocs.gitlab-ci.yml'
   - local: 'ci-templates/mike.gitlab-ci.yml'
-  - local: 'ci-templates/eslint.gitlab-ci.yml'
   - local: 'ci-templates/eslint-prettier.gitlab-ci.yml'
   - local: 'ci-templates/doxygen.gitlab-ci.yml'
   - local: 'ci-templates/clang.gitlab-ci.yml'
