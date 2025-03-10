@@ -1,0 +1,49 @@
+BasedOnStyle: Google
+
+# Limite de colonne pour la largeur des lignes
+ColumnLimit: 150
+
+# Alignement des affectations consécutives
+AlignConsecutiveAssignments: true
+
+# Gestion des accolades
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterBlockComment: false
+  AfterFunction: false
+  AfterNamespace: true
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: false
+  IndentBraces: true
+
+# Commentaires
+PenaltyBreakComment: 10000
+MaxEmptyLinesToKeep: 1
+AlignTrailingComments: true
+
+IncludeSort: None
+SortIncludes: false
+
+# Alignement et indentation
+AlignAfterOpenBracket: Align
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+IndentCaseLabels: true
+
+# Autres réglages
+BreakBeforeBinaryOperators: None
+BreakStringLiterals: true
+DerivePointerAlignment: false
+KeepEmptyLinesAtTheStartOfBlocks: true
+KeepExtraEmptyLinesAtTheEndOfBlocks: false
+KeepOneLineBlocks: true
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: None
+
+PenaltyBreakFunctionBody: 0
+PenaltyBreakBeforeFirstCallParameter: 30000
+PenaltyBreakString: 0
