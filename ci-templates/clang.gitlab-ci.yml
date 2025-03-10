@@ -1,5 +1,10 @@
 # clang.gitlab-ci.yml
 
+# This GitLab CI configuration file sets up a job to run clang-format on C/C++ source files.
+# The job uses an Alpine Linux image and installs the necessary clang-format tools.
+# It then runs clang-format in dry-run mode to check for formatting issues.
+# The CLANG_PATH variable can be set to specify the directory to format. If not set, it defaults to the current directory.
+
 image: alpine:latest
 
 format-clang:
@@ -9,5 +14,5 @@ format-clang:
   - apk add clang18-extra-tools
   - ln -s /usr/lib/llvm18/bin/clang-format /usr/local/bin/clang-format
   - clang-format --version
-  - echo "Running clang-format on files in $CLANG_PATH"
-  - find $CLANG_PATH \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) | xargs --no-run-if-empty clang-format --dry-run --Werror
+  - echo "Running clang-format on files in ${CLANG_PATH:-.}"
+  - find ${CLANG_PATH:-.} \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) | xargs --no-run-if-empty clang-format --dry-run --Werror
