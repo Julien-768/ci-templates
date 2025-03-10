@@ -4,6 +4,7 @@
 # The job uses an Alpine Linux image and installs the necessary clang-format tools.
 # It then runs clang-format in dry-run mode to check for formatting issues.
 # The CLANG_PATH variable can be set to specify the directory to format. If not set, it defaults to the current directory.
+# The CLANG_FORMAT_FILE variable can be set to specify the path to the clang-format configuration file. If not set, it defaults to .clang-format.yml.
 
 image: alpine:latest
 
@@ -14,5 +15,6 @@ format-clang:
   - apk add clang18-extra-tools
   - ln -s /usr/lib/llvm18/bin/clang-format /usr/local/bin/clang-format
   - clang-format --version
-  - echo "Running clang-format on files in ${CLANG_PATH:-.}"
-  - find ${CLANG_PATH:-.} \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) | xargs --no-run-if-empty clang-format --dry-run --Werror
+  - echo "Running clang-format on files in ${CLANG_PATH:-.} with configuration from ${CLANG_FORMAT_FILE:-.clang-format.yml}"
+  - find ${CLANG_PATH:-.} \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) | xargs --no-run-if-empty clang-format --dry-run --Werror --style=file:${CLANG_FORMAT_FILE:-.clang-format.yml}
+  - echo "Using configuration file at $(pwd)/${CLANG_FORMAT_FILE:-.clang-format.yml}"

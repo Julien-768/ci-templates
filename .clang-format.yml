@@ -9,7 +9,9 @@ AlignConsecutiveAssignments: true
 # Gestion des accolades
 BreakBeforeBraces: Custom
 BraceWrapping:
-  AfterBlockComment: false
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
   AfterFunction: false
   AfterNamespace: true
   AfterStruct: true
@@ -23,7 +25,6 @@ PenaltyBreakComment: 10000
 MaxEmptyLinesToKeep: 1
 AlignTrailingComments: true
 
-IncludeSort: None
 SortIncludes: false
 
 # Alignement et indentation
@@ -38,12 +39,8 @@ BreakBeforeBinaryOperators: None
 BreakStringLiterals: true
 DerivePointerAlignment: false
 KeepEmptyLinesAtTheStartOfBlocks: true
-KeepExtraEmptyLinesAtTheEndOfBlocks: false
-KeepOneLineBlocks: true
 AllowShortBlocksOnASingleLine: Empty
 AllowShortFunctionsOnASingleLine: None
-AllowShortIfStatementsOnASingleLine: None
 
-PenaltyBreakFunctionBody: 0
 PenaltyBreakBeforeFirstCallParameter: 30000
 PenaltyBreakString: 0
