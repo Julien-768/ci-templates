@@ -1,7 +1,0 @@
-image: node
-
-prettier:
-  stage: lint
-  script:
-    - npm install --save-dev --save-exact prettier
-    - npx prettier --check .
