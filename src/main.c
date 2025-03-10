@@ -3,9 +3,11 @@
 /**
  * @brief Prints "Hello, World!" to the console.
  */
-void helloWorld(void) { printf("Hello, World!\n"); }
+void helloWorld(void) {
+    printf("Hello, World!\n");
+}
 
 int main(void) {
-  helloWorld();
-  return 0;
+    helloWorld();
+    return 0;
 }
