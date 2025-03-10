@@ -3,7 +3,7 @@
 # Ref https://github.com/sanger-pathogens/monocle/blob/master/.gitlab-ci.yml
 
 Format & lint:
-  stage: formatting_and_linting_check
+  stage: lint
   # Keep this version in sync w/ the one from `./.pre-commit-config.yaml`.
   image: node:18.18.0-alpine3.17
   before_script:
