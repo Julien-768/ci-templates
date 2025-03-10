@@ -2,7 +2,7 @@
 
 image: alpine:latest
 
-format:
+format-clang:
   stage: format
   script:
   - apk update

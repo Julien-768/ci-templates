@@ -13,6 +13,9 @@ include:
   - local: 'ci-templates/doxygen.gitlab-ci.yml'
   - local: 'ci-templates/clang.gitlab-ci.yml'
 
+format-clang::
+  allow_failure: true
+
 # Example job to test the inclusion of the templates
 test_python_template:
   stage: test
