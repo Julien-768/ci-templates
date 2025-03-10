@@ -1,7 +1,7 @@
 # python.gitlab-ci.yml
 
 isort:
-  stage: linting
+  stage: lint
   image: python:latest
   before_script:
     - pip install isort
@@ -9,7 +9,7 @@ isort:
     - isort . --check-only
 
 black:
-  stage: linting
+  stage: lint
   image: python:latest
   before_script:
     - pip install black
@@ -18,7 +18,7 @@ black:
     - black --check .
 
 flake8:
-  stage: linting
+  stage: lint
   image: python:latest
   script:
     - pip install flake8
@@ -26,7 +26,7 @@ flake8:
     - flake8 .
 
 pylint:
-  stage: linting
+  stage: lint
   image: python:latest
   before_script:
     - pip install pylint

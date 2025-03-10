@@ -3,7 +3,7 @@
 # Ref https://github.com/sanger-pathogens/monocle/blob/master/.gitlab-ci.yml
 
 Check that FE code & non-Python files are formatted & linted:
-  stage: formatting_and_linting_check
+  stage: lint
   tags:
     - openstack-autoscale-theta
   # Keep this version in sync w/ the one from `./.pre-commit-config.yaml`.

@@ -1,8 +1,5 @@
 image: node
 
-stages:
-  - lint
-
 prettier:
   stage: lint
   script:

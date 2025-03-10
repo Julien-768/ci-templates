@@ -1,7 +1,9 @@
 stages:
   - lint
   - test
-  - deploy
+  - pages
+  - format
+  - deployment
 
 include:
   - local: 'ci-templates/python.gitlab-ci.yml'

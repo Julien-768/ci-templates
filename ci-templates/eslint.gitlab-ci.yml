@@ -1,8 +1,5 @@
 image: node
 
-stages:
-  - lint
-
 eslint:
   stage: lint
   script:
