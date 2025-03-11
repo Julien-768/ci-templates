@@ -42,8 +42,8 @@ export default [
       "package.json",
       "eslint.config.mjs",
       "prettier.config.cjs", // Ajout pour éviter les conflits
-      "**/*.yml",
-      "**/*.yaml",
+      // "**/*.yml",
+      // "**/*.yaml",
     ],
 
     rules: {
