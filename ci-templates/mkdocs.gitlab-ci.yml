@@ -4,10 +4,11 @@
 # The mkdocs_test job builds the documentation and stores the output in the test directory.
 # The pages job builds the documentation and stores the output in the public directory for deployment to GitLab Pages.
 
-image: python:latest
+
 
 mkdocs_test:
   stage: test
+  image: python:latest
   script:
     - time pip install -r requirements.txt
     - time mkdocs build --strict --verbose --site-dir test
@@ -16,8 +17,9 @@ mkdocs_test:
       - test
     expire_in: 24 hours
 
-pages:
+mkdocs_pages:
   stage: pages
+  image: python:latest
   script:
     - time pip install -r requirements.txt
     - time mkdocs build --strict --verbose --site-dir public

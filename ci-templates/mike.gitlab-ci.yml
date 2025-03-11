@@ -7,13 +7,12 @@
 # The PAGES_BRANCH variable specifies the branch used for GitLab Pages.
 # The HTTPS_REMOTE variable is used to authenticate with the GitLab repository.
 
-image: python:latest
-
 variables:
   GIT_DEPTH: 0
 
 mkdocs_test:
   stage: test
+  image: python:latest
   script:
     - time pip install -r requirements.txt
     - time mike deploy --deploy-prefix test -p -u test-latest
@@ -22,8 +21,9 @@ mkdocs_test:
       - test
     expire_in: 24 hours
 
-pages:
+mike_pages:
   stage: pages
+  image: python:latest
   when: on_success
   variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
