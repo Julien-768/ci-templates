@@ -1,5 +1,12 @@
 # mike.gitlab-ci.yml
 
+# This GitLab CI configuration file sets up jobs to build and deploy documentation using MkDocs and Mike.
+# The mkdocs_test job builds the documentation and stores the output in the test directory.
+# The pages job deploys the documentation to GitLab Pages.
+# The PIP_CACHE_DIR variable is used to cache pip dependencies.
+# The PAGES_BRANCH variable specifies the branch used for GitLab Pages.
+# The HTTPS_REMOTE variable is used to authenticate with the GitLab repository.
+
 image: python:latest
 
 variables:

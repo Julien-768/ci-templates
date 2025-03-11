@@ -1,6 +1,19 @@
-#mkdocs.gitlab-ci.yml
+# mkdocs.gitlab-ci.yml
+
+# This GitLab CI configuration file sets up jobs to build and deploy documentation using MkDocs.
+# The mkdocs_test job builds the documentation and stores the output in the test directory.
+# The pages job builds the documentation and stores the output in the public directory for deployment to GitLab Pages.
 
 image: python:latest
+
+Markdown Lint:
+  stage: lint
+  image: node:18
+  before_script:
+    - npm i -D markdownlint-cli2
+  script:
+    - npx markdownlint-cli2 "**/*.md"
+
 
 mkdocs_test:
   stage: test
