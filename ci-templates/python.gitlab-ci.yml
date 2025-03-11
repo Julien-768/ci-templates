@@ -1,20 +1,22 @@
 # python.gitlab-ci.yml
 
+# This GitLab CI configuration file sets up jobs to run various linting tools on Python source files.
+# The jobs use a Python image and install the necessary linting tools.
+# The PYLINT_RCFILE variable can be set to specify the path to the pylint configuration file. If not set, it defaults to pyproject.toml.
+
 isort:
   stage: lint
   image: python:latest
-  before_script:
-    - pip install isort
   script:
+    - pip install isort
     - isort . --check-only
 
 black:
   stage: lint
   image: python:latest
-  before_script:
+  script:
     - pip install black
     - pip install black[jupyter]
-  script:
     - black --check .
 
 flake8:
@@ -28,8 +30,7 @@ flake8:
 pylint:
   stage: lint
   image: python:latest
-  before_script:
-    - pip install pylint
   script:
+    - pip install pylint
     - ls
-    - find . -type f -name "*.py" | xargs pylint --rcfile=pyproject.toml
+    - find . -type f -name "*.py" | xargs pylint --rcfile="${PYLINT_RCFILE:-pyproject.toml}"

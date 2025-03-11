@@ -1,0 +1,192 @@
+
+[tool.commitizen]
+name = "cz_conventional_commits"
+tag_format = "$version"
+version_scheme = "pep440"
+version_provider = "poetry"
+update_changelog_on_bump = true
+major_version_zero = true
+
+[tool.black]
+line-length = 100 # override black's default line-length
+exclude = '''
+/(
+    \.git
+  | \.mypy_cache
+  | \.tox
+  | venv
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.flake8]
+# Flake8 plug-in loading the configuration from pyproject.toml
+# E127 continuation line over-indented for visual indent
+# make flake8 compatible with black
+ignore = ['E203', 'E266', 'E501', 'W503']
+max-line-length = 100
+exclude = ['env', 'bin', "node_modules"]
+
+[tool.isort]
+# make it compatible with black
+profile = "black"
+skip = ["*/env/*", "docs/*"]
+
+[tool.pylint.MASTER]
+# A comma-separated list of package or module names from where C extensions may
+# be loaded. Extensions are loading into the active Python interpreter and may
+# run arbitrary code.
+extension-pkg-whitelist = ''
+
+# Specify a score threshold to be exceeded before program exits with error.
+fail-under = '10.0'
+
+# Add files or directories to the blacklist. They should be base names, not
+# paths.
+ignore = ['.git','models.py','manage.py','__init__.py','flatted.py','test.py','consumers.py','0001_initial.py']
+
+# Add files or directories matching the regex patterns to the blacklist. The
+# regex matches against base names, not paths.
+ignore-patterns =  '''
+    \*/migrations/\*
+'''
+
+# Python code to execute, usually for sys.path manipulation such as
+# pygtk.require().
+#init-hook=
+
+# Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
+# number of processors available to use.
+jobs = 0
+
+# Control the amount of potential inferred values when inferring a single
+# object. This can help the performance when dealing with large functions or
+# complex, nested conditions.
+limit-inference-results = 100
+
+# List of plugins (as comma separated values of python module names) to load,
+# usually to register additional checkers.
+load-plugins = ''
+
+# Pickle collected data for later comparisons.
+persistent = 'yes'
+
+# When enabled, pylint would attempt to guess common misconfiguration and emit
+# user-friendly hints instead of false-positive error messages.
+suggestion-mode = 'yes'
+
+# Allow loading of arbitrary C extensions. Extensions are imported into the
+# active Python interpreter and may run arbitrary code.
+unsafe-load-any-extension = 'no'
+
+[tool.pylint."MESSAGES CONTROL"]
+# Disable some messages that you don't want
+disable = ["import-error",
+        "broad-except",
+        "no-member",
+        "global-variable-not-assigned",
+        "global-statement",
+        "missing-class-docstring",
+        "too-many-nested-blocks",
+        "too-many-branches",
+        "too-many-statements",
+        "too-many-locals",
+        "too-few-public-methods",
+        "too-many-lines",
+        "protected-access",
+        "fixme",
+        "no-name-in-module",
+        "C0103"
+        ]
+
+[tool.pylint.SIMILARITIES]
+
+# Ignore comments when computing similarities.
+ignore-comments = 'yes'
+
+# Ignore docstrings when computing similarities.
+ignore-docstrings = 'yes'
+
+# Ignore imports when computing similarities.
+ignore-imports = 'yes'
+
+# Minimum lines number of a similarity.
+min-similarity-lines = 5
+
+[tool.pylint.BASIC]
+# Good variable names
+good-names = ["i", "j", "k", "e", "ex", "Run", "_"]
+
+
+[tool.pylint.FORMAT]
+
+# Expected format of line ending, e.g. empty (any line ending), LF or CRLF.
+expected-line-ending-format = ''
+
+# Regexp for a line that is allowed to be longer than the limit.
+ignore-long-lines = '^\s*(# )?<?https?://\S+>?$'
+
+# Number of spaces of indent required inside a hanging or continued line.
+indent-after-paren = 4
+
+# String used as indentation unit. This is usually "    " (4 spaces) or "\t" (1
+# tab).
+indent-string = '    '
+
+# Maximum number of characters on a single line.
+max-line-length = 100
+
+# Maximum number of lines in a module.
+max-module-lines = 1000
+
+# Allow the body of a class to be on the same line as the declaration if body
+# contains single statement.
+single-line-class-stmt = 'no'
+
+# Allow the body of an if to be on the same line as the test if there is no
+# else.
+single-line-if-stmt = 'no'
+
+[tool.pylint.IMPORTS]
+# Disallowed imports
+# banned-modules = "<your_disallowed_module>"
+
+[tool.pylint.REPORTS]
+
+# Python expression which should return a score less than or equal to 10. You
+# have access to the variables 'error', 'warning', 'refactor', and 'convention'
+# which contain the number of messages in each category, as well as 'statement'
+# which is the total number of statements analyzed. This score is used by the
+# global evaluation report (RP0004).
+evaluation = '10.0 - ((float(5 * error + warning + refactor + convention) / statement) * 10)'
+
+# Template used to display messages. This is a python new-style format string
+# used to format the message information. See doc for all details.
+#msg-template=
+
+# Set the output format. Available formats are text, parseable, colorized, json
+# and msvs (visual studio). You can also give a reporter class, e.g.
+# mypackage.mymodule.MyReporterClass.
+output-format = 'text'
+
+# Tells whether to display a full report or only the messages.
+reports = 'no'
+
+# Activate the evaluation score.
+score = 'yes'
+
+
+[tool.pylint.REFACTORING]
+
+# Maximum number of nested blocks for function / method body
+max-nested-blocks = 5
+
+# Complete name of functions that never returns. When checking for
+# inconsistent-return-statements if a never returning function is called then
+# it will be considered as an explicit return statement and no message will be
+# printed.
+never-returning-functions = 'sys.exit'
