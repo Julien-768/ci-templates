@@ -4,14 +4,15 @@
 # The mkdocs_test job builds the documentation and stores the output in the test directory.
 # The pages job builds the documentation and stores the output in the public directory for deployment to GitLab Pages.
 
-
+variables:
+  MKDOCS_CONFIG_FILE: 'mkdocs.yml' # optional path to the MkDocs configuration file
 
 mkdocs_test:
   stage: test
   image: python:latest
   script:
     - time pip install -r requirements.txt
-    - time mkdocs build --strict --verbose --site-dir test
+    - time mkdocs build --strict --verbose --site-dir test -f ${MKDOCS_CONFIG_FILE=-.mkdocs.yml}
   artifacts:
     paths:
       - test
@@ -22,7 +23,7 @@ mkdocs_pages:
   image: python:latest
   script:
     - time pip install -r requirements.txt
-    - time mkdocs build --strict --verbose --site-dir public
+    - time mkdocs build --strict --verbose --site-dir public -f ${MKDOCS_CONFIG_FILE:-.mkdocs.yml}
   artifacts:
     paths:
       - public
