@@ -1,0 +1,12 @@
+# CI job for Markdown linting
+# Uses markdownlint-cli2 to check Markdown files for style issues.
+# LINT_PATH (optional) allows specifying a subset of files to lint.
+# Defaults to all Markdown files in 'docs/' if not set.
+
+Markdown Lint:
+  stage: lint
+  image: node:18
+  before_script:
+    - npm i -D markdownlint-cli2
+  script:
+    - find "${LINT_PATH:-docs}" -type f -name "*.md" -print0 | xargs -0 npx markdownlint-cli2 --config .markdownlint.json
