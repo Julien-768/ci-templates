@@ -10,7 +10,7 @@
 variables:
   GIT_DEPTH: 0
 
-mkdocs_test:
+mike_test:
   stage: test
   image: python:latest
   script:

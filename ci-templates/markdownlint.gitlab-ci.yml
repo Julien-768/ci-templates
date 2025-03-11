@@ -9,4 +9,4 @@ Markdown Lint:
   before_script:
     - npm i -D markdownlint-cli2
   script:
-    - find "${LINT_PATH:-docs}" -type f -name "*.md" -print0 | xargs -0 npx markdownlint-cli2 --config .markdownlint.json
+    find "${LINT_PATH:-docs}" -type f -name "*.md" -exec npx markdownlint-cli2 --config .markdownlint.json {} +
