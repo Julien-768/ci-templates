@@ -26,7 +26,7 @@ Format & lint:
   script:
     # Run Prettier to check for formatting issues, excluding files specified in .eslintignore
     # Then run ESLint to check for linting issues. If any issues are found, set the exit code.
-    - prettier --check --ignore-path .eslintignore . && eslint . || exit_code=$?
+    - prettier --check . && eslint . || exit_code=$?
     - >
       if [[ $exit_code -eq 1 ]]; then
         echo "❌ Formatting and/or linting issues detected. Please ensure all frontend code and non-Python files adhere to the project's code style guidelines. Refer to the project README for instructions on installing pre-commit hooks locally."

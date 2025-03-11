@@ -15,8 +15,9 @@ const compat = new FlatCompat({
 });
 
 export default [
+  // Étend la configuration recommandée d'ESLint
   ...compat.extends("eslint:recommended"),
-  ...compat.extends("plugin:prettier/recommended"),
+
   {
     plugins: {
       prettier: eslintPluginPrettier,
@@ -34,10 +35,13 @@ export default [
     },
 
     ignores: [
-      "node_modules",
+      "node_modules/",
+      "dist/",
+      "build/",
       "package-lock.json",
       "package.json",
       "eslint.config.mjs",
+      "prettier.config.cjs", // Ajout pour éviter les conflits
       "**/*.yml",
       "**/*.yaml",
     ],
@@ -53,8 +57,7 @@ export default [
       "@gitlab/vue-prefer-dollar-scopedslots": "off",
       "@gitlab/no-runtime-template-compiler": "off",
       "@gitlab/no-absolute-urls": "off",
-      "prettier/prettier": "error",
-      // quotes: ["error", "single"],
+      "prettier/prettier": "error", // Exécute Prettier via ESLint
     },
   },
 ];
