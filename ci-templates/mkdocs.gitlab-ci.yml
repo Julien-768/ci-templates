@@ -12,9 +12,10 @@ mkdocs_test:
   image: python:latest
   script:
     - cd ${MK_PATH:-.}
+    - echo "Running MkDocs on ${MK_PATH:-.}"
     - ls
     - time pip install -r requirements.txt
-    - time mkdocs build --strict --verbose --site-dir test -f ${MKDOCS_CONFIG_FILE=-.mkdocs.yml}
+    - time mkdocs build --strict --verbose --site-dir test -f ${MKDOCS_CONFIG_FILE=-mkdocs.yml}
   artifacts:
     paths:
       - test
@@ -27,7 +28,7 @@ mkdocs_pages:
     - cd ${MK_PATH:-.}
     - ls
     - time pip install -r requirements.txt
-    - time mkdocs build --strict --verbose --site-dir public -f ${MKDOCS_CONFIG_FILE:-.mkdocs.yml}
+    - time mkdocs build --strict --verbose --site-dir public -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
   artifacts:
     paths:
       - public

@@ -18,7 +18,7 @@ mike_test:
     - cd ${MK_PATH:-.}
     - ls
     - time pip install -r requirements.txt
-    - time mike deploy --deploy-prefix test -p -u test-latest -f ${MIKE_CONFIG_FILE}
+    - time mike deploy --deploy-prefix test -p -u test-latest
   artifacts:
     paths:
       - test
