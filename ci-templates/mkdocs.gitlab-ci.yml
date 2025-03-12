@@ -18,7 +18,8 @@ mkdocs_test:
     - time mkdocs build --strict --verbose --site-dir test -f ${MKDOCS_CONFIG_FILE=-mkdocs.yml}
   artifacts:
     paths:
-      - test
+      - echo "Artifacts:" + "${MK_PATH:-.}/test"
+      - ${MK_PATH:-.}/test
     expire_in: 24 hours
 
 mkdocs_pages:
@@ -31,6 +32,7 @@ mkdocs_pages:
     - time mkdocs build --strict --verbose --site-dir public -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
   artifacts:
     paths:
-      - public
+      - echo "Artifacts:" + "${MK_PATH:-.}/public"
+      - ${MK_PATH:-.}/public
   rules:
     - if: $CI_COMMIT_MESSAGE=~ /publication/
