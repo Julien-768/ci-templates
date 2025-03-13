@@ -13,13 +13,15 @@ mkdocs_test:
   script:
     - cd ${MK_PATH:-.}
     - echo "Running MkDocs on ${MK_PATH:-.}"
-    - ls
     - time pip install -r requirements.txt
     - time mkdocs build --strict --verbose --site-dir test -f ${MKDOCS_CONFIG_FILE=-mkdocs.yml}
+    - if [ -n "$MK_PATH" ]; then
+        echo "Moving ${MK_PATH:-.}/test to ./test"
+        mv "${MK_PATH:-.}/test" ./test
+      fi
   artifacts:
     paths:
-      - echo "Artifacts:" + "${MK_PATH:-.}/test"
-      - ${MK_PATH:-.}/test
+      - test
     expire_in: 24 hours
 
 mkdocs_pages:
@@ -27,12 +29,14 @@ mkdocs_pages:
   image: python:latest
   script:
     - cd ${MK_PATH:-.}
-    - ls
     - time pip install -r requirements.txt
     - time mkdocs build --strict --verbose --site-dir public -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
+    - if [ -n "$MK_PATH" ]; then
+        echo "Moving ${MK_PATH:-.}/public to ./public"
+        mv "${MK_PATH:-.}/public" ./public
+      fi
   artifacts:
     paths:
-      - echo "Artifacts:" + "${MK_PATH:-.}/public"
-      - ${MK_PATH:-.}/public
+      - public
   rules:
     - if: $CI_COMMIT_MESSAGE=~ /publication/

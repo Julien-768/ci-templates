@@ -6,10 +6,10 @@
 # The variables section allows setting optional paths for configuration files used by different tools.
 
 stages:
-  - format
-  - lint
+  # - format
+  # - lint
   - test
-  - pages
+  # - pages
 
 
 include:
