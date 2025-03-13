@@ -7,7 +7,7 @@
 
 stages:
   # - format
-  # - lint
+  - lint
   - test
   # - pages
 
