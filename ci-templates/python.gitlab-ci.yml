@@ -34,3 +34,9 @@ pylint:
     - pip install pylint
     - ls
     - find . -type f -name "*.py" | xargs pylint --rcfile="${PYLINT_RCFILE:-pyproject.toml}"
+
+test:
+  stage: test  # Assign the job to an existing stage like 'test'
+  script:
+    - echo "This is a fake job to avoid errors"
+  allow_failure: true
