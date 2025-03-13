@@ -18,7 +18,10 @@ mike_test:
     - cd ${MK_PATH:-.}
     - ls
     - time pip install -r requirements.txt
+    - time git config user.name "$GITLAB_USER_NAME"
+    - time git config user.email "$GITLAB_USER_EMAIL"
     - time mike deploy --deploy-prefix test -p -u test-latest
+    - if [ -n "$MK_PATH" ]; then mv test $CI_PROJECT_DIR/test; fi
   artifacts:
     paths:
       - test
@@ -44,6 +47,7 @@ mike_pages:
     - time mike deploy --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "$CI_COMMIT_TAG" latest -f ${MIKE_CONFIG_FILE}
     - time mike set-default --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest -f ${MIKE_CONFIG_FILE}
     - time git checkout "$PAGES_BRANCH" -- public
+    - if [ -n "$MK_PATH" ]; then mv public $CI_PROJECT_DIR/public; fi
   artifacts:
     paths:
       - public
