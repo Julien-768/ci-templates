@@ -17,7 +17,7 @@ include:
   # - local: 'ci-templates/markdownlint.gitlab-ci.yml' # lint stage
   # - local: 'ci-templates/eslint-prettier.gitlab-ci.yml' # lint stage
   - local: 'ci-templates/mkdocs.gitlab-ci.yml' # test and pages stages
-  # - local: 'ci-templates/mike.gitlab-ci.yml' # test and pages stages
+  - local: 'ci-templates/mike.gitlab-ci.yml' # test and pages stages
   # - local: 'ci-templates/doxygen.gitlab-ci.yml' # pages stage
 
 variables:
@@ -26,4 +26,4 @@ variables:
   DOXYFILE_PATH: 'src' # optional path to the Doxygen configuration file
   PYLINT_RCFILE: 'pyproject.toml' # optional path to the Pylint configuration file
   LINT_PATH: 'src' # optional path to the linting files
-  MK_PATH: 'src' # optional path to the MkDocs configuration file
+  MK_PATH: 'src' # optional path to the Markdown directory
