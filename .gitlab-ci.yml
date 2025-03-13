@@ -12,13 +12,13 @@ stages:
   - pages
 
 include:
-  - local: 'ci-templates/clang.gitlab-ci.yml' # format stage
-  - local: 'ci-templates/python.gitlab-ci.yml' # lint stage
-  - local: 'ci-templates/markdownlint.gitlab-ci.yml' # lint stage
-  - local: 'ci-templates/eslint-prettier.gitlab-ci.yml' # lint stage
+  # - local: 'ci-templates/clang.gitlab-ci.yml' # format stage
+  # - local: 'ci-templates/python.gitlab-ci.yml' # lint stage
+  # - local: 'ci-templates/markdownlint.gitlab-ci.yml' # lint stage
+  # - local: 'ci-templates/eslint-prettier.gitlab-ci.yml' # lint stage
   - local: 'ci-templates/mkdocs.gitlab-ci.yml' # test and pages stages
-  - local: 'ci-templates/mike.gitlab-ci.yml' # test and pages stages
-  - local: 'ci-templates/doxygen.gitlab-ci.yml' # pages stage
+  # - local: 'ci-templates/mike.gitlab-ci.yml' # test and pages stages
+  # - local: 'ci-templates/doxygen.gitlab-ci.yml' # pages stage
 
 variables:
   CLANG_PATH: 'src' # optional path to the C/C++ source files

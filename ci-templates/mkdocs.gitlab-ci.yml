@@ -17,7 +17,7 @@ mkdocs_test:
     - time mkdocs build --strict --verbose --site-dir test -f ${MKDOCS_CONFIG_FILE=-mkdocs.yml}
     - if [ -n "$MK_PATH" ]; then
         echo "Moving ${MK_PATH:-.}/test to ./test"
-        mv "${MK_PATH:-.}/test" ./test
+        mv "${MK_PATH:-.}/test" ../test
       fi
   artifacts:
     paths:
@@ -32,7 +32,7 @@ mkdocs_pages:
     - time pip install -r requirements.txt
     - time mkdocs build --strict --verbose --site-dir public -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
     - if [ -n "$MK_PATH" ]; then
-        echo "Moving ${MK_PATH:-.}/public to ./public"
+        echo "Moving ${MK_PATH:-.}/public to ../public"
         mv "${MK_PATH:-.}/public" ./public
       fi
   artifacts:
