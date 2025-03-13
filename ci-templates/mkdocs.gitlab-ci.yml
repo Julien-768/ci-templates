@@ -15,10 +15,7 @@ mkdocs_test:
     - echo "Running MkDocs on ${MK_PATH:-.}"
     - time pip install -r requirements.txt
     - time mkdocs build --strict --verbose --site-dir test -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
-    - if [ -n "$MK_PATH" ]; then
-        echo "Moving ${MK_PATH:-.}/test to root directory"
-        mv test ../test
-      fi
+    - if [ -n "$MK_PATH" ]; then mv test ../test; fi
   artifacts:
     paths:
       - test
