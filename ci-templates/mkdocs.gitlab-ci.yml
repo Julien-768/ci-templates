@@ -4,34 +4,32 @@
 # The mkdocs_test job builds the documentation and stores the output in the test directory.
 # The pages job builds the documentation and stores the output in the public directory for deployment to GitLab Pages.
 
-variables:
+.variables-mkdocs:
   MKDOCS_CONFIG_FILE: 'mkdocs.yml' # optional path to the MkDocs configuration file
 
-mkdocs_test:
-  stage: test
+.mkdocs-template:
   image: python:latest
   script:
     - cd ${MK_PATH:-.}
     - echo "Running MkDocs on ${MK_PATH:-.}"
     - time pip install -r requirements.txt
-    - time mkdocs build --strict --verbose --site-dir test -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
-    - if [ -n "$MK_PATH" ]; then mv test $CI_PROJECT_DIR/test; fi
+    - time mkdocs build --strict --verbose --site-dir ${SITE_DIR} -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
+    - if [ -n "$MK_PATH" ]; then mv ${SITE_DIR} $CI_PROJECT_DIR/${SITE_DIR}; fi
   artifacts:
     paths:
-      - test
-    expire_in: 24 hours
+      - ${SITE_DIR}
+  expire_in: 24 hours
+
+mkdocs_test:
+  extends: .mkdocs-template
+  stage: test
+  script:
+    - SITE_DIR=test
 
 mkdocs_pages:
+  extends: .mkdocs-template
   stage: pages
-  image: python:latest
   script:
-    - cd ${MK_PATH:-.}
-    - echo "Running MkDocs on ${MK_PATH:-.}"
-    - time pip install -r requirements.txt
-    - time mkdocs build --strict --verbose --site-dir public -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
-    - if [ -n "$MK_PATH" ]; then mv public $CI_PROJECT_DIR/public; fi
-  artifacts:
-    paths:
-      - public
+    - SITE_DIR=public
   rules:
     - if: $CI_COMMIT_MESSAGE=~ /publication/

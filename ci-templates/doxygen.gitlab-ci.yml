@@ -7,7 +7,7 @@
 
 image: alpine
 
-pages:
+.doxygen-template:
   stage: pages
   script:
     - apk add doxygen
@@ -19,5 +19,8 @@ pages:
   artifacts:
     paths:
       - public/
+
+pages:
+  extends: .doxygen-template
   rules:
-    - if: $CI_COMMIT_MESSAGE=~ /publication/
+    - if: $CI_COMMIT_MESSAGE =~ /publication/

@@ -3,10 +3,15 @@
 # LINT_PATH (optional) allows specifying a subset of files to lint.
 # Defaults to all Markdown files in 'docs/' if not set.
 
-Markdown Lint:
+# Définir une ancre pour la configuration Markdown Lint
+.markdown-lint-template:
   stage: lint
   image: node:18
   before_script:
     - npm i -D markdownlint-cli2
   script:
     find "${LINT_PATH:-docs}" -type f -name "*.md" -exec npx markdownlint-cli2 --config .markdownlint.json {} +
+
+# Utiliser l'ancre dans le job
+Markdown Lint:
+  extends: .markdown-lint-template

@@ -15,21 +15,18 @@
 # If any linting or formatting issues are detected, an appropriate message is displayed
 # and the pipeline is marked as failed.
 
-Format & lint:
+.format-lint-template:
   stage: lint
   image: node:18.18.0-alpine3.17
-  before_script:
-    # Install global dependencies for Prettier and ESLint with the latest stable versions.
-    - npm i -g prettier@latest prettier-plugin-svelte@latest eslint@latest
-    # Install local dependencies for ESLint plugins and configurations, ensuring compatibility.
-    - npm i -D eslint-config-prettier@latest eslint-plugin-jest@latest eslint-plugin-svelte3@latest eslint-plugin-prettier@latest @gitlab/eslint-plugin@latest
   script:
-    # Run Prettier to check for formatting issues, excluding files specified in .eslintignore
-    # Then run ESLint to check for linting issues. If any issues are found, set the exit code.
+    - npm i -g prettier@latest prettier-plugin-svelte@latest eslint@latest
+    - npm i -D eslint-config-prettier@latest eslint-plugin-jest@latest eslint-plugin-svelte3@latest eslint-plugin-prettier@latest @gitlab/eslint-plugin@latest
     - prettier --check . && eslint . || exit_code=$?
     - >
       if [[ $exit_code -eq 1 ]]; then
         echo "❌ Formatting and/or linting issues detected. Please ensure all frontend code and non-Python files adhere to the project's code style guidelines. Refer to the project README for instructions on installing pre-commit hooks locally."
       fi
-    # Exit with the appropriate code to indicate success or failure.
     - exit $exit_code
+
+Format & lint:
+  extends: .format-lint-template

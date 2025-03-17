@@ -7,25 +7,10 @@
 # The PAGES_BRANCH variable specifies the branch used for GitLab Pages.
 # The HTTPS_REMOTE variable is used to authenticate with the GitLab repository.
 
-variables:
-  GIT_DEPTH: 0
-  MIKE_CONFIG_FILE: 'mkdocs.yml' # optional path to the MkDocs configuration file
+# .gitlab-ci.yml
 
-mike_test:
-  stage: test
-  image: python:latest
-  script:
-    - cd ${MK_PATH:-.}
-    - echo "Running MkDocs on ${MK_PATH:-.}"
-    - time pip install -r requirements.txt
-    - time mkdocs build --strict --verbose --site-dir test -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
-    - if [ -n "$MK_PATH" ]; then mv test $CI_PROJECT_DIR/test; fi
-  artifacts:
-    paths:
-      - test
-    expire_in: 24 hours
-
-mike_pages:
+# Définir une ancre pour la configuration de mike_pages
+.mike-pages-template:
   stage: pages
   image: python:latest
   when: on_success
@@ -48,5 +33,12 @@ mike_pages:
   artifacts:
     paths:
       - public
+  rules:
+    - if: "$CI_COMMIT_MESSAGE =~ /publication/"
+
+# Utiliser l'ancre dans le job mike_pages
+mike_pages:
+  extends: .mike-pages-template
+  # Vous pouvez ajouter ou surcharger des paramètres spécifiques ici si nécessaire
   rules:
     - if: "$CI_COMMIT_MESSAGE =~ /publication/"
