@@ -27,3 +27,8 @@ variables:
   PYLINT_RCFILE: 'pyproject.toml' # optional path to the Pylint configuration file
   LINT_PATH: 'src' # optional path to the linting files
   MK_PATH: 'src' # optional path to the Markdown directory
+
+mkdocs_test:
+  variables:
+    MK_PATH: 'src'  # If your docs are in a docs folder
+    MKDOCS_CONFIG_FILE: 'mkdocs.yml' # optional path to the MkDocs configuration file
