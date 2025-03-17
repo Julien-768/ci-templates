@@ -18,7 +18,7 @@
   artifacts:
     paths:
       - ${SITE_DIR}
-  expire_in: 24 hours
+    expire_in: 24 hours
 
 mkdocs_test:
   extends: .mkdocs-template
