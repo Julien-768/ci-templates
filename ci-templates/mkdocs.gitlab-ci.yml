@@ -23,16 +23,13 @@
 mkdocs_test:
   extends: .mkdocs-template
   stage: test
-  script:
-    - SITE_DIR=test
-    - echo "Running MkDocs on ${MK_PATH}"
-    - echo "Running MkDocs with configuration ${MKDOCS_CONFIG_FILE}"
-    - echo "Running MkDocs to upload on ${SITE_DIR}"
+  variables:
+    SITE_DIR: test
 
 mkdocs_pages:
   extends: .mkdocs-template
   stage: pages
-  script:
-    - SITE_DIR=public
+  variables:
+    SITE_DIR: public
   rules:
     - if: $CI_COMMIT_MESSAGE=~ /publication/
