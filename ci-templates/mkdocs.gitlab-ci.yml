@@ -29,6 +29,7 @@ mkdocs_test:
 mkdocs_pages:
   extends: .mkdocs-template
   stage: pages
+  pages: true
   variables:
     SITE_DIR: public
   rules:
