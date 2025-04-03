@@ -1,5 +1,6 @@
-function greet() {
-  console.log("Hello, World!");
+function greet(message) {
+  document.body.innerHTML = message;
+  alert(message);
 }
 
-greet();
+greet("Hello, World!");
