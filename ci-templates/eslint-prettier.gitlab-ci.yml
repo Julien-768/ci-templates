@@ -34,12 +34,7 @@
     - npm install -g prettier@latest prettier-plugin-svelte@latest eslint@latest
 
     # Single command for all dev dependencies
-    - npm install --save-dev --no-progress \
-        eslint-config-prettier@latest \
-        eslint-plugin-jest@latest \
-        eslint-plugin-svelte3@latest \
-        eslint-plugin-prettier@latest \
-        @gitlab/eslint-plugin@latest
+    - npm install --save-dev --no-progress eslint-config-prettier@latest eslint-plugin-jest@latest eslint-plugin-svelte3@latest eslint-plugin-prettier@latest @gitlab/eslint-plugin@latest
 
     # Run checks with proper exit code handling
     - |
