@@ -18,15 +18,41 @@
 .format-lint-template:
   stage: lint
   image: node:18.18.0-alpine3.17
+  variables:
+    # Fail fast on errors
+    ESLINT_NO_DEV_ERRORS: "true"
+    PRETTIER_CI: "true"
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  before_script:
+    - npm config set fund false
+    - npm config set audit false
   script:
-    - npm i -g prettier@latest prettier-plugin-svelte@latest eslint@latest
-    - npm i -D eslint-config-prettier@latest eslint-plugin-jest@latest eslint-plugin-svelte3@latest eslint-plugin-prettier@latest @gitlab/eslint-plugin@latest
-    - prettier --check . && eslint . || exit_code=$?
-    - >
-      if [[ $exit_code -eq 1 ]]; then
-        echo "❌ Formatting and/or linting issues detected. Please ensure all frontend code and non-Python files adhere to the project's code style guidelines. Refer to the project README for instructions on installing pre-commit hooks locally."
+    # Single command for all global installs (only if truly needed globally)
+    - npm install -g prettier@latest prettier-plugin-svelte@latest eslint@latest
+
+    # Single command for all dev dependencies
+    - npm install --save-dev --no-progress \
+        eslint-config-prettier@latest \
+        eslint-plugin-jest@latest \
+        eslint-plugin-svelte3@latest \
+        eslint-plugin-prettier@latest \
+        @gitlab/eslint-plugin@latest
+
+    # Run checks with proper exit code handling
+    - |
+      exit_code=0
+      prettier --check --loglevel=warn . || exit_code=$?
+      eslint --max-warnings=0 . || exit_code=$?
+
+      if [[ $exit_code -ne 0 ]]; then
+        echo "❌ Formatting and/or linting issues detected."
+        echo "Please ensure all frontend code and non-Python files adhere to the project's code style guidelines."
+        echo "Refer to the project README for instructions on installing pre-commit hooks locally."
       fi
-    - exit $exit_code
+      exit $exit_code
 
 Format & lint:
   extends: .format-lint-template
