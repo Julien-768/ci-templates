@@ -35,7 +35,8 @@
 
     # Single command for all dev dependencies
     # eslint-plugin-jest@^28.6.0 is to be updated once stable release is available
-    - npm install --save-dev --no-progress eslint-config-prettier@latest  eslint-plugin-jest@^28.6.0 eslint-plugin-svelte3@latest eslint-plugin-prettier@latest @gitlab/eslint-plugin@latest
+    - npm install --save-dev --no-progress eslint-config-prettier@latest eslint-plugin-jest@^28.14.0 eslint-plugin-svelte3@latest eslint-plugin-prettier@latest @gitlab/eslint-plugin@latest
+
 
     # Run checks with proper exit code handling
     - |
