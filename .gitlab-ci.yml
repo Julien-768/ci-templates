@@ -1,0 +1,29 @@
+# .gitlab-ci.yml
+
+# This GitLab CI configuration file sets up various stages and includes multiple CI templates.
+# It defines the stages for format, lint, pages, test, and deployment.
+# The included templates provide specific configurations for different tools and languages.
+# The variables section allows setting optional paths for configuration files used by different tools.
+
+stages:
+  - format
+  - lint
+  - test
+  - pages
+
+include:
+  - local: 'ci-templates/clang.gitlab-ci.yml' # format stage
+  - local: 'ci-templates/python.gitlab-ci.yml' # lint stage
+  - local: 'ci-templates/markdownlint.gitlab-ci.yml' # lint stage
+  - local: 'ci-templates/eslint-prettier.gitlab-ci.yml' # lint stage
+  - local: 'ci-templates/mkdocs.gitlab-ci.yml' # test and pages stages
+  - local: 'ci-templates/mike.gitlab-ci.yml' # test and pages stages
+  - local: 'ci-templates/doxygen.gitlab-ci.yml' # pages stage
+
+variables:
+  CLANG_PATH: 'src' # optional path to the C/C++ source files
+  CLANG_FORMAT_FILE: '.clang-format.yml' # optional path to the clang-format configuration file
+  DOXYFILE_PATH: 'src' # optional path to the Doxygen configuration file
+  PYLINT_RCFILE: 'pyproject.toml' # optional path to the Pylint configuration file
+  LINT_PATH: 'src' # optional path to the linting files
+  MK_PATH: 'src' # optional path to the Markdown directory

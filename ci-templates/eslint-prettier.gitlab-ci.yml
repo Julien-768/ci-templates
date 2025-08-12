@@ -1,0 +1,55 @@
+# eslint-prettier.gitlab-ci.yml
+
+# This configuration defines a linting and formatting job for the GitLab CI pipeline.
+# It ensures that the frontend code and non-Python files comply with the formatting and
+# linting rules defined by Prettier and ESLint. This job checks for code style issues
+# and formatting inconsistencies, and fails the pipeline if any violations are found.
+#
+# The job installs and updates the required dependencies for Prettier and ESLint, both
+# globally (for Prettier and ESLint commands) and locally (for ESLint plugins and
+# configurations). It also ensures that the latest versions of these tools are used.
+#
+# Pre-commit hooks are required locally for consistent behavior across development
+# environments and CI. Make sure to install these hooks as outlined in the project README.
+#
+# If any linting or formatting issues are detected, an appropriate message is displayed
+# and the pipeline is marked as failed.
+
+.format-lint-template:
+  stage: lint
+  image: node:18.18.0-alpine3.17
+  variables:
+    # Fail fast on errors
+    ESLINT_NO_DEV_ERRORS: "true"
+    PRETTIER_CI: "true"
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules/
+  before_script:
+    - npm config set fund false
+    - npm config set audit false
+  script:
+    # Single command for all global installs (only if truly needed globally)
+    - npm install -g prettier@latest prettier-plugin-svelte@latest eslint@latest
+
+    # Single command for all dev dependencies
+    # eslint-plugin-jest@^28.6.0 is to be updated once stable release is available
+    - npm install --save-dev --no-progress eslint-config-prettier@latest eslint-plugin-jest@^28.14.0 eslint-plugin-svelte3@latest eslint-plugin-prettier@latest @gitlab/eslint-plugin@latest
+
+
+    # Run checks with proper exit code handling
+    - |
+      exit_code=0
+      prettier --check --log-level=warn . || exit_code=$?
+      eslint --max-warnings=0 . || exit_code=$?
+
+      if [[ $exit_code -ne 0 ]]; then
+        echo "❌ Formatting and/or linting issues detected."
+        echo "Please ensure all frontend code and non-Python files adhere to the project's code style guidelines."
+        echo "Refer to the project README for instructions on installing pre-commit hooks locally."
+      fi
+      exit $exit_code
+
+Format & lint:
+  extends: .format-lint-template

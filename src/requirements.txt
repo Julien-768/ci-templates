@@ -1,0 +1,5 @@
+# requirements file for mkdocs build
+mike
+mkdocs-git-revision-date-localized-plugin
+mkdocs-material # This will automatically install compatible versions of all dependencies: MkDocs, Markdown, Pygments and Python Markdown Extensions.
+mkdocs-pdf-export-plugin

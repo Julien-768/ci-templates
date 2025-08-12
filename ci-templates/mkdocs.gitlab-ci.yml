@@ -1,0 +1,36 @@
+# mkdocs.gitlab-ci.yml
+
+# This GitLab CI configuration file sets up jobs to build and deploy documentation using MkDocs.
+# The mkdocs_test job builds the documentation and stores the output in the test directory.
+# The pages job builds the documentation and stores the output in the public directory for deployment to GitLab Pages.
+
+.variables-mkdocs:
+  MKDOCS_CONFIG_FILE: 'mkdocs.yml' # optional path to the MkDocs configuration file
+
+.mkdocs-template:
+  image: python:latest
+  script:
+    - cd ${MK_PATH:-.}
+    - echo "Running MkDocs on ${MK_PATH:-.}"
+    - time pip install -r requirements.txt
+    - time mkdocs build --strict --verbose --site-dir ${SITE_DIR} -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
+    - if [ -n "$MK_PATH" ]; then mv ${SITE_DIR} $CI_PROJECT_DIR/${SITE_DIR}; fi
+  artifacts:
+    paths:
+      - ${SITE_DIR}
+    expire_in: 24 hours
+
+mkdocs_test:
+  extends: .mkdocs-template
+  stage: test
+  variables:
+    SITE_DIR: test
+
+mkdocs_pages:
+  extends: .mkdocs-template
+  stage: pages
+  pages: true
+  variables:
+    SITE_DIR: public
+  rules:
+    - if: $CI_COMMIT_MESSAGE=~ /publication/
