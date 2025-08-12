@@ -10,6 +10,7 @@ stages:
 - lint
 - test
 - pages
+- release
 
 include:
 - local: 'ci-templates/clang.gitlab-ci.yml' # format stage
