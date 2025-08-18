@@ -1,42 +1,32 @@
 # .gitlab-ci.yml
 
 # This GitLab CI configuration file sets up various stages and includes multiple CI templates.
-# It defines the stages for format, lint, pages, test, and release.
+# It defines the stages for format, lint, pages, test, deployment and release.
 # The included templates provide specific configurations for different tools and languages.
 # The variables section allows setting optional paths for configuration files used by different tools.
 
 stages:
-  - format
-  - lint
-  - test
-  - pages
-  - release
+- format
+- lint
+- test
+- pages
+- release
 
 include:
-  - local: 'ci-templates/clang.gitlab-ci.yml'         # Format C/C++ files
-  - local: 'ci-templates/python.gitlab-ci.yml'         # Lint Python files
-  - local: 'ci-templates/markdownlint.gitlab-ci.yml'   # Lint Markdown
-  - local: 'ci-templates/eslint-prettier.gitlab-ci.yml'# Lint JS
-  - local: 'ci-templates/mkdocs.gitlab-ci.yml'         # Build MkDocs docs
-  - local: 'ci-templates/mike.gitlab-ci.yml'           # Handle MkDocs versions
-  - local: 'ci-templates/doxygen.gitlab-ci.yml'        # Generate C/C++ docs with Doxygen
-  - local: 'ci-templates/release.gitlab-ci.yml'        # <== Added your custom release template here
+- local: 'ci-templates/clang.gitlab-ci.yml' # format stage
+- local: 'ci-templates/python.gitlab-ci.yml' # lint stage
+- local: 'ci-templates/markdownlint.gitlab-ci.yml' # lint stage
+- local: 'ci-templates/eslint-prettier.gitlab-ci.yml' # lint stage
+- local: 'ci-templates/mkdocs.gitlab-ci.yml' # test and pages stages
+- local: 'ci-templates/mike.gitlab-ci.yml' # test and pages stages
+- local: 'ci-templates/doxygen.gitlab-ci.yml' # pages stage
+- local: 'ci-templates/release.gitlab-ci.yml' # release stage
 
 variables:
-  CLANG_PATH: 'src'
-  CLANG_FORMAT_FILE: '.clang-format.yml'
-  DOXYFILE_PATH: 'src'
-  PYLINT_RCFILE: 'pyproject.toml'
-  LINT_PATH: 'src'
-  MK_PATH: 'src'
-
-  # Optional override for the ZIP content (used by release template)
-  ZIP_PREFIX: "release"
-
-# Job to test the custom release template
-release:
-  extends: .release-template
-
-# Job to publish a GitLab release using release-cli
-gitlab_release:
-  extends: .gitlab-release-template
+  CLANG_PATH: 'src' # optional path to the C/C++ source files
+  CLANG_FORMAT_FILE: '.clang-format.yml' # optional path to the clang-format configuration file
+  DOXYFILE_PATH: 'src' # optional path to the Doxygen configuration file
+  PYLINT_RCFILE: 'pyproject.toml' # optional path to the Pylint configuration file
+  LINT_PATH: 'src' # optional path to the linting files
+  MK_PATH: 'src' # optional path to the Markdown directory
+  ZIP_PREFIX: "release" # optional prefix for the release zip file
