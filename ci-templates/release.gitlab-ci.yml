@@ -8,6 +8,9 @@
 #   - CI_BOT_NAME
 #   - ZIP_PREFIX (default: "release")
 
+stages:
+- release
+
 # -------------------------------
 # Template: bump version + tag + zip
 # -------------------------------
@@ -15,35 +18,42 @@
   stage: release
   image: node:20
 
-  # Default variable for the ZIP prefix (can be overridden)
   variables:
     ZIP_PREFIX: "release"
 
   script:
-  # 1) Install dependencies and configure Git
+  # 1) Install deps & Git config
   - npm install
   - git config --global user.email "${CI_BOT_EMAIL:-ci@example.com}"
   - git config --global user.name "${CI_BOT_NAME:-CI Bot}"
   - git fetch --tags
 
-  # 2. Use standard-version to bump semver and create tag and changelog
+  # 2) Bump version + create tag & changelog
   - 'npx standard-version --message "chore(release): %s"'
 
-  # 3. Archive source code at the tag into a zip, push commit and tags
-  - bash -c ' VERSION=$(node -p "require(\"./package.json\").version"); TAG="v${VERSION}"; ZIP_NAME="${ZIP_PREFIX}-${TAG}.zip"; git archive --format=zip --output "$ZIP_NAME" "$TAG"; git remote set-url origin https://gitlab-ci-token:${CI_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git; git push origin HEAD:$CI_COMMIT_REF_NAME; git push origin --tags '
+  # 3) Compute VERSION/TAG, build zip, push commit and tags
+  - |
+    VERSION=$(node -p "require('./package.json').version")
+    TAG="v${VERSION}"
+    ZIP_NAME="${ZIP_PREFIX}-${TAG}.zip"
+    git archive --format=zip --output "$ZIP_NAME" "$TAG"
 
-  # Expose the zip as CI artifact (downloadable in GitLab)
+    # Set remote with CI token and push commit + tags
+    git remote set-url origin "https://gitlab-ci-token:${CI_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+    git push origin "HEAD:${CI_COMMIT_REF_NAME}"
+    git push origin --tags
+
+    # Export variables for downstream jobs (dotenv)
+    echo "VERSION=${VERSION}" > tag.env
+    echo "TAG=${TAG}" >> tag.env
+    echo "ZIP_NAME=${ZIP_NAME}" >> tag.env
+
   artifacts:
     name: "release-$CI_COMMIT_REF_NAME"
     paths:
     - release-v*.zip
-
-  # Run only if pushing to main (not on tag pipelines)
-  # rules:
-  #   - if: '$CI_COMMIT_TAG'  # skip if pipeline is for tag
-  #     when: never
-  #   - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
-  #     when: on_success
+    reports:
+      dotenv: tag.env
 
   rules:
   - if: '$CI_COMMIT_TAG'
@@ -52,38 +62,42 @@
     when: on_success
 
 # -------------------------------
-# Template: GitLab Release from tag
+# Template: GitLab Release from tag (same pipeline)
 # -------------------------------
 .gitlab-release-template:
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   stage: release
 
   needs:
-  - job: release-template
+  - job: release # <- le job concret qui produit TAG + artefacts
     artifacts: true
 
-  # Minimal script for release-cli, content handled by `release:` keyword
   script:
-  - echo "Creating GitLab release with release-cli"
+  - echo "Creating GitLab release with release-cli for tag $TAG"
+  # Optionnel : vérifier que le zip est présent (hérité via needs)
+  - ls -la
 
-  # GitLab release definition
   release:
-    tag_name: "$CI_COMMIT_TAG"
-    name: "Release $CI_COMMIT_TAG"
-    description: $CI_COMMIT_MESSAGE
+    tag_name: "$TAG"
+    name: "Release $TAG"
+    description: "$CI_COMMIT_MESSAGE"
     assets:
       links:
       - name: "Source Archive"
         url: "$CI_PROJECT_URL/-/jobs/$CI_JOB_ID/artifacts/download"
 
-  # Run only on tags
   rules:
-  - if: '$CI_COMMIT_TAG && $CI_COMMIT_BRANCH == "main"'
+  # On déclenche dans le même pipeline que 'release'
+  - if: '$CI_COMMIT_TAG'
+    when: never
+  - if: '$CI_COMMIT_BRANCH =~ /^main$|^ci-cd$/ && $CI_PIPELINE_SOURCE == "push"'
+    when: on_success
 
-# Job to test the custom release template
+# -------------------------------
+# Jobs
+# -------------------------------
 release:
   extends: .release-template
 
-# Job to publish a GitLab release using release-cli
 gitlab_release:
   extends: .gitlab-release-template
