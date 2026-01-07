@@ -1,21 +1,48 @@
 # doxygen.gitlab-ci.yml
-
-# This GitLab CI configuration file sets up a job to generate documentation using Doxygen.
-# The job uses an Alpine Linux image and installs the necessary Doxygen tools.
-# It then runs Doxygen to generate the documentation and moves the generated files to the public directory.
-# The DOXYFILE_PATH variable can be set to specify the directory containing the Doxygen configuration file. If not set, it defaults to src.
+#
+# Generate documentation using Doxygen.
+# This template expects each project to provide a minimal
+# doxygen/Doxyfile which @INCLUDEs the shared Doxyfile.base
+# hosted in the external iphc/ci-templates repository.
 
 image: alpine
+
+variables:
+  # Path where the project stores the "doxygen/" directory
+  # Default is repository root
+  DOXYFILE_PATH: "."
+
+  # External CI templates repository
+  CI_TEMPLATES_PROJECT: "iphc/ci-templates"
+
+  # Ref (branch / tag / commit) used to fetch Doxyfile.base
+  # Should be aligned with the ref used in the include statement
+  CI_TEMPLATES_REF: "main"
 
 .doxygen-template:
   stage: pages
   script:
-    - apk add doxygen
-    - echo "Running Doxygen on ${DOXYFILE_PATH:-src}"
-    - cd $DOXYFILE_PATH
+    # Install required tools
+    - apk add --no-cache doxygen graphviz curl
+
+    - echo "Running Doxygen on ${DOXYFILE_PATH}"
+    - cd "${DOXYFILE_PATH}"
+
+    # Fetch shared IPHC Doxyfile.base
+    - mkdir -p doxygen
+    - >
+      curl --fail --location
+      --header "JOB-TOKEN: $CI_JOB_TOKEN"
+      "$CI_SERVER_URL/api/v4/projects/$(echo "$CI_TEMPLATES_PROJECT" | sed 's/\//%2F/g')/repository/files/doxygen%2FDoxyfile.base/raw?ref=$CI_TEMPLATES_REF"
+      -o doxygen/Doxyfile.base
+
+    # Run Doxygen using project-specific Doxyfile
     - doxygen doxygen/Doxyfile
-    - cd $CI_PROJECT_DIR
-    - mv $DOXYFILE_PATH/doxygen/documentation/html/ public/
+
+    # Publish generated HTML documentation
+    - cd "$CI_PROJECT_DIR"
+    - mv "${DOXYFILE_PATH}/doxygen/documentation/html/" public/
+
   artifacts:
     paths:
       - public/
@@ -24,3 +51,4 @@ pages:
   extends: .doxygen-template
   rules:
     - if: $CI_COMMIT_MESSAGE =~ /publication/
+
