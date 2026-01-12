@@ -1,11 +1,15 @@
 # platformio.gitlab-ci.yml
-# Generic PlatformIO build template for embedded projects
+# Generic PlatformIO build template for shared GitLab runners
 
 .platformio-build-template:
-  image: platformio/platformio:latest
+  image: python:3.11
   stage: build
-  script:
+  before_script:
+    - python --version
+    - pip install --no-cache-dir -U platformio
     - pio --version
+  script:
     - pio platform list
     - pio run
+
 
