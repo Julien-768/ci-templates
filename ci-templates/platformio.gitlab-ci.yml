@@ -2,7 +2,8 @@
 # Generic PlatformIO build template for embedded projects
 
 .platformio-build-template:
-  image: platformio/platformio-core:latest
+image: platformio/platformio:latest
+
   stage: build
   script:
     - pio --version
