@@ -1,15 +1,11 @@
-# platformio.gitlab-ci.yml
-# Generic PlatformIO build template for shared GitLab runners
-
 .platformio-build-template:
   image: python:3.11
   stage: build
   before_script:
-    - python --version
+    - apt-get update
+    - apt-get install -y --no-install-recommends nodejs
     - pip install --no-cache-dir -U platformio
-    - pio --version
   script:
-    - pio platform list
     - pio run
 
 
