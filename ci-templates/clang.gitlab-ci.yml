@@ -27,11 +27,12 @@ format-clang:
 .clang-tidy-template:
   image: python:3.11
   stage: format
+  variables:
+    PLATFORMIO_CORE_DIR: "$CI_PROJECT_DIR/.pio"
   cache:
     key: platformio
     paths:
-      - /root/.platformio/
-      - .platformio/
+      - .pio/
   script:
     - |
       set -e
@@ -42,10 +43,6 @@ format-clang:
       echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
       pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
 
-clang-tidy:
-  extends: .clang-tidy-template
-  stage: format
-  allow_failure: true
 
 
 
