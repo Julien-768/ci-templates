@@ -25,24 +25,27 @@ format-clang:
 # clang-tidy via PlatformIO
 # ------------------------------
 .clang-tidy-template:
-  image: platformio/platformio-core:latest
+  image: python:3.11
   stage: format
   cache:
     key: platformio
     paths:
-      - .platformio/
       - /root/.platformio/
+      - .platformio/
+  before_script:
+    - apt-get update
+    - apt-get install -y --no-install-recommends git
+    - pip install --no-cache-dir -U platformio
   script:
-    - |
-      set -e
-      platformio --version
-      echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
-      pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
+    - platformio --version
+    - echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
+    - pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
 
 clang-tidy:
   extends: .clang-tidy-template
   stage: format
   allow_failure: true
+
 
 
 
