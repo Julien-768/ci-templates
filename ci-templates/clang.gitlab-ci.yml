@@ -43,6 +43,15 @@ format-clang:
 
 clang-tidy:
   extends: .clang-tidy-template
+  stage: format
+  allow_failure: true
+  cache:
+    key: platformio
+    paths:
+      - .venv/
+      - .platformio/
+      - ~/.platformio/
+
 
 
 
