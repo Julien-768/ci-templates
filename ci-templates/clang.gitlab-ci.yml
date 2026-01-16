@@ -15,23 +15,6 @@ image: alpine:latest
 format-clang:
   extends: .clang-format-template
 
-# clang.gitlab-ci.yml
-image: alpine:latest
-
-.clang-format-template:
-  stage: format
-  script:
-    - apk update
-    - apk add --no-cache findutils
-    - apk add --no-cache clang18-extra-tools
-    - ln -sf /usr/lib/llvm18/bin/clang-format /usr/local/bin/clang-format
-    - clang-format --version
-    - echo "Running clang-format on files in ${CLANG_PATH:-.} with configuration from ${CLANG_FORMAT_FILE:-.clang-format}"
-    - find ${CLANG_PATH:-.} \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) -exec clang-format --dry-run --Werror --style=file:${CLANG_FORMAT_FILE:-.clang-format} {} +
-
-format-clang:
-  extends: .clang-format-template
-
 .clang-tidy-template:
   stage: format
   script:
@@ -58,9 +41,11 @@ format-clang:
       echo "Running clang-tidy on ${CLANG_TIDY_PATH:-src include}"
       echo "Extra args: ${CLANG_TIDY_EXTRA_ARGS:-<none>}"
 
-      # Build a safe find root list (space-separated)
       ROOTS="${CLANG_TIDY_PATH:-src include}"
 
+      # Note:
+      # - We prune known large/irrelevant directories
+      # - We still need headers in the find set, but clang-tidy runs per file
       find ${ROOTS} \
         \( -path "*/.platformio/*" -o -path "*/.venv/*" -o -path "*/build/*" -o -path "*/.git/*" \) -prune -o \
         \( -name '*.c' -o -name '*.cc' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) -print0 \
@@ -76,6 +61,7 @@ clang-tidy:
       - .venv/
       - .platformio/
       - ~/.platformio/
+
 
 
 
