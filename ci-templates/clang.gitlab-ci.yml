@@ -32,14 +32,15 @@ format-clang:
     paths:
       - /root/.platformio/
       - .platformio/
-  before_script:
-    - apt-get update
-    - apt-get install -y --no-install-recommends git
-    - pip install --no-cache-dir -U platformio
   script:
-    - platformio --version
-    - echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
-    - pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
+    - |
+      set -e
+      apt-get update
+      apt-get install -y --no-install-recommends git
+      pip install --no-cache-dir -U platformio
+      platformio --version
+      echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
+      pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
 
 clang-tidy:
   extends: .clang-tidy-template
