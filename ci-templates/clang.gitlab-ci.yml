@@ -1,6 +1,9 @@
 # clang.gitlab-ci.yml
 image: alpine:latest
 
+# ------------------------------
+# clang-format
+# ------------------------------
 .clang-format-template:
   stage: format
   script:
@@ -15,6 +18,9 @@ image: alpine:latest
 format-clang:
   extends: .clang-format-template
 
+# ------------------------------
+# clang-tidy via PlatformIO
+# ------------------------------
 .clang-tidy-template:
   stage: format
   script:
@@ -25,8 +31,8 @@ format-clang:
     - pip install -U pip
     - pip install -U platformio
     - platformio --version
-    - echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV}"
-    - pio check --environment "${PIO_ENV}"
+    - echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
+    - pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
 
 clang-tidy:
   extends: .clang-tidy-template
@@ -37,7 +43,7 @@ clang-tidy:
     paths:
       - .venv/
       - .platformio/
-      - ~/.platformio/
+      - /root/.platformio/
 
 
 
