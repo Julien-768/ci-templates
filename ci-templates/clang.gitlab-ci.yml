@@ -43,7 +43,6 @@ format-clang:
 
 clang-tidy:
   extends: .clang-tidy-template
-  rules:
-    - if: '$CLANG_TIDY_ENABLE == "1"'
+
 
 
