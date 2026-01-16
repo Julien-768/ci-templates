@@ -19,37 +19,14 @@ format-clang:
   stage: format
   script:
     - apk update
-    - apk add --no-cache clang21-extra-tools python3 py3-pip git bash curl unzip findutils
-    - ln -sf /usr/lib/llvm21/bin/clang-tidy /usr/local/bin/clang-tidy
-    - clang-tidy --version
-
-    # Optional: command to generate compile_commands.json
-    - |
-      if [ -n "${CLANG_TIDY_GEN_CMD}" ]; then
-        echo "Generating compile_commands.json via:"
-        echo "  ${CLANG_TIDY_GEN_CMD}"
-        sh -lc "${CLANG_TIDY_GEN_CMD}"
-      else
-        echo "CLANG_TIDY_GEN_CMD is empty, expecting compile_commands.json in ${CLANG_TIDY_BUILD_DIR:-.}"
-      fi
-
-    # Ensure compile_commands.json exists
-    - test -f "${CLANG_TIDY_BUILD_DIR:-.}/compile_commands.json"
-
-    # Run clang-tidy only on translation units (.c/.cc/.cpp)
-    - |
-      echo "Running clang-tidy on ${CLANG_TIDY_PATH:-src include}"
-      echo "Extra args: ${CLANG_TIDY_EXTRA_ARGS:-<none>}"
-
-      ROOTS="${CLANG_TIDY_PATH:-src include}"
-
-      find ${ROOTS} \
-        \( -path "*/.platformio/*" -o -path "*/.venv/*" -o -path "*/build/*" -o -path "*/.git/*" \) -prune -o \
-        \( -name '*.c' -o -name '*.cc' -o -name '*.cpp' \) -print0 \
-      | xargs -0 -n1 clang-tidy \
-          -p "${CLANG_TIDY_BUILD_DIR:-.}" \
-          --header-filter='^(src|include)/' \
-          ${CLANG_TIDY_EXTRA_ARGS:-}
+    - apk add --no-cache python3 py3-pip git bash curl unzip
+    - python3 -m venv .venv
+    - . .venv/bin/activate
+    - pip install -U pip
+    - pip install -U platformio
+    - platformio --version
+    - echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV}"
+    - pio check --environment "${PIO_ENV}"
 
 clang-tidy:
   extends: .clang-tidy-template
