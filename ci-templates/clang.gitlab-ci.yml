@@ -33,7 +33,11 @@ format-clang:
     - |
       set -e
       apk update
-      apk add --no-cache python3 py3-pip git bash curl unzip
+      apk add --no-cache python3 py3-pip git bash curl unzip clang21-extra-tools
+
+      # Ensure clang-tidy is available in PATH (avoid PlatformIO tool-clangtidy issues on Alpine)
+      ln -sf /usr/lib/llvm21/bin/clang-tidy /usr/local/bin/clang-tidy
+      clang-tidy --version
 
       python3 -m venv .venv
       . .venv/bin/activate
@@ -44,11 +48,6 @@ format-clang:
 
       echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
       pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
-
-clang-tidy:
-  extends: .clang-tidy-template
-  stage: format
-  allow_failure: true
 
 
 
