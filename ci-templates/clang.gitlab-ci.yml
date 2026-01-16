@@ -36,20 +36,20 @@ format-clang:
     # Ensure compile_commands.json exists
     - test -f "${CLANG_TIDY_BUILD_DIR:-.}/compile_commands.json"
 
-    # Run clang-tidy ONLY on project sources (ignore deps/build dirs)
+    # Run clang-tidy only on translation units (.c/.cc/.cpp)
     - |
       echo "Running clang-tidy on ${CLANG_TIDY_PATH:-src include}"
       echo "Extra args: ${CLANG_TIDY_EXTRA_ARGS:-<none>}"
 
       ROOTS="${CLANG_TIDY_PATH:-src include}"
 
-      # Note:
-      # - We prune known large/irrelevant directories
-      # - We still need headers in the find set, but clang-tidy runs per file
       find ${ROOTS} \
         \( -path "*/.platformio/*" -o -path "*/.venv/*" -o -path "*/build/*" -o -path "*/.git/*" \) -prune -o \
-        \( -name '*.c' -o -name '*.cc' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) -print0 \
-      | xargs -0 -n1 clang-tidy -p "${CLANG_TIDY_BUILD_DIR:-.}" ${CLANG_TIDY_EXTRA_ARGS:-}
+        \( -name '*.c' -o -name '*.cc' -o -name '*.cpp' \) -print0 \
+      | xargs -0 -n1 clang-tidy \
+          -p "${CLANG_TIDY_BUILD_DIR:-.}" \
+          --header-filter='^(src|include)/' \
+          ${CLANG_TIDY_EXTRA_ARGS:-}
 
 clang-tidy:
   extends: .clang-tidy-template
@@ -61,6 +61,7 @@ clang-tidy:
       - .venv/
       - .platformio/
       - ~/.platformio/
+
 
 
 
