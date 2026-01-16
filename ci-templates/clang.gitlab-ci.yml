@@ -19,27 +19,31 @@ format-clang:
   stage: format
   script:
     - apk update
-    - apk add --no-cache clang18-extra-tools python3 py3-pip git bash curl unzip
-    - ln -sf /usr/lib/llvm18/bin/clang-tidy /usr/local/bin/clang-tidy
+    - apk add --no-cache clang21-extra-tools python3 py3-pip git bash curl unzip
+    - ln -sf /usr/lib/llvm21/bin/clang-tidy /usr/local/bin/clang-tidy
     - clang-tidy --version
 
-    # Optional: command to generate compile_commands.json (PlatformIO, CMake, etc.)
+    # Optional: command to generate compile_commands.json
     - |
       if [ -n "${CLANG_TIDY_GEN_CMD}" ]; then
-        echo "Generating compile_commands.json via: ${CLANG_TIDY_GEN_CMD}"
+        echo "Generating compile_commands.json via:"
+        echo "  ${CLANG_TIDY_GEN_CMD}"
         sh -lc "${CLANG_TIDY_GEN_CMD}"
       else
-        echo "CLANG_TIDY_GEN_CMD is empty. Expecting compile_commands.json in ${CLANG_TIDY_BUILD_DIR:-.}"
+        echo "CLANG_TIDY_GEN_CMD is empty, expecting compile_commands.json in ${CLANG_TIDY_BUILD_DIR:-.}"
       fi
 
+    # Ensure compile_commands.json exists
     - test -f "${CLANG_TIDY_BUILD_DIR:-.}/compile_commands.json"
 
+    # Run clang-tidy directly (Alpine-compatible)
     - |
-      if [ -x /usr/lib/llvm18/share/clang/run-clang-tidy.py ]; then
-        python3 /usr/lib/llvm18/share/clang/run-clang-tidy.py -p "${CLANG_TIDY_BUILD_DIR:-.}" ${CLANG_TIDY_PATH:-src}
-      else
-        run-clang-tidy -p "${CLANG_TIDY_BUILD_DIR:-.}" ${CLANG_TIDY_PATH:-src}
-      fi
+      echo "Running clang-tidy on ${CLANG_TIDY_PATH:-src}"
+      find ${CLANG_TIDY_PATH:-src} \
+        \( -name '*.c' -o -name '*.cpp' -o -name '*.cc' \) \
+        -print0 \
+      | xargs -0 -n1 clang-tidy -p "${CLANG_TIDY_BUILD_DIR:-.}"
+
 
 clang-tidy:
   extends: .clang-tidy-template
