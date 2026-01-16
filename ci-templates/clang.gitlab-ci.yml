@@ -33,21 +33,29 @@ format-clang:
     - |
       set -e
       apk update
-      apk add --no-cache python3 py3-pip git bash curl unzip clang21-extra-tools
+      apk add --no-cache python3 py3-pip git bash curl unzip clang18-extra-tools
 
-      # Ensure clang-tidy is available in PATH (avoid PlatformIO tool-clangtidy issues on Alpine)
-      ln -sf /usr/lib/llvm21/bin/clang-tidy /usr/local/bin/clang-tidy
+      # clang-tidy system (works on Alpine)
+      ln -sf /usr/lib/llvm18/bin/clang-tidy /usr/local/bin/clang-tidy
       clang-tidy --version
 
       python3 -m venv .venv
       . .venv/bin/activate
-
       pip install -U pip
       pip install -U platformio
       platformio --version
 
+      # Force-install PlatformIO tool package, then patch missing binary path expected by PlatformIO
+      pio pkg install -g -p platformio/tool-clangtidy
+      PKGDIR="/root/.platformio/packages/tool-clangtidy"
+      mkdir -p "${PKGDIR}"
+      ln -sf "$(command -v clang-tidy)" "${PKGDIR}/clang-tidy"
+      mkdir -p "${PKGDIR}/bin"
+      ln -sf "$(command -v clang-tidy)" "${PKGDIR}/bin/clang-tidy"
+
       echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
       pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
+
 
 
 
