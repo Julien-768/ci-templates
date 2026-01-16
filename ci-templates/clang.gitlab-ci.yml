@@ -9,8 +9,8 @@ image: alpine:latest
   stage: format
   script:
     - apk update
-    - apk add --no-cache findutils clang18-extra-tools
-    - ln -sf /usr/lib/llvm18/bin/clang-format /usr/local/bin/clang-format
+    - apk add --no-cache findutils clang21-extra-tools
+    - ln -sf /usr/lib/llvm21/bin/clang-format /usr/local/bin/clang-format
     - clang-format --version
     - |
       set -e
