@@ -23,27 +23,34 @@ format-clang:
 # ------------------------------
 .clang-tidy-template:
   stage: format
-  script:
-    - apk update
-    - apk add --no-cache python3 py3-pip git bash curl unzip
-    - python3 -m venv .venv
-    - . .venv/bin/activate
-    - pip install -U pip
-    - pip install -U platformio
-    - platformio --version
-    - echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
-    - pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
-
-clang-tidy:
-  extends: .clang-tidy-template
-  stage: format
-  allow_failure: true
   cache:
     key: platformio
     paths:
       - .venv/
       - .platformio/
       - /root/.platformio/
+  script:
+    - |
+      set -e
+      apk update
+      apk add --no-cache python3 py3-pip git bash curl unzip
+
+      python3 -m venv .venv
+      . .venv/bin/activate
+
+      pip install -U pip
+      pip install -U platformio
+      platformio --version
+
+      echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
+      pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
+
+clang-tidy:
+  extends: .clang-tidy-template
+  stage: format
+  allow_failure: true
+
+
 
 
 
