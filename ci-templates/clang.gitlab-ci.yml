@@ -12,8 +12,10 @@ image: alpine:latest
     - apk add --no-cache findutils clang18-extra-tools
     - ln -sf /usr/lib/llvm18/bin/clang-format /usr/local/bin/clang-format
     - clang-format --version
-    - echo "Running clang-format on ${CLANG_PATH:-.} (config: ${CLANG_FORMAT_FILE:-.clang-format})"
-    - find ${CLANG_PATH:-.} \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) \
+    - |
+      set -e
+      echo "Running clang-format on ${CLANG_PATH:-.} (config: ${CLANG_FORMAT_FILE:-.clang-format})"
+      find ${CLANG_PATH:-.} \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) \
         -exec clang-format --dry-run --Werror --style=file:${CLANG_FORMAT_FILE:-.clang-format} {} +
 
 format-clang:
@@ -41,6 +43,7 @@ clang-tidy:
   extends: .clang-tidy-template
   stage: format
   allow_failure: true
+
 
 
 
