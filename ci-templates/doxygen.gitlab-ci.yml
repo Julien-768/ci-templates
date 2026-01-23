@@ -16,7 +16,6 @@ variables:
   CI_TEMPLATES_PROJECT: "iphc/ci-templates"
 
   # Ref (branch / tag / commit) used to fetch Doxyfile.base
-  # Should be aligned with the ref used in the include statement
   CI_TEMPLATES_REF: "main"
 
 .doxygen-template:
@@ -28,12 +27,11 @@ variables:
     - echo "Running Doxygen on ${DOXYFILE_PATH}"
     - cd "${DOXYFILE_PATH}"
 
-    # Fetch shared IPHC Doxyfile.base
+    # Fetch shared IPHC Doxyfile.base (public raw URL)
     - mkdir -p doxygen
     - >
       curl --fail --location
-      --header "JOB-TOKEN: $CI_JOB_TOKEN"
-      "$CI_SERVER_URL/api/v4/projects/$(echo "$CI_TEMPLATES_PROJECT" | sed 's/\//%2F/g')/repository/files/doxygen%2FDoxyfile.base/raw?ref=$CI_TEMPLATES_REF"
+      "$CI_SERVER_URL/$CI_TEMPLATES_PROJECT/-/raw/$CI_TEMPLATES_REF/ci-templates/doxygen/Doxyfile.base"
       -o doxygen/Doxyfile.base
 
     # Run Doxygen using project-specific Doxyfile
@@ -50,5 +48,6 @@ variables:
 pages:
   extends: .doxygen-template
   rules:
-    - if: $CI_COMMIT_MESSAGE =~ /publication/
+    - if: '$CI_COMMIT_MESSAGE =~ /publication/'
+
 
