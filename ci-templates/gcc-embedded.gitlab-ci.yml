@@ -2,11 +2,6 @@
   stage: build
   image: debian:stable-slim
 
-  variables:
-    GCC_MAKE_DIR: ""
-    SDK_PATH: ""
-    EXTRA_MAKE_ARGS: ""
-
   cache:
     key: gcc-deps
     paths:
@@ -31,3 +26,4 @@
       make -C "$GCC_MAKE_DIR" \
         SDK_PATH="$SDK_PATH" \
         $EXTRA_MAKE_ARGS
+
