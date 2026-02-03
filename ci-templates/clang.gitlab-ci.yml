@@ -1,38 +1,78 @@
 # clang.gitlab-ci.yml
+#
+# Shared GitLab CI *templates* for clang-based code quality checks.
+#
+# IMPORTANT:
+# - This file defines only *hidden template jobs* (prefixed with a dot).
+# - Templates are NOT executed unless instantiated by a concrete job
+#   in a consuming project pipeline.
+# - No global `stages:` and no global `image:` are defined here to avoid
+#   interfering with project-level pipelines and to keep this file reusable
+#   across different toolchains (PlatformIO, STM32Cube, EFM32, Zephyr, etc.).
+#
+# Typical usage in a project:
+#
+#   format-clang:
+#     extends: .clang-format-template
+#
+#   clang-tidy:
+#     extends: .clang-tidy-template
+#     variables:
+#       PIO_ENV: my_env_name
+#
+# Notes:
+# - The clang-format template is toolchain-agnostic and should work for most C/C++ projects.
+# - The clang-tidy template below is implemented via PlatformIO (`pio check`) for convenience.
+#   Non-PlatformIO projects can either:
+#     * ignore `.clang-tidy-template` and provide their own clang-tidy job, or
+#     * override the `script:` section when extending the template.
 
-# ------------------------------
-# clang-format (Alpine)
-# ------------------------------
-image: alpine:latest
-
+# --------------------------------------------------
+# Hidden template: clang-format (Alpine + LLVM tools)
+# --------------------------------------------------
 .clang-format-template:
   stage: format
+  image: alpine:latest
+
   script:
+    # Install required tooling
     - apk update
     - apk add --no-cache findutils clang21-extra-tools
+
+    # Ensure clang-format is available on PATH
     - ln -sf /usr/lib/llvm21/bin/clang-format /usr/local/bin/clang-format
     - clang-format --version
+
+    # Run clang-format in check mode
     - |
       set -e
       echo "Running clang-format on ${CLANG_PATH:-.} (config: ${CLANG_FORMAT_FILE:-.clang-format})"
       find ${CLANG_PATH:-.} \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) \
         -exec clang-format --dry-run --Werror --style=file:${CLANG_FORMAT_FILE:-.clang-format} {} +
 
-format-clang:
-  extends: .clang-format-template
-
-# ------------------------------
-# clang-tidy via PlatformIO
-# ------------------------------
+# --------------------------------------------------
+# Hidden template: clang-tidy (PlatformIO implementation)
+#
+# This template runs clang-tidy via `pio check` to leverage PlatformIO's
+# compilation database and environment settings.
+#
+# Projects NOT using PlatformIO should not extend this template as-is.
+# Instead, define a dedicated clang-tidy job suited to the toolchain,
+# or extend this template while overriding the `script:` section.
+# --------------------------------------------------
 .clang-tidy-template:
-  image: python:3.11
   stage: format
+  image: python:3.11
+
   variables:
+    # Allow caching PlatformIO packages and build artifacts
     PLATFORMIO_CORE_DIR: "$CI_PROJECT_DIR/.pio"
+
   cache:
     key: platformio
     paths:
       - .pio/
+
   script:
     - |
       set -e
@@ -42,6 +82,7 @@ format-clang:
       platformio --version
       echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
       pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
+
 
 
 
