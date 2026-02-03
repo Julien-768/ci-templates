@@ -1,4 +1,5 @@
 # doxygen.gitlab-ci.yml
+# doxygen.gitlab-ci.yml
 #
 # Shared GitLab CI *template* for generating documentation using Doxygen.
 #
@@ -47,7 +48,7 @@
     - mkdir -p doxygen
     - >
       curl --fail --location
-      "$CI_SERVER_URL/$CI_TEMPLATES_PROJECT/-/raw/$CI_TEMPLATES_REF/ci-templates/doxygen/Doxyfile.base"
+      "$CI_SERVER_URL/$CI_TEMPLATES_PROJECT/-/raw/$CI_TEMPLATES_REF/doxygen/Doxyfile.base"
       -o doxygen/Doxyfile.base
 
     # Run Doxygen using project-specific Doxyfile
@@ -66,13 +67,13 @@
     - if: '$CI_COMMIT_TAG'
       when: never
 
-    # Run only when explicitly requested by keyword in commit message
-    # (case-insensitive match)
+    # Run only when explicitly requested by keyword in commit message (case-insensitive)
     - if: '$CI_COMMIT_MESSAGE =~ /publication/i'
       when: on_success
 
     # Disable in all other cases
     - when: never
+
 
 
 
