@@ -47,20 +47,13 @@ Define the stages in this order:
 
 ```yaml
 stages:
-  - format
-  - pages
   - release
 ```
 
-Then extend the jobs:
+No job definition is required locally.
 
-```yaml
-release:
-  extends: .release-template
+Including the template is sufficient to enable the release workflow:
 
-gitlab_release:
-  extends: .gitlab-release-template
-```
 
 ---
 
@@ -70,7 +63,6 @@ gitlab_release:
 - `CI_BOT_EMAIL` *(optional)* – Email used in Git commits (`ci@example.com` by default).
 - `CI_BOT_NAME` *(optional)* – Git username for commits (`CI Bot` by default).
 - `ZIP_PREFIX` *(optional)* – Prefix of the zip file (`release` by default).
-- `FILES_TO_PACKAGE` – Used by `git archive` to select what files to include (default: `src include lib platformio.ini README.md CHANGELOG.md`).
 
 ---
 
@@ -86,4 +78,6 @@ gitlab_release:
 
 - **Artifact**: `release-vX.Y.Z.zip`
 - **GitLab Release**: created via `release-cli` and accessible under the project’s Releases tab.
+
+
 
