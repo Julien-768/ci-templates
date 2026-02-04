@@ -1,31 +1,20 @@
 # clang.gitlab-ci.yml
 #
-# Shared GitLab CI *templates* for clang-based code quality checks.
+# Shared GitLab CI templates and jobs for clang-based code quality checks.
 #
-# IMPORTANT:
-# - This file defines only *hidden template jobs* (prefixed with a dot).
-# - Templates are NOT executed unless instantiated by a concrete job
-#   in a consuming project pipeline.
-# - No global `stages:` and no global `image:` are defined here to avoid
-#   interfering with project-level pipelines and to keep this file reusable
-#   across different toolchains (PlatformIO, STM32Cube, EFM32, Zephyr, etc.).
+# DESIGN CHOICE:
+# - Hidden template jobs (prefixed with a dot) define reusable building blocks.
+# - Concrete jobs (clang-format, clang-tidy) are defined in this file so that
+#   consuming projects can simply include this template without redefining jobs.
+# - Projects may still override behavior if needed by redefining jobs locally.
 #
-# Typical usage in a project:
+# This follows the "plug-and-play" template convention:
+# including this file is sufficient to get the default jobs executed.
 #
-#   format-clang:
-#     extends: .clang-format-template
-#
-#   clang-tidy:
-#     extends: .clang-tidy-template
-#     variables:
-#       PIO_ENV: my_env_name
-#
-# Notes:
-# - The clang-format template is toolchain-agnostic and should work for most C/C++ projects.
-# - The clang-tidy template below is implemented via PlatformIO (`pio check`) for convenience.
-#   Non-PlatformIO projects can either:
-#     * ignore `.clang-tidy-template` and provide their own clang-tidy job, or
-#     * override the `script:` section when extending the template.
+# Toolchain compatibility:
+# - clang-format is toolchain-agnostic.
+# - clang-tidy implementation below relies on PlatformIO.
+#   Non-PlatformIO projects may ignore or override this job.
 
 # --------------------------------------------------
 # Hidden template: clang-format (Alpine + LLVM tools)
@@ -55,10 +44,6 @@
 #
 # This template runs clang-tidy via `pio check` to leverage PlatformIO's
 # compilation database and environment settings.
-#
-# Projects NOT using PlatformIO should not extend this template as-is.
-# Instead, define a dedicated clang-tidy job suited to the toolchain,
-# or extend this template while overriding the `script:` section.
 # --------------------------------------------------
 .clang-tidy-template:
   stage: format
@@ -82,6 +67,22 @@
       platformio --version
       echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
       pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
+
+# --------------------------------------------------
+# Concrete jobs exposed to consuming projects
+#
+# These jobs are executed automatically when this file is included.
+# They intentionally do not define allow_failure or project-specific rules.
+# --------------------------------------------------
+
+# Code formatting check
+clang-format:
+  extends: .clang-format-template
+
+# Static analysis (clang-tidy via PlatformIO)
+clang-tidy:
+  extends: .clang-tidy-template
+
 
 
 
