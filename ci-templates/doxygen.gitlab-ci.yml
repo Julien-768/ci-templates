@@ -1,24 +1,18 @@
 # doxygen.gitlab-ci.yml
-# doxygen.gitlab-ci.yml
 #
-# Shared GitLab CI *template* for generating documentation using Doxygen.
+# Shared GitLab CI configuration for generating documentation using Doxygen.
 #
-# IMPORTANT:
-# - This file defines only *hidden template jobs* (prefixed with a dot).
-# - Templates are NOT executed unless instantiated by a concrete job
-#   in a consuming project pipeline.
-# - No global `stages:` / no global `image:` / no global `variables:` are
-#   defined to avoid interfering with project-level pipelines.
+# DESIGN CHOICE:
+# - A hidden template job defines the reusable Doxygen build logic.
+# - A concrete job (`doxygen`) is exposed so consuming projects only need
+#   to include this file to enable documentation generation.
+#
+# Documentation is generated only when explicitly requested via the
+# "publication" keyword in the commit message.
 #
 # Expected project layout:
-# - Each project provides a minimal `doxygen/Doxyfile` (or equivalent)
-#   which @INCLUDEs the shared `Doxyfile.base` fetched from the IPHC
-#   `ci-templates` repository.
-#
-# Default execution policy:
-# - The template runs only when explicitly requested by including the
-#   keyword "publication" in the commit message (case-insensitive).
-# - Consuming projects may override `rules:` if they need a different trigger.
+# - Each project provides a `doxygen/Doxyfile` (or equivalent) which
+#   @INCLUDEs the shared `Doxyfile.base` from this repository.
 
 # --------------------------------------------------
 # Hidden template: Doxygen documentation build
@@ -28,10 +22,11 @@
   image: alpine:latest
 
   variables:
-    # Path where the project stores the "doxygen/" directory (default: repo root)
+    # Path where the project stores the "doxygen/" directory
+    # Default is repository root
     DOXYFILE_PATH: "."
 
-    # External CI templates repository used to fetch Doxyfile.base
+    # External CI templates repository
     CI_TEMPLATES_PROJECT: "iphc/ci-templates"
 
     # Ref (branch / tag / commit) used to fetch Doxyfile.base
@@ -62,17 +57,28 @@
     paths:
       - public/
 
+# --------------------------------------------------
+# Concrete job exposed to consuming projects
+#
+# This job is executed automatically when this file is included.
+# Documentation generation is explicitly triggered via commit message.
+# --------------------------------------------------
+doxygen:
+  extends: .doxygen-template
+
   rules:
     # Never run on tag pipelines
     - if: '$CI_COMMIT_TAG'
       when: never
 
-    # Run only when explicitly requested by keyword in commit message (case-insensitive)
+    # Run only when explicitly requested by keyword in commit message
+    # (case-insensitive match)
     - if: '$CI_COMMIT_MESSAGE =~ /publication/i'
       when: on_success
 
     # Disable in all other cases
     - when: never
+
 
 
 
