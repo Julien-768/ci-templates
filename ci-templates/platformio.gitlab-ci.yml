@@ -1,25 +1,25 @@
 # platformio.gitlab-ci.yml
 #
-# GitLab CI *template* for building firmware using PlatformIO.
+# Shared GitLab CI configuration for building firmware using PlatformIO.
 #
-# IMPORTANT:
-# - This file defines only *hidden template jobs* (prefixed with a dot).
-# - Templates are NOT executed by GitLab CI unless they are instantiated
-#   by a concrete job in a consuming project pipeline.
-# - No global `stages:` definition is provided to avoid interfering
-#   with project-level stage ordering.
+# DESIGN CHOICE:
+# - A hidden template job defines the reusable PlatformIO build logic.
+# - A concrete job (`pio-build`) is exposed so consuming projects only need
+#   to include this file to enable firmware builds.
+#
+# This follows the "plug-and-play" CI template convention:
+# including this file is sufficient to get a default PlatformIO build job.
 #
 # The consuming project is responsible for:
-# - Defining the pipeline stages
-# - Instantiating a concrete job extending this template
-# - Providing required variables (e.g. PIO_ENV)
+# - Defining the pipeline stages (including a `build` stage)
+# - Providing the `PIO_ENV` variable corresponding to the PlatformIO environment
 
 # --------------------------------------------------
 # Hidden template: PlatformIO firmware build
 # --------------------------------------------------
 .platformio-build-template:
-  image: python:3.11
   stage: build
+  image: python:3.11
 
   before_script:
     # Install system dependencies required by PlatformIO
@@ -32,6 +32,17 @@
   script:
     # Build firmware using the environment defined by PIO_ENV
     - pio run
+
+# --------------------------------------------------
+# Concrete job exposed to consuming projects
+#
+# This job is executed automatically when this file is included.
+# Project-specific behavior (rules, allow_failure, etc.) can be
+# overridden locally if needed.
+# --------------------------------------------------
+pio-build:
+  extends: .platformio-build-template
+
 
 
 
