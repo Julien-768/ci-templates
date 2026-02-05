@@ -12,9 +12,15 @@
 # including this file is sufficient to get the default jobs executed.
 #
 # Toolchain compatibility:
-# - clang-format is toolchain-agnostic.
+# - clang-format is toolchain-agnostic and can run on any C/C++ codebase.
 # - clang-tidy implementation below relies on PlatformIO.
-#   Non-PlatformIO projects may ignore or override this job.
+#
+# IMPORTANT:
+# - The clang-tidy job is automatically skipped if no `platformio.ini` file
+#   is found at the repository root.
+# - This makes the template safe to include in non-PlatformIO projects
+#   (including this CI template repository itself).
+#
 
 # --------------------------------------------------
 # Hidden template: clang-format (Alpine + LLVM tools)
@@ -44,6 +50,10 @@
 #
 # This template runs clang-tidy via `pio check` to leverage PlatformIO's
 # compilation database and environment settings.
+#
+# NOTE:
+# - This job assumes a valid PlatformIO project structure.
+# - Execution is controlled at the concrete job level via `rules`.
 # --------------------------------------------------
 .clang-tidy-template:
   stage: format
@@ -72,37 +82,24 @@
 # Concrete jobs exposed to consuming projects
 #
 # These jobs are executed automatically when this file is included.
-# They intentionally do not define allow_failure or project-specific rules.
 # --------------------------------------------------
 
-# Code formatting check
+# Code formatting check (always enabled)
 clang-format:
   extends: .clang-format-template
 
 # Static analysis (clang-tidy via PlatformIO)
+#
+# This job is executed only if a `platformio.ini` file exists
+# at the repository root.
+#
+# This prevents failures when the template is included in:
+# - non-PlatformIO projects
+# - CI template libraries
+#
 clang-tidy:
   extends: .clang-tidy-template
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  rules:
+    - exists:
+        - platformio.ini
+    - when: never
