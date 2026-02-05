@@ -1,20 +1,34 @@
 # release.gitlab-ci.yml
 #
-# Shared GitLab CI configuration for handling version bumping, tagging,
-# release archive creation, and GitLab Release publication.
+# Shared GitLab CI template implementing a complete release workflow:
+# version bumping, changelog generation, Git tagging, release archive
+# creation and GitLab Release publication.
 #
 # DESIGN CHOICE:
 # - Hidden template jobs define reusable release building blocks.
 # - Concrete jobs (`release` and `gitlab_release`) are exposed so consuming
 #   projects only need to include this file to enable the full release flow.
 #
-# Required CI/CD variables:
-#   - CI_PUSH_TOKEN
+# Variables used by this template:
 #
-# Optional variables:
-#   - CI_BOT_EMAIL
-#   - CI_BOT_NAME
-#   - ZIP_PREFIX (default: "release")
+# - CI_PUSH_TOKEN (required):
+#   Personal Access Token or project token with permission to push commits
+#   and tags to the repository. Used to authenticate Git operations performed
+#   by the CI job.
+#
+# - CI_BOT_EMAIL (optional):
+#   Email address used for Git commits created during the release process.
+#   Default: "ci@example.com"
+#
+# - CI_BOT_NAME (optional):
+#   Git author name used for release commits.
+#   Default: "CI Bot"
+#
+# - ZIP_PREFIX (optional):
+#   Prefix used when generating the release archive filename.
+#   Default: "release"
+#
+
 
 # --------------------------------------------------
 # Hidden template: version bump + tag creation + zip
