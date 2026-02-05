@@ -13,16 +13,16 @@ stages:
 - release
 
 include:
-  - local: 'ci-templates/ci-templates/clang/clang.gitlab-ci.yml'
-  - local: 'ci-templates/ci-templates/cpython/python.gitlab-ci.yml'
-  - local: 'ci-templates/ci-templates/markdownlint/markdownlint.gitlab-ci.yml'
-  - local: 'ci-templates/ci-templates/eslint-prettier/eslint-prettier.gitlab-ci.yml'
-  - local: 'ci-templates/ci-templates/mkdocs/mkdocs.gitlab-ci.yml'
-  - local: 'ci-templates/ci-templates/mike/mike.gitlab-ci.yml'
-  - local: 'ci-templates/ci-templates/doxygen/doxygen.gitlab-ci.yml'
-  - local: 'ci-templates/ci-templates/release/release.gitlab-ci.yml'
-  - local: 'ci-templates/ci-templates/gcc-embedded/gcc-embedded.gitlab-ci.yml'
-  - local: 'ci-templates/ci-templates/platformio/platformio.gitlab-ci.yml'
+  - local: 'ci-templates/clang/clang.gitlab-ci.yml'
+  - local: 'ci-templates/python/python.gitlab-ci.yml'
+  - local: 'ci-templates/markdownlint/markdownlint.gitlab-ci.yml'
+  - local: 'ci-templates/eslint-prettier/eslint-prettier.gitlab-ci.yml'
+  - local: 'ci-templates/mkdocs/mkdocs.gitlab-ci.yml'
+  - local: 'ci-templates/mike/mike.gitlab-ci.yml'
+  - local: 'ci-templates/doxygen/doxygen.gitlab-ci.yml'
+  - local: 'ci-templates/release/release.gitlab-ci.yml'
+  - local: 'ci-templates/gcc-embedded/gcc-embedded.gitlab-ci.yml'
+  - local: 'ci-templates/platformio/platformio.gitlab-ci.yml'
 
 variables:
   CLANG_PATH: 'src' # optional path to the C/C++ source files
