@@ -1,3 +1,18 @@
+# gcc-embedded.gitlab-ci.yml
+#
+# Shared GitLab CI template for building embedded firmware using the GNU Arm Embedded Toolchain
+# (arm-none-eabi-gcc) on a Debian-based runner.
+#
+# This file provides a hidden job that installs the ARM GCC toolchain and runs `make` from a
+# project-provided directory. Consuming projects should include this template and extend the
+# `.gcc-compile-template` job.
+#
+# Variables used by this template:
+# - GCC_MAKE_DIR (required): Directory containing the Makefile to build (passed to `make -C`).
+# - SDK_PATH (optional): Value forwarded to Make as `SDK_PATH=...`.
+# - EXTRA_MAKE_ARGS (optional): Extra arguments forwarded to `make` (e.g. "TARGET=foo VERBOSE=1").
+#
+
 .gcc-compile-template:
   stage: build
   image: debian:stable-slim
@@ -26,4 +41,3 @@
       make -C "$GCC_MAKE_DIR" \
         SDK_PATH="$SDK_PATH" \
         $EXTRA_MAKE_ARGS
-
