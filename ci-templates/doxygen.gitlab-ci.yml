@@ -1,6 +1,12 @@
 # doxygen.gitlab-ci.yml
 #
-# Shared GitLab CI configuration for generating documentation using Doxygen.
+# Shared GitLab CI template for Doxygen documentation generation.
+#
+# Variables used by this template (optional unless stated otherwise):
+#
+# - DOXYFILE_PATH:
+#   Path to the directory containing the Doxygen configuration file.
+#   Default: "src"
 #
 # DESIGN CHOICE:
 # - A hidden template job defines the reusable Doxygen build logic.
@@ -13,6 +19,10 @@
 # Expected project layout:
 # - Each project provides a `doxygen/Doxyfile` (or equivalent) which
 #   @INCLUDEs the shared `Doxyfile.base` from this repository.
+#
+# This job uses an Alpine Linux image, installs Doxygen,
+# and publishes the generated documentation as GitLab Pages artifacts.
+
 
 # --------------------------------------------------
 # Hidden template: Doxygen documentation build
