@@ -1,4 +1,3 @@
-
 # GitLab CI Release Template – Documentation
 
 This documentation explains how to use the `release.gitlab-ci.yml` template provided by `iphc/ci-templates`
@@ -32,15 +31,15 @@ The `.gitlab-ci.yml` must include the following:
 
 ```yaml
 include:
-  - project: 'iphc/ci-templates'
-    file: '/ci-templates/clang.gitlab-ci.yml'
-    ref: '<commit-sha>'
-  - project: 'iphc/ci-templates'
-    file: '/ci-templates/doxygen.gitlab-ci.yml'
-    ref: '<commit-sha>'
-  - project: 'iphc/ci-templates'
-    file: '/ci-templates/release.gitlab-ci.yml'
-    ref: '<commit-sha>'
+  - project: "iphc/ci-templates"
+    file: "/ci-templates/clang.gitlab-ci.yml"
+    ref: "<commit-sha>"
+  - project: "iphc/ci-templates"
+    file: "/ci-templates/doxygen.gitlab-ci.yml"
+    ref: "<commit-sha>"
+  - project: "iphc/ci-templates"
+    file: "/ci-templates/release.gitlab-ci.yml"
+    ref: "<commit-sha>"
 ```
 
 Define the stages in this order:
@@ -54,15 +53,14 @@ No job definition is required locally.
 
 Including the template is sufficient to enable the release workflow:
 
-
 ---
 
 ## 🔧 Variables you can override
 
-- `CI_PUSH_TOKEN` *(required)* – GitLab CI variable for authentication to push commits/tags.
-- `CI_BOT_EMAIL` *(optional)* – Email used in Git commits (`ci@example.com` by default).
-- `CI_BOT_NAME` *(optional)* – Git username for commits (`CI Bot` by default).
-- `ZIP_PREFIX` *(optional)* – Prefix of the zip file (`release` by default).
+- `CI_PUSH_TOKEN` _(required)_ – GitLab CI variable for authentication to push commits/tags.
+- `CI_BOT_EMAIL` _(optional)_ – Email used in Git commits (`ci@example.com` by default).
+- `CI_BOT_NAME` _(optional)_ – Git username for commits (`CI Bot` by default).
+- `ZIP_PREFIX` _(optional)_ – Prefix of the zip file (`release` by default).
 
 ---
 
@@ -78,6 +76,3 @@ Including the template is sufficient to enable the release workflow:
 
 - **Artifact**: `release-vX.Y.Z.zip`
 - **GitLab Release**: created via `release-cli` and accessible under the project’s Releases tab.
-
-
-
