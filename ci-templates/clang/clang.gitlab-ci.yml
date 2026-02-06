@@ -16,15 +16,6 @@
 #   PlatformIO environment name used by the clang-tidy job.
 #   Default: "adafruit_feather_m0"
 #
-# DESIGN CHOICE:
-# - Hidden template jobs (prefixed with a dot) define reusable building blocks.
-# - Concrete jobs (clang-format, clang-tidy) are defined in this file so that
-#   consuming projects can simply include this template without redefining jobs.
-# - Projects may still override behavior if needed by redefining jobs locally.
-#
-# This follows the "plug-and-play" template convention:
-# including this file is sufficient to get the default jobs executed.
-#
 # Toolchain compatibility:
 # - clang-format is toolchain-agnostic and can run on any C/C++ codebase.
 # - clang-tidy implementation below relies on PlatformIO.
