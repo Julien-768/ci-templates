@@ -24,7 +24,6 @@
 #   Default: "release"
 #
 
-
 # --------------------------------------------------
 # Hidden template: version bump + tag creation + zip
 # --------------------------------------------------
@@ -71,8 +70,16 @@
   rules:
     - if: '$CI_COMMIT_TAG'
       when: never
+
+    # Manual test mode for branches/MRs (opt-in)
+    - if: '$FORCE_RELEASE == "1"'
+      when: manual
+      allow_failure: true
+
+    # Normal behavior on main pushes
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE !~ /^chore\(release\):/'
       when: on_success
+
     - when: never
 
 # --------------------------------------------------
@@ -102,21 +109,23 @@
   rules:
     - if: '$CI_COMMIT_TAG'
       when: never
-    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+
+    # Manual test mode for branches/MRs (opt-in)
+    - if: '$FORCE_RELEASE == "1"'
+      when: manual
+      allow_failure: true
+
+    # Normal behavior on main pushes
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE !~ /^chore\(release\):/'
       when: on_success
+
+    - when: never
 
 # --------------------------------------------------
 # Concrete jobs exposed to consuming projects
-#
-# These jobs are executed automatically when this file is included.
 # --------------------------------------------------
-
-# Version bump, tag creation and release archive generation
 release:
   extends: .release-template
 
-# GitLab Release publication (UI release + assets)
 gitlab_release:
   extends: .gitlab-release-template
-
-
