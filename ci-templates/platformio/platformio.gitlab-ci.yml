@@ -1,6 +1,7 @@
 # platformio.gitlab-ci.yml
 #
 # Shared GitLab CI template for building embedded firmware using PlatformIO.
+#
 # This template installs PlatformIO Core and runs a default firmware build
 # using the environments defined in the project's `platformio.ini` file.
 #
@@ -8,10 +9,13 @@
 # without redefining build logic.
 #
 # Variables used by this template:
-# (none)
+# - (none)
 #
-# The build relies exclusively on the `platformio.ini` configuration provided
-# by the consuming project.
+# Behavior:
+# - The build job is executed only if a `platformio.ini` file is present
+#   at the repository root.
+# - This makes the template safe to include in non-PlatformIO repositories,
+#   including the ci-templates library itself.
 #
 
 # --------------------------------------------------
@@ -37,8 +41,14 @@
 # Concrete job exposed to consuming projects
 #
 # This job is executed automatically when this file is included.
-# Project-specific behavior (rules, allow_failure, etc.) can be
+# The job is skipped if no `platformio.ini` file is found.
+#
+# Project-specific behavior (rules, allow_failure, etc.) can still be
 # overridden locally if needed.
 # --------------------------------------------------
 pio-build:
   extends: .platformio-build-template
+  rules:
+    - exists:
+        - platformio.ini
+    - when: never
