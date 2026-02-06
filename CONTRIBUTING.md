@@ -21,14 +21,14 @@ The repository is organized into component directories, each containing a `templ
 ci-templates/
 ├── README.md
 ├── clang/
-│   ├── template.yml
-│   └── README.md
+│ ├── template.yml
+│ └── README.md
 ├── python/
-│   ├── template.yml
-│   └── README.md
+│ ├── template.yml
+│ └── README.md
 └── release/
-    ├── template.yml
-    └── README.md
+├── template.yml
+└── README.md
 ```
 
 ## Template Headers
