@@ -4,11 +4,6 @@
 # version bumping, changelog generation, Git tagging, release archive
 # creation and GitLab Release publication.
 #
-# DESIGN CHOICE:
-# - Hidden template jobs define reusable release building blocks.
-# - Concrete jobs (`release` and `gitlab_release`) are exposed so consuming
-#   projects only need to include this file to enable the full release flow.
-#
 # Variables used by this template:
 #
 # - CI_PUSH_TOKEN (required):

@@ -39,12 +39,6 @@
 
 # --------------------------------------------------
 # Concrete job exposed to consuming projects
-#
-# This job is executed automatically when this file is included.
-# The job is skipped if no `platformio.ini` file is found.
-#
-# Project-specific behavior (rules, allow_failure, etc.) can still be
-# overridden locally if needed.
 # --------------------------------------------------
 pio-build:
   extends: .platformio-build-template

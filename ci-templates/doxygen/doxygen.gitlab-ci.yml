@@ -8,11 +8,6 @@
 #   Path to the directory containing the Doxygen configuration file.
 #   Default: "src"
 #
-# DESIGN CHOICE:
-# - A hidden template job defines the reusable Doxygen build logic.
-# - A concrete job (`doxygen`) is exposed so consuming projects only need
-#   to include this file to enable documentation generation.
-#
 # Documentation is generated only when explicitly requested via the
 # "publication" keyword in the commit message.
 #
@@ -69,9 +64,6 @@
 
 # --------------------------------------------------
 # Concrete job exposed to consuming projects
-#
-# This job is executed automatically when this file is included.
-# Documentation generation is explicitly triggered via commit message.
 # --------------------------------------------------
 doxygen:
   extends: .doxygen-template
