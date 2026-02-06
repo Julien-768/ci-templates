@@ -1,0 +1,94 @@
+# clang.gitlab-ci.yml
+#
+# Shared GitLab CI templates and jobs for clang-based code quality checks.
+#
+# Variables used by this template (optional unless stated otherwise):
+#
+# - CLANG_PATH:
+#   Directory to scan for C/C++ source files.
+#   Default: "."
+#
+# - CLANG_FORMAT_FILE:
+#   Path to the clang-format configuration file.
+#   Default: ".clang-format"
+#
+# - PIO_ENV:
+#   PlatformIO environment name used by the clang-tidy job.
+#   Default: "adafruit_feather_m0"
+#
+# Toolchain compatibility:
+# - clang-format is toolchain-agnostic and can run on any C/C++ codebase.
+# - clang-tidy implementation below relies on PlatformIO.
+#
+# IMPORTANT:
+# - The clang-tidy job is automatically skipped if no `platformio.ini` file
+#   is found at the repository root.
+# - This makes the template safe to include in non-PlatformIO projects
+#   (including this CI template repository itself).
+#
+# --------------------------------------------------
+# Hidden template: clang-format (Alpine + LLVM tools)
+# --------------------------------------------------
+.clang-format-template:
+  stage: format
+  image: alpine:latest
+
+  script:
+    # Install required tooling
+    - apk update
+    - apk add --no-cache findutils clang21-extra-tools
+
+    # Ensure clang-format is available on PATH
+    - ln -sf /usr/lib/llvm21/bin/clang-format /usr/local/bin/clang-format
+    - clang-format --version
+
+    # Run clang-format in check mode
+    - |
+      set -e
+      echo "Running clang-format on ${CLANG_PATH:-.} (config: ${CLANG_FORMAT_FILE:-.clang-format})"
+      find ${CLANG_PATH:-.} \( -name '*.c' -o -name '*.cpp' -o -name '*.h' -o -name '*.hpp' \) \
+        -exec clang-format --dry-run --Werror --style=file:${CLANG_FORMAT_FILE:-.clang-format} {} +
+
+# --------------------------------------------------
+# Hidden template: clang-tidy (PlatformIO implementation)
+# --------------------------------------------------
+.clang-tidy-template:
+  stage: format
+  image: python:3.11
+
+  variables:
+    # Allow caching PlatformIO packages and build artifacts
+    PLATFORMIO_CORE_DIR: "$CI_PROJECT_DIR/.pio"
+
+  cache:
+    key: platformio
+    paths:
+      - .pio/
+
+  script:
+    - |
+      set -e
+      apt-get update
+      apt-get install -y --no-install-recommends git
+      pip install --no-cache-dir -U platformio
+      platformio --version
+      echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
+      pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
+
+# --------------------------------------------------
+# Concrete jobs exposed to consuming projects
+#
+# These jobs are executed automatically when this file is included.
+# --------------------------------------------------
+
+# Code formatting check (always enabled)
+clang-format:
+  extends: .clang-format-template
+
+# Static analysis (clang-tidy via PlatformIO)
+clang-tidy:
+  extends: .clang-tidy-template
+  rules:
+    - exists:
+        - platformio.ini
+    - when: never

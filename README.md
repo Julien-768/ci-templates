@@ -1,105 +1,196 @@
-# ci-templates
+# 🛠️ GitLab CI/CD Pipeline Template Usage Guide
 
-> **Note:** This repository is ready for public sharing.
+This guide explains how to use the shared GitLab CI templates provided by the
+`iphc/ci-templates` repository to enable formatting, documentation, firmware
+builds, and release automation in a C/C++ (PlatformIO-based) project.
 
-## Getting started
+The templates follow a **plug-and-play convention**:
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.in2p3.fr/iphc/ci-templates.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://gitlab.in2p3.fr/iphc/ci-templates/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+- Each template exposes concrete CI jobs directly.
+- Consuming projects only need to include the templates.
+- No local job definition or `extends` is required.
 
 ---
 
-# Editing this README
+## 📦 Included Templates
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+The project `.gitlab-ci.yml` includes reusable CI jobs from the
+`iphc/ci-templates` repository:
 
-## Suggestions for a good README
+```yaml
+include:
+  - project: "iphc/ci-templates"
+    file: "/ci-templates/clang.gitlab-ci.yml"
+    ref: "<commit-hash>"
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+  - project: "iphc/ci-templates"
+    file: "/ci-templates/platformio.gitlab-ci.yml"
+    ref: "<commit-hash>"
 
-## Name
+  - project: "iphc/ci-templates"
+    file: "/ci-templates/doxygen.gitlab-ci.yml"
+    ref: "<commit-hash>"
 
-Choose a self-explaining name for your project.
+  - project: "iphc/ci-templates"
+    file: "/ci-templates/release.gitlab-ci.yml"
+    ref: "<commit-hash>"
+```
 
-## Description
+All templates should be pinned to the same commit hash to ensure full
+reproducibility of CI behavior.
 
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+```yaml
+## 🔧 Project Variables
+The following variables must be defined in your .gitlab-ci.yml:
 
-## Badges
+variables:
+  # Paths checked by clang-format / clang-tidy
+  CLANG_PATH: "src include"
 
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+  # Path containing the doxygen/ directory
+  DOXYFILE_PATH: "."
 
-## Visuals
+  # Files included in the release archive
+  FILES_TO_PACKAGE: "src include lib platformio.ini README.md CHANGELOG.md"
+```
 
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### Required GitLab CI/CD Variable
 
-## Installation
+The following variable must be defined in
+**GitLab → Settings → CI/CD → Variables** (🔐 Protected):
 
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+| Key             | Description                                                    |
+| --------------- | -------------------------------------------------------------- |
+| `CI_PUSH_TOKEN` | Personal Access Token with `api` and `write_repository` scopes |
 
-## Usage
+This token is used by the release job to push commits and tags.
 
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+## 🚦 Pipeline Stages
 
-## Support
+```yaml
+stages:
+  - format # clang-format / clang-tidy
+  - build # PlatformIO firmware build
+  - pages # Doxygen documentation (on demand)
+  - release # versioning and GitLab release
+```
 
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+## 🧹 Code Quality Jobs
 
-## Roadmap
+`Clang-format`
 
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+- Runs automatically on every pipeline.
 
-## Contributing
+- Checks formatting on files under CLANG_PATH.
 
-State if you are open to contributions and what your requirements are for accepting them.
+- Fails the pipeline if formatting issues are found.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+`Clang-tidy`
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+- Runs automatically on every pipeline.
 
-## Authors and acknowledgment
+- Uses PlatformIO (pio check) for static analysis.
 
-Show your appreciation to those who have contributed to the project.
+- Intended as _informative_ (non-blocking) depending on template configuration.
 
-## License
+## 📘 Documentation Generation (Doxygen)
 
-For open source projects, say how it is licensed.
+`doxygen`
 
-## Project status
+- Generates HTML documentation using Doxygen.
 
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+- Uses a project-provided doxygen/Doxyfile which must @INCLUDE
+  the shared Doxyfile.base from ci-templates.
+
+### Trigger condition
+
+The documentation job only runs when explicitly requested via the commit
+message containing the keyword:
+
+```text
+publication
+```
+
+(case-insensitive match)
+
+**Example:**
+
+```text
+git commit -m "publication: update API documentation"
+git push
+```
+
+This avoids generating documentation on every pipeline.
+
+### 🚀 Release Automation
+
+`release`
+
+This job performs the following actions:
+
+1. Bumps the version using standard-version
+
+2. Generates or updates CHANGELOG.md
+
+3. Creates a Git tag (e.g. v1.2.0)
+
+4. Builds a ZIP archive of the source code
+
+5. Pushes the commit and tag back to GitLab
+
+**Execution rules:**
+
+- Runs only on the main branch
+
+- Triggered on push
+
+- Skips commits starting with chore(release):
+
+- Never runs on tag pipelines
+
+---
+
+`gitlab_release`
+
+- Runs after the release job.
+
+- Creates a GitLab Release using release-cli.
+
+- Publishes the ZIP archive generated by release.
+
+## Example Commits
+
+### Trigger a normal pipeline
+
+```text
+git commit -m "feat: add new sensor support"
+git push
+```
+
+### Trigger documentation generation
+
+```text
+git commit -m "publication: update documentation"
+git push
+```
+
+⚠️ Do not manually create chore(release): commits — these are generated
+automatically by the CI.
+
+## 📁 Generated Outputs
+
+- `CHANGELOG.md` updated automatically
+
+- Git tag `vX.Y.Z`
+
+- `release-vX.Y.Z.zip` source archive
+
+- GitLab Release with downloadable assets
+
+### 🔐 Notes
+
+- Ensure `CI_PUSH_TOKEN` has sufficient permissions.
+
+- Including a template implies accepting the default jobs it exposes.
+
+- Project-specific behavior should be handled via variables, not job overrides.

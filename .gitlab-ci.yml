@@ -1,25 +1,41 @@
 # .gitlab-ci.yml
 
 # This GitLab CI configuration file sets up various stages and includes multiple CI templates.
-# It defines the stages for format, lint, pages, test, and deployment.
+# It defines the stages for format, lint, pages, test, deployment and release.
 # The included templates provide specific configurations for different tools and languages.
 # The variables section allows setting optional paths for configuration files used by different tools.
 
 stages:
-- format
-- lint
-- test
-- pages
-- release
+  - format
+  - lint
+  - build
+  - test
+  - pages
+  - release
 
 include:
-- local: 'ci-templates/clang.gitlab-ci.yml' # format stage
-- local: 'ci-templates/python.gitlab-ci.yml' # lint stage
-- local: 'ci-templates/markdownlint.gitlab-ci.yml' # lint stage
-- local: 'ci-templates/eslint-prettier.gitlab-ci.yml' # lint stage
-- local: 'ci-templates/mkdocs.gitlab-ci.yml' # test and pages stages
-- local: 'ci-templates/mike.gitlab-ci.yml' # test and pages stages
-- local: 'ci-templates/doxygen.gitlab-ci.yml' # pages stage
+  # --- Format stage ---
+  - local: 'ci-templates/clang/clang.gitlab-ci.yml'
+
+  # --- Lint stage ---
+  - local: 'ci-templates/python/python.gitlab-ci.yml'
+  - local: 'ci-templates/markdown/markdownlint.gitlab-ci.yml'
+  - local: 'ci-templates/eslint/eslint-prettier.gitlab-ci.yml'
+
+  # --- Build stage ---
+  - local: 'ci-templates/platformio/platformio.gitlab-ci.yml'
+  - local: 'ci-templates/gcc/gcc-embedded.gitlab-ci.yml'
+
+  # --- Test / Pages stages ---
+  - local: 'ci-templates/mkdocs/mkdocs.gitlab-ci.yml'
+  - local: 'ci-templates/mike/mike.gitlab-ci.yml'
+
+  # --- Pages stage ---
+  - local: 'ci-templates/doxygen/doxygen.gitlab-ci.yml'
+
+  # --- Release stage ---
+  - local: 'ci-templates/release/release.gitlab-ci.yml'
+
 
 variables:
   CLANG_PATH: 'src' # optional path to the C/C++ source files
@@ -28,13 +44,4 @@ variables:
   PYLINT_RCFILE: 'pyproject.toml' # optional path to the Pylint configuration file
   LINT_PATH: 'src' # optional path to the linting files
   MK_PATH: 'src' # optional path to the Markdown directory
-
-create-release:
-  stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
-  script: echo "Creating release $CI_COMMIT_TAG"
-  rules:
-  - if: $CI_COMMIT_TAG
-  release:
-    tag_name: $CI_COMMIT_TAG
-    description: "Release $CI_COMMIT_TAG of components in $CI_PROJECT_PATH"
+  ZIP_PREFIX: "release" # optional prefix for the release zip file
