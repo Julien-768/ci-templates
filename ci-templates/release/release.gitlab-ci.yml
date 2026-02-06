@@ -71,13 +71,17 @@
     - if: '$CI_COMMIT_TAG'
       when: never
 
-    # Manual test mode for branches/MRs (opt-in)
+    # Manual test mode for branches/MRs (opt-in) - only for Node projects
     - if: '$FORCE_RELEASE == "1"'
+      exists:
+        - package.json
       when: manual
       allow_failure: true
 
-    # Normal behavior on main pushes
+    # Normal behavior on main pushes - only for Node projects
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE !~ /^chore\(release\):/'
+      exists:
+        - package.json
       when: on_success
 
     - when: never
@@ -110,13 +114,17 @@
     - if: '$CI_COMMIT_TAG'
       when: never
 
-    # Manual test mode for branches/MRs (opt-in)
+    # Manual test mode for branches/MRs (opt-in) - only for Node projects
     - if: '$FORCE_RELEASE == "1"'
+      exists:
+        - package.json
       when: manual
       allow_failure: true
 
-    # Normal behavior on main pushes
-    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE !~ /^chore\(release\):/'
+    # Normal behavior on main pushes - only for Node projects
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+      exists:
+        - package.json
       when: on_success
 
     - when: never
