@@ -26,7 +26,6 @@
 # - This makes the template safe to include in non-PlatformIO projects
 #   (including this CI template repository itself).
 #
-
 # --------------------------------------------------
 # Hidden template: clang-format (Alpine + LLVM tools)
 # --------------------------------------------------
@@ -52,13 +51,6 @@
 
 # --------------------------------------------------
 # Hidden template: clang-tidy (PlatformIO implementation)
-#
-# This template runs clang-tidy via `pio check` to leverage PlatformIO's
-# compilation database and environment settings.
-#
-# NOTE:
-# - This job assumes a valid PlatformIO project structure.
-# - Execution is controlled at the concrete job level via `rules`.
 # --------------------------------------------------
 .clang-tidy-template:
   stage: format
@@ -94,14 +86,6 @@ clang-format:
   extends: .clang-format-template
 
 # Static analysis (clang-tidy via PlatformIO)
-#
-# This job is executed only if a `platformio.ini` file exists
-# at the repository root.
-#
-# This prevents failures when the template is included in:
-# - non-PlatformIO projects
-# - CI template libraries
-#
 clang-tidy:
   extends: .clang-tidy-template
   rules:
