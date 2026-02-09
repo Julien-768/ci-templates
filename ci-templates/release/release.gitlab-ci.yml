@@ -6,10 +6,19 @@
 #
 # Variables used by this template:
 #
-# - CI_PUSH_TOKEN (required):
+# - CI_PUSH_TOKEN (optional but recommended):
 #   Personal Access Token or project token with permission to push commits
 #   and tags to the repository. Used to authenticate Git operations performed
-#   by the CI job.
+#   by the CI job. Typically configured as a protected CI/CD variable.
+#
+# - ACCESS_TOKEN (optional fallback):
+#   Alternative token used as a fallback for Git HTTPS authentication.
+#   This is useful when repositories already rely on ACCESS_TOKEN for other
+#   publishing workflows (e.g. GitLab Pages via Mike).
+#
+# - CI_PUSH_TOKEN_TEST (optional, test-only):
+#   Token used only when FORCE_RELEASE=1 (manual test mode) to allow testing
+#   on non-protected branches without exposing CI_PUSH_TOKEN.
 #
 # - CI_BOT_EMAIL (optional):
 #   Email address used for Git commits created during the release process.
@@ -23,6 +32,12 @@
 #   Prefix used when generating the release archive filename.
 #   Default: "release"
 #
+# - FORCE_RELEASE (optional):
+#   If set to "1", enables a manual (play button) test mode on non-main branches.
+#
+# Requirements:
+# - package.json must exist at the repository root (Node-based release workflow).
+#
 
 # --------------------------------------------------
 # Hidden template: version bump + tag creation + zip
@@ -35,6 +50,23 @@
     ZIP_PREFIX: "release"
 
   script:
+    # 0) Select the push token (prod / fallback / test)
+    - |
+      set -e
+      PUSH_TOKEN="${CI_PUSH_TOKEN:-${ACCESS_TOKEN:-}}"
+
+      # Optional test-only token when FORCE_RELEASE=1
+      if [ "${FORCE_RELEASE:-0}" = "1" ] && [ -n "${CI_PUSH_TOKEN_TEST:-}" ]; then
+        PUSH_TOKEN="${CI_PUSH_TOKEN_TEST}"
+      fi
+
+      if [ -z "${PUSH_TOKEN}" ]; then
+        echo "ERROR: no push token available (CI_PUSH_TOKEN / ACCESS_TOKEN / CI_PUSH_TOKEN_TEST)"
+        exit 1
+      fi
+
+      echo "Using authenticated HTTPS remote (token value not printed)."
+
     # 1) Install dependencies and configure Git identity
     - npm install
     - git config --global user.email "${CI_BOT_EMAIL:-ci@example.com}"
@@ -52,7 +84,7 @@
 
       git archive --format=zip --output "$ZIP_NAME" "$TAG"
 
-      git remote set-url origin "https://gitlab-ci-token:${CI_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+      git remote set-url origin "https://gitlab-ci-token:${PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
       git push origin "HEAD:${CI_COMMIT_REF_NAME}"
       git push origin --tags
 
