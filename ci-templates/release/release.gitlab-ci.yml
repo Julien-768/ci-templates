@@ -8,17 +8,12 @@
 #
 # - CI_PUSH_TOKEN (optional but recommended):
 #   Personal Access Token or project token with permission to push commits
-#   and tags to the repository. Used to authenticate Git operations performed
-#   by the CI job. Typically configured as a protected CI/CD variable.
+#   and tags to the repository. Typically configured as a protected CI/CD variable.
 #
 # - ACCESS_TOKEN (optional fallback):
 #   Alternative token used as a fallback for Git HTTPS authentication.
-#   This is useful when repositories already rely on ACCESS_TOKEN for other
-#   publishing workflows (e.g. GitLab Pages via Mike).
-#
-# - CI_PUSH_TOKEN_TEST (optional, test-only):
-#   Token used only when FORCE_RELEASE=1 (manual test mode) to allow testing
-#   on non-protected branches without exposing CI_PUSH_TOKEN.
+#   Useful when repositories already rely on ACCESS_TOKEN for other publishing
+#   workflows (e.g. GitLab Pages via Mike).
 #
 # - CI_BOT_EMAIL (optional):
 #   Email address used for Git commits created during the release process.
@@ -38,6 +33,11 @@
 # Requirements:
 # - package.json must exist at the repository root (Node-based release workflow).
 #
+# Notes:
+# - If no push token is available, the job runs in "dry-run" mode:
+#   it bumps the version, updates CHANGELOG.md, creates a tag and builds the ZIP,
+#   but skips pushing commits/tags and skips GitLab Release publication.
+#
 
 # --------------------------------------------------
 # Hidden template: version bump + tag creation + zip
@@ -50,47 +50,42 @@
     ZIP_PREFIX: "release"
 
   script:
-    # 0) Select the push token (prod / fallback / test)
     - |
       set -e
-      PUSH_TOKEN="${CI_PUSH_TOKEN:-${ACCESS_TOKEN:-}}"
 
-      # Optional test-only token when FORCE_RELEASE=1
-      if [ "${FORCE_RELEASE:-0}" = "1" ] && [ -n "${CI_PUSH_TOKEN_TEST:-}" ]; then
-        PUSH_TOKEN="${CI_PUSH_TOKEN_TEST}"
-      fi
+      # 1) Install dependencies and configure Git identity
+      npm install
+      git config --global user.email "${CI_BOT_EMAIL:-ci@example.com}"
+      git config --global user.name "${CI_BOT_NAME:-CI Bot}"
+      git fetch --tags
 
-      if [ -z "${PUSH_TOKEN}" ]; then
-        echo "ERROR: no push token available (CI_PUSH_TOKEN / ACCESS_TOKEN / CI_PUSH_TOKEN_TEST)"
-        exit 1
-      fi
+      # 2) Bump version, generate changelog and create Git tag
+      npx standard-version --message "chore(release): %s"
 
-      echo "Using authenticated HTTPS remote (token value not printed)."
-
-    # 1) Install dependencies and configure Git identity
-    - npm install
-    - git config --global user.email "${CI_BOT_EMAIL:-ci@example.com}"
-    - git config --global user.name "${CI_BOT_NAME:-CI Bot}"
-    - git fetch --tags
-
-    # 2) Bump version, generate changelog and create Git tag
-    - 'npx standard-version --message "chore(release): %s"'
-
-    # 3) Compute version/tag, create release archive and push changes
-    - |
+      # 3) Compute version/tag, create release archive
       VERSION=$(node -p "require('./package.json').version")
       TAG="v${VERSION}"
       ZIP_NAME="${ZIP_PREFIX}-${TAG}.zip"
 
       git archive --format=zip --output "$ZIP_NAME" "$TAG"
 
-      git remote set-url origin "https://gitlab-ci-token:${PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
-      git push origin "HEAD:${CI_COMMIT_REF_NAME}"
-      git push origin --tags
-
+      # Export variables for downstream jobs
       echo "VERSION=${VERSION}" > tag.env
       echo "TAG=${TAG}" >> tag.env
       echo "ZIP_NAME=${ZIP_NAME}" >> tag.env
+
+      # 4) Push changes and tags (if a token is available)
+      PUSH_TOKEN="${CI_PUSH_TOKEN:-${ACCESS_TOKEN:-}}"
+
+      if [ -z "${PUSH_TOKEN}" ]; then
+        echo "⚠️ No push token available (CI_PUSH_TOKEN / ACCESS_TOKEN)."
+        echo "Dry-run mode: commit/tag/archive generated locally, but push is skipped."
+        exit 0
+      fi
+
+      git remote set-url origin "https://gitlab-ci-token:${PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+      git push origin "HEAD:${CI_COMMIT_REF_NAME}"
+      git push origin --tags
 
   artifacts:
     name: "release-$CI_COMMIT_REF_NAME"
@@ -130,8 +125,14 @@
       artifacts: true
 
   script:
-    - echo "Creating GitLab release for tag $TAG"
-    - ls -la
+    - |
+      set -e
+      if [ -z "${TAG:-}" ]; then
+        echo "No TAG provided (dry-run mode likely). Skipping GitLab Release publication."
+        exit 0
+      fi
+      echo "Creating GitLab release for tag $TAG"
+      ls -la
 
   release:
     tag_name: "$TAG"
