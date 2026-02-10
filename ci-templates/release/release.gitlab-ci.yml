@@ -134,7 +134,8 @@
         --tag-name "$TAG" \
         --name "Release $TAG" \
         --description "$CI_COMMIT_MESSAGE" \
-        --assets-link "name=Source Archive,url=$CI_PROJECT_URL/-/jobs/$CI_JOB_ID/artifacts/download" \
+        --assets-link "name=Source Archive;url=$CI_PROJECT_URL/-/jobs/$CI_JOB_ID/artifacts/download"
+
       || {
         echo "⚠️ GitLab release creation failed (ignored)."
         exit 0
