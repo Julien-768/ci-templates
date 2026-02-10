@@ -26,10 +26,6 @@
 #   Prefix used when generating the release archive filename.
 #   Default: CI_PROJECT_NAME (project name). Can be overridden if needed.
 #
-# - PUBLISH_GITLAB_RELEASE (optional):
-#   If set to "1", enables GitLab Release publication via release-cli.
-#   Default: disabled (opt-in), because some GitLab instances/projects may reject Release creation.
-#
 # Requirements:
 # - package.json must exist at the repository root (Node-based release workflow).
 #
@@ -129,13 +125,14 @@
       echo "Creating GitLab release for tag $TAG (best-effort)"
       ls -la
 
+      # Link to the 'release' job artifacts for this ref (best effort; may vary by GitLab instance)
+      ASSET_URL="$CI_PROJECT_URL/-/jobs/artifacts/$CI_COMMIT_REF_NAME/download?job=release"
+
       # Best-effort release creation: do not fail the pipeline if GitLab rejects releases (HTTP 4xx/5xx)
       release-cli create \
         --tag-name "$TAG" \
         --name "Release $TAG" \
-        --description "$CI_COMMIT_MESSAGE" \
-        --assets-link "name=Source Archive;url=$CI_PROJECT_URL/-/jobs/$CI_JOB_ID/artifacts/download"
-
+        --description "$(printf '%s\n\nSource archive: %s\n' "$CI_COMMIT_MESSAGE" "$ASSET_URL")" \
       || {
         echo "⚠️ GitLab release creation failed (ignored)."
         exit 0
@@ -161,4 +158,3 @@ release:
 gitlab_release:
   extends: .gitlab-release-template
   allow_failure: true
-
