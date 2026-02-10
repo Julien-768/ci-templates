@@ -1,9 +1,16 @@
 # .gitlab-ci.yml
-
-# This GitLab CI configuration file sets up various stages and includes multiple CI templates.
-# It defines the stages for format, lint, pages, test, deployment and release.
-# The included templates provide specific configurations for different tools and languages.
-# The variables section allows setting optional paths for configuration files used by different tools.
+#
+# This GitLab CI configuration file sets up the pipeline stages and includes the
+# shared CI templates from this repository (local includes).
+#
+# Stages:
+# - format: code formatting checks (clang-format / clang-tidy)
+# - lint: static checks (python, markdownlint, eslint/prettier)
+# - build: firmware builds (PlatformIO, GNU Arm Embedded)
+# - test: documentation build/tests (mkdocs)
+# - pages: publication jobs (mike, doxygen)
+# - release: versioning/tagging/archive/release publication
+#
 
 stages:
   - format
@@ -15,33 +22,77 @@ stages:
 
 include:
   # --- Format stage ---
-  - local: 'ci-templates/clang/clang.gitlab-ci.yml'
+  - local: "ci-templates/clang/clang.gitlab-ci.yml"
 
   # --- Lint stage ---
-  - local: 'ci-templates/python/python.gitlab-ci.yml'
-  - local: 'ci-templates/markdown/markdownlint.gitlab-ci.yml'
-  - local: 'ci-templates/eslint/eslint-prettier.gitlab-ci.yml'
+  - local: "ci-templates/python/python.gitlab-ci.yml"
+  - local: "ci-templates/markdown/markdownlint.gitlab-ci.yml"
+  - local: "ci-templates/eslint/eslint-prettier.gitlab-ci.yml"
 
   # --- Build stage ---
-  - local: 'ci-templates/platformio/platformio.gitlab-ci.yml'
-  - local: 'ci-templates/gcc/gcc-embedded.gitlab-ci.yml'
+  - local: "ci-templates/platformio/platformio.gitlab-ci.yml"
+  - local: "ci-templates/gcc/gcc-embedded.gitlab-ci.yml"
 
   # --- Test / Pages stages ---
-  - local: 'ci-templates/mkdocs/mkdocs.gitlab-ci.yml'
-  - local: 'ci-templates/mike/mike.gitlab-ci.yml'
+  - local: "ci-templates/mkdocs/mkdocs.gitlab-ci.yml"
+  - local: "ci-templates/mike/mike.gitlab-ci.yml"
 
   # --- Pages stage ---
-  - local: 'ci-templates/doxygen/doxygen.gitlab-ci.yml'
+  - local: "ci-templates/doxygen/doxygen.gitlab-ci.yml"
 
   # --- Release stage ---
-  - local: 'ci-templates/release/release.gitlab-ci.yml'
-
+  - local: "ci-templates/release/release.gitlab-ci.yml"
 
 variables:
-  CLANG_PATH: 'src' # optional path to the C/C++ source files
-  CLANG_FORMAT_FILE: '.clang-format.yml' # optional path to the clang-format configuration file
-  DOXYFILE_PATH: 'src' # optional path to the Doxygen configuration file
-  PYLINT_RCFILE: 'pyproject.toml' # optional path to the Pylint configuration file
-  LINT_PATH: 'src' # optional path to the linting files
-  MK_PATH: 'src' # optional path to the Markdown directory
-  ZIP_PREFIX: "release" # optional prefix for the release zip file
+  CLANG_PATH: "src" # optional path to the C/C++ source files
+  CLANG_FORMAT_FILE: ".clang-format.yml" # optional path to the clang-format configuration file
+  DOXYFILE_PATH: "src" # optional path to the Doxygen configuration file
+  PYLINT_RCFILE: "pyproject.toml" # optional path to the Pylint configuration file
+  LINT_PATH: "src" # optional path to the linting files
+  MK_PATH: "src" # optional path to the Markdown directory
+  ZIP_PREFIX: "release" # optional prefix for the release zip file (override template default if needed)
+
+# --------------------------------------------------------------------
+# Local override: enable manual release testing on a dedicated branch
+# --------------------------------------------------------------------
+#
+# We avoid a "FORCE_RELEASE" mechanism in the shared template.
+# Instead, consumers (or this repository) can opt-in to test the release jobs
+# by overriding `rules` locally.
+#
+# Adjust the branch name below to your preferred test branch.
+#
+release:
+  rules:
+    # Never run on tag pipelines
+    - if: '$CI_COMMIT_TAG'
+      when: never
+
+    # Manual test on a dedicated branch
+    - if: '$CI_COMMIT_BRANCH == "test/release-test-mode"'
+      when: manual
+      allow_failure: true
+
+    # Default behavior from the template (main push, excluding chore(release))
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE !~ /^chore\(release\):/'
+      when: on_success
+
+    - when: never
+
+gitlab_release:
+  rules:
+    # Never run on tag pipelines
+    - if: '$CI_COMMIT_TAG'
+      when: never
+
+    # Manual test on a dedicated branch (publication still depends on template conditions/vars)
+    - if: '$CI_COMMIT_BRANCH == "test/release-test-mode"'
+      when: manual
+      allow_failure: true
+
+    # Default behavior from the template (main push)
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+      when: on_success
+      allow_failure: true
+
+    - when: never

@@ -1,8 +1,11 @@
 # release.gitlab-ci.yml
 #
-# Shared GitLab CI template implementing a complete release workflow:
-# version bumping, changelog generation, Git tagging, release archive
-# creation and GitLab Release publication.
+# Shared GitLab CI template implementing a release workflow:
+# - version bump (standard-version)
+# - changelog generation
+# - Git tag creation
+# - source archive (zip) creation
+# - optional GitLab Release publication (release-cli)
 #
 # Variables used by this template:
 #
@@ -23,9 +26,6 @@
 #   Prefix used when generating the release archive filename.
 #   Default: CI_PROJECT_NAME (project name). Can be overridden if needed.
 #
-# - FORCE_RELEASE (optional):
-#   If set to "1", enables a manual (play button) test mode on non-main branches.
-#
 # - PUBLISH_GITLAB_RELEASE (optional):
 #   If set to "1", enables GitLab Release publication via release-cli.
 #   Default: disabled (opt-in), because some GitLab instances/projects may reject Release creation.
@@ -36,7 +36,8 @@
 # Notes:
 # - Dry-run mode (no CI_PUSH_TOKEN): the job bumps version, updates CHANGELOG.md,
 #   creates a local tag and builds the ZIP, but skips pushing commits/tags.
-# - GitLab Release publication is opt-in via PUBLISH_GITLAB_RELEASE=1 and requires CI_PUSH_TOKEN.
+# - Branch-specific testing should be done by overriding job `rules` in the consuming project,
+#   not by adding "force" logic in this shared template.
 #
 
 # --------------------------------------------------
@@ -96,13 +97,6 @@
     - if: '$CI_COMMIT_TAG'
       when: never
 
-    # Manual test mode for branches/MRs (opt-in) - only for Node projects
-    - if: '$FORCE_RELEASE == "1"'
-      exists:
-        - package.json
-      when: manual
-      allow_failure: true
-
     # Normal behavior on main pushes - only for Node projects
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE !~ /^chore\(release\):/'
       exists:
@@ -126,7 +120,7 @@
     - |
       set -e
 
-      # If TAG is missing, we are likely in dry-run mode (no push).
+      # Dry-run mode: no TAG exported => skip
       if [ -z "${TAG:-}" ]; then
         echo "No TAG provided (dry-run mode). Skipping GitLab Release publication."
         exit 0
@@ -148,18 +142,12 @@
     - if: '$CI_COMMIT_TAG'
       when: never
 
-    # Manual test mode (opt-in) - publish only if explicitly enabled and token is available
-    - if: '$FORCE_RELEASE == "1" && $PUBLISH_GITLAB_RELEASE == "1" && $CI_PUSH_TOKEN'
-      exists:
-        - package.json
-      when: manual
-      allow_failure: true
-
-    # Normal behavior on main pushes (opt-in) - publish only if explicitly enabled and token is available
+    # Opt-in publication, only on main, only when token exists
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $PUBLISH_GITLAB_RELEASE == "1" && $CI_PUSH_TOKEN'
       exists:
         - package.json
       when: on_success
+      allow_failure: true
 
     - when: never
 
