@@ -98,11 +98,3 @@ Update the documentation to reflect any changes you make. This includes updating
 If you have any questions or need further clarification, feel free to reach out to the repository maintainers.
 
 Happy contributing!
-
-
-
-
-
-
-
-
