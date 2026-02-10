@@ -147,7 +147,6 @@
       exists:
         - package.json
       when: on_success
-      allow_failure: true
 
     - when: never
 
@@ -160,3 +159,4 @@ release:
 gitlab_release:
   extends: .gitlab-release-template
   allow_failure: true
+

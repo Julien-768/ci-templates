@@ -62,7 +62,9 @@ variables:
 #
 # Adjust the branch name below to your preferred test branch.
 #
+
 release:
+  allow_failure: true
   rules:
     # Never run on tag pipelines
     - if: '$CI_COMMIT_TAG'
@@ -70,29 +72,35 @@ release:
 
     # Manual test on a dedicated branch
     - if: '$CI_COMMIT_BRANCH == "test/release-test-mode"'
+      exists:
+        - package.json
       when: manual
-      allow_failure: true
 
     # Default behavior from the template (main push, excluding chore(release))
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE !~ /^chore\(release\):/'
+      exists:
+        - package.json
       when: on_success
 
     - when: never
 
 gitlab_release:
+  allow_failure: true
   rules:
     # Never run on tag pipelines
     - if: '$CI_COMMIT_TAG'
       when: never
 
-    # Manual test on a dedicated branch (publication still depends on template conditions/vars)
-    - if: '$CI_COMMIT_BRANCH == "test/release-test-mode"'
+    # Manual test on a dedicated branch (opt-in publication)
+    - if: '$CI_COMMIT_BRANCH == "test/release-test-mode" && $PUBLISH_GITLAB_RELEASE == "1" && $CI_PUSH_TOKEN'
+      exists:
+        - package.json
       when: manual
-      allow_failure: true
 
-    # Default behavior from the template (main push)
-    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push"'
+    # Default behavior from the template (main push) + opt-in publication
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $PUBLISH_GITLAB_RELEASE == "1" && $CI_PUSH_TOKEN'
+      exists:
+        - package.json
       when: on_success
-      allow_failure: true
 
     - when: never
