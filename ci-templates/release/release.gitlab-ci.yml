@@ -6,38 +6,37 @@
 #
 # Variables used by this template:
 #
-# - CI_PUSH_TOKEN (optional but recommended):
-#   Personal Access Token or project token with permission to push commits
-#   and tags to the repository. Typically configured as a protected CI/CD variable.
-#
-# - ACCESS_TOKEN (optional fallback):
-#   Alternative token used as a fallback for Git HTTPS authentication.
-#   Useful when repositories already rely on ACCESS_TOKEN for other publishing
-#   workflows (e.g. GitLab Pages via Mike).
+# - CI_PUSH_TOKEN (recommended to publish a release):
+#   Project access token / bot token with permission to push commits and tags.
+#   Typically configured as a protected CI/CD variable in the consuming project.
+#   If not set, the `release` job runs in "dry-run" mode (no push).
 #
 # - CI_BOT_EMAIL (optional):
-#   Email address used for Git commits created during the release process.
-#   Default: "ci@example.com"
+#   Override Git author email for the release commit.
+#   Default: GitLab-provided identity (GITLAB_USER_EMAIL), with a final fallback to "ci@example.com".
 #
 # - CI_BOT_NAME (optional):
-#   Git author name used for release commits.
-#   Default: "CI Bot"
+#   Override Git author name for the release commit.
+#   Default: GitLab-provided identity (GITLAB_USER_NAME), with a final fallback to "CI Bot".
 #
 # - ZIP_PREFIX (optional):
 #   Prefix used when generating the release archive filename.
-#   Default: "release"
+#   Default: CI_PROJECT_NAME (project name). Can be overridden if needed.
 #
 # - FORCE_RELEASE (optional):
 #   If set to "1", enables a manual (play button) test mode on non-main branches.
+#
+# - PUBLISH_GITLAB_RELEASE (optional):
+#   If set to "1", enables GitLab Release publication via release-cli.
+#   Default: disabled (opt-in), because some GitLab instances/projects may reject Release creation.
 #
 # Requirements:
 # - package.json must exist at the repository root (Node-based release workflow).
 #
 # Notes:
-# - If no push token is available, the `release` job runs in "dry-run" mode:
-#   it bumps the version, updates CHANGELOG.md, creates a tag and builds the ZIP,
-#   but skips pushing commits/tags.
-# - The `gitlab_release` job is executed only when a token is available.
+# - Dry-run mode (no CI_PUSH_TOKEN): the job bumps version, updates CHANGELOG.md,
+#   creates a local tag and builds the ZIP, but skips pushing commits/tags.
+# - GitLab Release publication is opt-in via PUBLISH_GITLAB_RELEASE=1 and requires CI_PUSH_TOKEN.
 #
 
 # --------------------------------------------------
@@ -47,25 +46,25 @@
   stage: release
   image: node:20
 
-  variables:
-    ZIP_PREFIX: "release"
-
   script:
     - |
       set -e
 
-      # 1) Install dependencies and configure Git identity
+      # 1) Install dependencies and configure Git identity (GitLab-native with overrides)
       npm install
-      git config --global user.email "${CI_BOT_EMAIL:-ci@example.com}"
-      git config --global user.name "${CI_BOT_NAME:-CI Bot}"
+      git config --global user.email "${CI_BOT_EMAIL:-${GITLAB_USER_EMAIL:-ci@example.com}}"
+      git config --global user.name "${CI_BOT_NAME:-${GITLAB_USER_NAME:-CI Bot}}"
       git fetch --tags
 
       # 2) Bump version, generate changelog and create Git tag
+      # NOTE: standard-version warns that --message will be deprecated in favor of --releaseCommitMessageFormat.
       npx standard-version --message "chore(release): %s"
 
       # 3) Compute version/tag, create release archive
       VERSION=$(node -p "require('./package.json').version")
       TAG="v${VERSION}"
+
+      ZIP_PREFIX="${ZIP_PREFIX:-$CI_PROJECT_NAME}"
       ZIP_NAME="${ZIP_PREFIX}-${TAG}.zip"
 
       git archive --format=zip --output "$ZIP_NAME" "$TAG"
@@ -75,23 +74,21 @@
       echo "TAG=${TAG}" >> tag.env
       echo "ZIP_NAME=${ZIP_NAME}" >> tag.env
 
-      # 4) Push changes and tags (if a token is available)
-      PUSH_TOKEN="${CI_PUSH_TOKEN:-${ACCESS_TOKEN:-}}"
-
-      if [ -z "${PUSH_TOKEN}" ]; then
-        echo "⚠️ No push token available (CI_PUSH_TOKEN / ACCESS_TOKEN)."
+      # 4) Push changes and tags (if token is available)
+      if [ -z "${CI_PUSH_TOKEN:-}" ]; then
+        echo "⚠️ No CI_PUSH_TOKEN provided."
         echo "Dry-run mode: commit/tag/archive generated locally, but push is skipped."
         exit 0
       fi
 
-      git remote set-url origin "https://gitlab-ci-token:${PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+      git remote set-url origin "https://gitlab-ci-token:${CI_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
       git push origin "HEAD:${CI_COMMIT_REF_NAME}"
       git push origin --tags
 
   artifacts:
     name: "release-$CI_COMMIT_REF_NAME"
     paths:
-      - release-v*.zip
+      - "*.zip"
     reports:
       dotenv: tag.env
 
@@ -128,6 +125,13 @@
   script:
     - |
       set -e
+
+      # If TAG is missing, we are likely in dry-run mode (no push).
+      if [ -z "${TAG:-}" ]; then
+        echo "No TAG provided (dry-run mode). Skipping GitLab Release publication."
+        exit 0
+      fi
+
       echo "Creating GitLab release for tag $TAG"
       ls -la
 
@@ -144,15 +148,15 @@
     - if: '$CI_COMMIT_TAG'
       when: never
 
-    # Manual test mode: publish only if a token is available
-    - if: '$FORCE_RELEASE == "1" && ($CI_PUSH_TOKEN || $ACCESS_TOKEN)'
+    # Manual test mode (opt-in) - publish only if explicitly enabled and token is available
+    - if: '$FORCE_RELEASE == "1" && $PUBLISH_GITLAB_RELEASE == "1" && $CI_PUSH_TOKEN'
       exists:
         - package.json
       when: manual
       allow_failure: true
 
-    # Normal behavior on main pushes: publish only if a token is available
-    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && ($CI_PUSH_TOKEN || $ACCESS_TOKEN)'
+    # Normal behavior on main pushes (opt-in) - publish only if explicitly enabled and token is available
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $PUBLISH_GITLAB_RELEASE == "1" && $CI_PUSH_TOKEN'
       exists:
         - package.json
       when: on_success
