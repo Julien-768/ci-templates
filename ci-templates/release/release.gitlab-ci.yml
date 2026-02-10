@@ -159,3 +159,4 @@ release:
 
 gitlab_release:
   extends: .gitlab-release-template
+  allow_failure: true
