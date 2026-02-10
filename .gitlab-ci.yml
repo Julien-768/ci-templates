@@ -92,13 +92,13 @@ gitlab_release:
       when: never
 
     # Manual test on a dedicated branch (opt-in publication)
-    - if: '$CI_COMMIT_BRANCH == "test/release-test-mode" && $PUBLISH_GITLAB_RELEASE == "1" && $CI_PUSH_TOKEN'
+    - if: '$CI_COMMIT_BRANCH == "test/release-test-mode" && $CI_PUSH_TOKEN'
       exists:
         - package.json
       when: manual
 
     # Default behavior from the template (main push) + opt-in publication
-    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $PUBLISH_GITLAB_RELEASE == "1" && $CI_PUSH_TOKEN'
+    - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_PUSH_TOKEN'
       exists:
         - package.json
       when: on_success
