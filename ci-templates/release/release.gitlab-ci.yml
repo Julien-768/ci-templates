@@ -126,25 +126,25 @@
         exit 0
       fi
 
-      echo "Creating GitLab release for tag $TAG"
+      echo "Creating GitLab release for tag $TAG (best-effort)"
       ls -la
 
-  release:
-    tag_name: "$TAG"
-    name: "Release $TAG"
-    description: "$CI_COMMIT_MESSAGE"
-    assets:
-      links:
-        - name: "Source Archive"
-          url: "$CI_PROJECT_URL/-/jobs/$CI_JOB_ID/artifacts/download"
+      # Best-effort release creation: do not fail the pipeline if GitLab rejects releases (HTTP 4xx/5xx)
+      release-cli create \
+        --tag-name "$TAG" \
+        --name "Release $TAG" \
+        --description "$CI_COMMIT_MESSAGE" \
+        --assets-link "name=Source Archive,url=$CI_PROJECT_URL/-/jobs/$CI_JOB_ID/artifacts/download" \
+      || {
+        echo "⚠️ GitLab release creation failed (ignored)."
+        exit 0
+      }
 
   rules:
     - if: '$CI_COMMIT_TAG'
       when: never
 
-    # Opt-in publication, only on main, only when token exists
     - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_PUSH_TOKEN'
-
       exists:
         - package.json
       when: on_success
