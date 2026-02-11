@@ -4,38 +4,15 @@
 # version bumping, changelog generation, Git tagging, release archive
 # creation and (optional) GitLab Release publication.
 #
-# Variables used by this template:
-#
-# - CI_PUSH_TOKEN (recommended to publish a release):
-#   Project access token / bot token with permission to push commits and tags.
-#   Typically configured as a protected CI/CD variable in the consuming project.
-#   If not set, the `release` job runs in "dry-run" mode (no push).
-#
-# - CI_BOT_EMAIL (optional):
-#   Override Git author email for the release commit.
-#   Default: GitLab-provided identity (GITLAB_USER_EMAIL), with a final fallback to "ci@example.com".
-#
-# - CI_BOT_NAME (optional):
-#   Override Git author name for the release commit.
-#   Default: GitLab-provided identity (GITLAB_USER_NAME), with a final fallback to "CI Bot".
-#
-# - ZIP_PREFIX (optional):
-#   Prefix used when generating the release archive filename.
-#   Default: CI_PROJECT_NAME (project name). Can be overridden if needed.
+# Variables:
+# - CI_PUSH_TOKEN (recommended): push commits/tags. If missing => dry-run (no push).
+# - CI_BOT_EMAIL (optional): default ci@example.com
+# - CI_BOT_NAME  (optional): default CI Bot
+# - ZIP_PREFIX   (optional): default CI_PROJECT_NAME
 #
 # Requirements:
-# - package.json must exist at the repository root (Node-based release workflow).
-#
-# Notes:
-# - Dry-run mode (no CI_PUSH_TOKEN): the job bumps version, updates CHANGELOG.md,
-#   creates a local tag and builds the ZIP, but skips pushing commits/tags.
-# - Branch-specific testing should be done by overriding job `rules` in the consuming project,
-#   not by adding "force" logic in this shared template.
-#
+# - package.json at repo root
 
-# --------------------------------------------------
-# Hidden template: version bump + tag creation + zip
-# --------------------------------------------------
 .release-template:
   stage: release
   image: node:20
@@ -60,22 +37,12 @@
       # 3) Compute tag from git (robust) and create release archive
       TAG="$(git describe --tags --abbrev=0)"
       VERSION="${TAG#v}"
+
+      ZIP_PREFIX="${ZIP_PREFIX:-$CI_PROJECT_NAME}"
       ZIP_NAME="${ZIP_PREFIX}-${TAG}.zip"
 
       echo "Creating archive for ${TAG} -> ${ZIP_NAME}"
       git archive --format=zip --output "$ZIP_NAME" "$TAG"
-
-      # Export variables for downstream jobs
-      echo "VERSION=${VERSION}" > tag.env
-      echo "TAG=${TAG}" >> tag.env
-      echo "ZIP_NAME=${ZIP_NAME}" >> tag.env
-
-      # 4) Push changes and tags (if token is available)
-      if [ -z "${CI_PUSH_TOKEN:-}" ]; then
-        echo "⚠️ No CI_PUSH_TOKEN provided."
-        echo "Dry-run mode: commit/tag/archive generated locally, but push is skipped."
-        exit 0
-      fi
 
       # Export variables for downstream jobs
       echo "VERSION=${VERSION}" > tag.env
@@ -111,9 +78,6 @@
 
     - when: never
 
-# --------------------------------------------------
-# Hidden template: GitLab Release publication (best-effort)
-# --------------------------------------------------
 .gitlab-release-template:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
@@ -154,13 +118,9 @@
 
     - when: never
 
-# --------------------------------------------------
-# Concrete jobs
-# --------------------------------------------------
 release:
   extends: .release-template
 
 gitlab_release:
   extends: .gitlab-release-template
-  allow_failure: true
   allow_failure: true
