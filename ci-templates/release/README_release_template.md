@@ -72,6 +72,67 @@ Including the template is sufficient to enable the release workflow:
 
 ---
 
+## ⚠️ GitLab Release publication behavior (important)
+
+On some GitLab instances or projects, the GitLab Release API may be restricted or partially disabled.
+
+Typical symptoms include errors such as:
+
+```text
+422 Project must contain components
+```
+
+This can happen even when:
+
+- the Git tag is correctly created,
+
+- the ZIP archive is generated,
+
+- the push succeeds.
+
+**How the template handles this**
+
+- The `release` job is **authoritative**:
+  - version bump
+
+  - changelog
+
+  - tag creation
+
+  - ZIP archive generation
+
+  - push to the repository
+
+  These steps always run when conditions are met.
+
+- The `gitlab-release` **job is best-effort**:
+  - It attempts to publish a GitLab Release via release-cli
+
+  - If the GitLab instance refuses Release creation, the job may fail
+
+  - **This failure does NOT invalidate the release itself**
+
+For this reason, the `gitlab-release` job is configured as **non-blocking** (`allow_failure: true`) in the template.
+
+**Practical consequences**
+
+- Your project still gets a **valid release**:
+  - Git tag `vX.Y.Z`
+
+  - ZIP archive available as a pipeline artifact
+
+- GitLab Release UI entry is created **only if the instance allows it**
+
+- CI pipelines remain green and predictable across GitLab instances
+
+**Recommendation**
+
+Projects should rely on:
+
+- **Git tags and release artifacts** as the canonical release output
+
+- GitLab Release UI as an optional convenience layer
+
 ## 📦 Outputs
 
 - **Artifact**: `release-vX.Y.Z.zip`

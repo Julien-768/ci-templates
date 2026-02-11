@@ -1,9 +1,16 @@
 # .gitlab-ci.yml
-
-# This GitLab CI configuration file sets up various stages and includes multiple CI templates.
-# It defines the stages for format, lint, pages, test, deployment and release.
-# The included templates provide specific configurations for different tools and languages.
-# The variables section allows setting optional paths for configuration files used by different tools.
+#
+# This GitLab CI configuration file sets up the pipeline stages and includes the
+# shared CI templates from this repository (local includes).
+#
+# Stages:
+# - format: code formatting checks (clang-format / clang-tidy)
+# - lint: static checks (python, markdownlint, eslint/prettier)
+# - build: firmware builds (PlatformIO, GNU Arm Embedded)
+# - test: documentation build/tests (mkdocs)
+# - pages: publication jobs (mike, doxygen)
+# - release: versioning/tagging/archive/release publication
+#
 
 stages:
   - format
@@ -15,33 +22,32 @@ stages:
 
 include:
   # --- Format stage ---
-  - local: 'ci-templates/clang/clang.gitlab-ci.yml'
+  - local: "ci-templates/clang/clang.gitlab-ci.yml"
 
   # --- Lint stage ---
-  - local: 'ci-templates/python/python.gitlab-ci.yml'
-  - local: 'ci-templates/markdown/markdownlint.gitlab-ci.yml'
-  - local: 'ci-templates/eslint/eslint-prettier.gitlab-ci.yml'
+  - local: "ci-templates/python/python.gitlab-ci.yml"
+  - local: "ci-templates/markdown/markdownlint.gitlab-ci.yml"
+  - local: "ci-templates/eslint/eslint-prettier.gitlab-ci.yml"
 
   # --- Build stage ---
-  - local: 'ci-templates/platformio/platformio.gitlab-ci.yml'
-  - local: 'ci-templates/gcc/gcc-embedded.gitlab-ci.yml'
+  - local: "ci-templates/platformio/platformio.gitlab-ci.yml"
+  - local: "ci-templates/gcc/gcc-embedded.gitlab-ci.yml"
 
   # --- Test / Pages stages ---
-  - local: 'ci-templates/mkdocs/mkdocs.gitlab-ci.yml'
-  - local: 'ci-templates/mike/mike.gitlab-ci.yml'
+  - local: "ci-templates/mkdocs/mkdocs.gitlab-ci.yml"
+  - local: "ci-templates/mike/mike.gitlab-ci.yml"
 
   # --- Pages stage ---
-  - local: 'ci-templates/doxygen/doxygen.gitlab-ci.yml'
+  - local: "ci-templates/doxygen/doxygen.gitlab-ci.yml"
 
   # --- Release stage ---
-  - local: 'ci-templates/release/release.gitlab-ci.yml'
-
+  - local: "ci-templates/release/release.gitlab-ci.yml"
 
 variables:
-  CLANG_PATH: 'src' # optional path to the C/C++ source files
-  CLANG_FORMAT_FILE: '.clang-format.yml' # optional path to the clang-format configuration file
-  DOXYFILE_PATH: 'src' # optional path to the Doxygen configuration file
-  PYLINT_RCFILE: 'pyproject.toml' # optional path to the Pylint configuration file
-  LINT_PATH: 'src' # optional path to the linting files
-  MK_PATH: 'src' # optional path to the Markdown directory
+  CLANG_PATH: "src" # optional path to the C/C++ source files
+  CLANG_FORMAT_FILE: ".clang-format.yml" # optional path to the clang-format configuration file
+  DOXYFILE_PATH: "src" # optional path to the Doxygen configuration file
+  PYLINT_RCFILE: "pyproject.toml" # optional path to the Pylint configuration file
+  LINT_PATH: "src" # optional path to the linting files
+  MK_PATH: "src" # optional path to the Markdown directory
   ZIP_PREFIX: "release" # optional prefix for the release zip file

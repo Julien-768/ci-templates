@@ -63,6 +63,18 @@ The `ci-gitlab.yml` file must include all jobs from the template and must execut
 - **Concrete Jobs**: Concrete jobs (e.g., `clang-format`, `clang-tidy`) are defined in this file so that consuming projects can simply include this template without redefining jobs.
 - **Plug-and-Play**: Including this file is sufficient to get the default jobs executed.
 
+## Token Naming Recommendations
+
+When naming tokens for CI/CD pipelines, clarity and consistency are key. Here are some recommendations based on common use cases:
+
+👉 CI_PUSH_TOKEN: Use this if the job needs to push changes to a repository or another system. It clearly indicates the token’s purpose.
+
+👉 CI_ACCESS_TOKEN: Ideal for jobs that call external APIs or services. This name is readable, neutral, and avoids ambiguity.
+
+👉 CI_API_TOKEN: Perfect if the token is exclusively used for API calls. It’s concise and directly describes the token’s role.
+
+Choose names that reflect the token’s purpose to ensure your pipelines remain clean, understandable, and maintainable.
+
 ## Commit Messages
 
 Write clear, descriptive commit messages that explain the purpose of your changes. Follow the conventional commit format if applicable.
