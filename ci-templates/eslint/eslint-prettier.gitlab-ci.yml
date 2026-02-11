@@ -17,7 +17,6 @@
 .format-lint-template:
   stage: lint
   image: node:20-alpine
-
   variables:
     # Fail fast on errors
     ESLINT_NO_DEV_ERRORS: "true"
