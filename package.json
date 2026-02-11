@@ -1,0 +1,8 @@
+{
+  "name": "@iphc/ci-templates",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "standard-version": "^9.5.0"
+  }
+}
