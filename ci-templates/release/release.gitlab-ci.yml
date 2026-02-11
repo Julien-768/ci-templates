@@ -40,7 +40,11 @@
       npm install
       git config --global user.email "${CI_BOT_EMAIL:-ci@example.com}"
       git config --global user.name "${CI_BOT_NAME:-CI Bot}"
-      git fetch --tags
+
+      # Ensure local tags match remote tags (avoid stale tags on runners)
+      git fetch --prune
+      git tag -l | xargs -r git tag -d
+      git fetch --tags --prune --prune-tags
 
       # 2) Bump version, generate changelog and create Git tag
       npx standard-version --message "chore(release): %s"
