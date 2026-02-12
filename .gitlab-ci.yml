@@ -22,26 +22,26 @@ stages:
 
 include:
 # --- Format stage ---
-- local: "ci-templates/clang/template.yml"
+- local: "templates/clang/template.yml"
 
 # --- Lint stage ---
-- local: "ci-templates/python/template.yml"
-- local: "ci-templates/markdown/template.yml"
-- local: "ci-templates/eslint/template.yml"
+- local: "templates/python/template.yml"
+- local: "templates/markdown/template.yml"
+- local: "templates/eslint/template.yml"
 
 # --- Build stage ---
-- local: "ci-templates/platformio/template.yml"
-- local: "ci-templates/gcc/template.yml"
+- local: "templates/platformio/template.yml"
+- local: "templates/gcc/template.yml"
 
 # --- Test / Pages stages ---
-- local: "ci-templates/mkdocs/template.yml"
-- local: "ci-templates/mike/template.yml"
+- local: "templates/mkdocs/template.yml"
+- local: "templates/mike/template.yml"
 
 # --- Pages stage ---
-- local: "ci-templates/doxygen/template.yml"
+- local: "templates/doxygen/template.yml"
 
 # --- Release stage ---
-- local: "ci-templates/release/template.yml"
+- local: "templates/release/template.yml"
 
 variables:
   CLANG_PATH: "src" # optional path to the C/C++ source files
