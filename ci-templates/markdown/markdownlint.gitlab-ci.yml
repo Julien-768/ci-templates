@@ -1,11 +1,11 @@
 # markdownlint.gitlab-ci.yml
 # Shared GitLab CI template for Markdown linting (markdownlint-cli).
 # Variable (optional):
-# - MK_PATH: Root directory to lint (default: "docs"; use "." to lint the whole repo).
-# Configuration (repo root):
+# - MD_PATH: Root directory to lint (default: ".", use "docs" to restrict).
+# Config (repo root):
 # - .markdownlint.json (rules)
-# - .markdownlintignore (exclusions; auto-read by markdownlint-cli)
-# Notes: Uses glob "${MK_PATH:-docs}/**/*.md".
+# - .markdownlintignore (exclusions; auto-read)
+# Notes: Uses glob "${MD_PATH:-.}/**/*.md".
 
 # --------------------------------------------------
 # Hidden template: Markdown lint job
@@ -22,8 +22,7 @@
   script:
     - |
       set -eu
-      # markdownlint-cli automatically reads .markdownlintignore if present
-      npx markdownlint --config .markdownlint.json "${MK_PATH:-docs}/**/*.md"
+      npx markdownlint --config .markdownlint.json "${MD_PATH:-.}/**/*.md"
 
 # --------------------------------------------------
 # Concrete job exposed to consuming projects
