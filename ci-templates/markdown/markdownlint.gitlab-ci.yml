@@ -1,17 +1,27 @@
 # CI job for Markdown linting
+#
 # Uses markdownlint-cli2 to check Markdown files for style issues.
-# LINT_PATH (optional) allows specifying a subset of files to lint.
-# Defaults to all Markdown files in 'docs/' if not set.
+#
+# By default, all Markdown files in the repository are linted.
+# The optional LINT_PATH variable can be used to restrict linting
+# to a specific subset of files (e.g. "docs/**/*.md").
+#
+# The job respects:
+# - .markdownlint.json      → rule configuration
+# - .markdownlintignore     → file exclusions (e.g. CHANGELOG.md, .pio/)
+#
+# This implementation avoids using `find` so that markdownlint-cli2
+# can properly handle glob patterns and ignore files.
+#
+# --------------------------------------------------
 
-# Définir une ancre pour la configuration Markdown Lint
 .markdown-lint-template:
   stage: lint
   image: node:18
   before_script:
     - npm i -D markdownlint-cli2
   script:
-    find "${LINT_PATH:-docs}" -type f -name "*.md" -exec npx markdownlint-cli2 --config .markdownlint.json {} +
+    npx markdownlint-cli2 --config .markdownlint.json -- "${LINT_PATH:-**/*.md}"
 
-# Utiliser l'ancre dans le job
 Markdown Lint:
   extends: .markdown-lint-template
