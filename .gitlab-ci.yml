@@ -22,33 +22,33 @@ stages:
 
 include:
   # --- Format stage ---
-  - local: "ci-templates/clang/clang.gitlab-ci.yml"
+  - local: "templates/clang/template.yml"
 
   # --- Lint stage ---
-  - local: "ci-templates/python/python.gitlab-ci.yml"
-  - local: "ci-templates/markdown/markdownlint.gitlab-ci.yml"
-  - local: "ci-templates/eslint/eslint-prettier.gitlab-ci.yml"
+  - local: "templates/python/template.yml"
+  - local: "templates/markdownlint/template.yml"
+  - local: "templates/eslint-prettier/template.yml"
 
   # --- Build stage ---
-  - local: "ci-templates/platformio/platformio.gitlab-ci.yml"
-  - local: "ci-templates/gcc/gcc-embedded.gitlab-ci.yml"
+  - local: "templates/platformio/template.yml"
+  - local: "templates/gcc-embedded/template.yml"
 
   # --- Test / Pages stages ---
-  - local: "ci-templates/mkdocs/mkdocs.gitlab-ci.yml"
-  - local: "ci-templates/mike/mike.gitlab-ci.yml"
+  - local: "templates/mkdocs/template.yml"
+  - local: "templates/mike/template.yml"
 
   # --- Pages stage ---
-  - local: "ci-templates/doxygen/doxygen.gitlab-ci.yml"
+  - local: "templates/doxygen/template.yml"
 
   # --- Release stage ---
-  - local: "ci-templates/release/release.gitlab-ci.yml"
+  - local: "templates/release/template.yml"
 
 variables:
   CLANG_PATH: "src" # optional path to the C/C++ source files
   CLANG_FORMAT_FILE: ".clang-format.yml" # optional path to the clang-format configuration file
   DOXYFILE_PATH: "src" # optional path to the Doxygen configuration file
   PYLINT_RCFILE: "pyproject.toml" # optional path to the Pylint configuration file
-  LINT_PATH: "src" # optional path to the linting files
-  MD_PATH: "." # lint all Markdown files in the repository (default if unset)
+  LINT_PATH: "src" # optional path for source-code linting (non-Markdown)
+  MD_PATH: "." # optional root for Markdown linting (default: lint all)
   MK_PATH: "src" # MkDocs project directory (contains mkdocs.yml + requirements.txt)
   ZIP_PREFIX: "release" # optional prefix for the release zip file
