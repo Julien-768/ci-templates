@@ -49,5 +49,5 @@ variables:
   DOXYFILE_PATH: "src" # optional path to the Doxygen configuration file
   PYLINT_RCFILE: "pyproject.toml" # optional path to the Pylint configuration file
   LINT_PATH: "src" # optional path to the linting files
-  MK_PATH: "src" # optional path to the Markdown directory
+  MK_PATH: "." # optional path to the Markdown directory
   ZIP_PREFIX: "release" # optional prefix for the release zip file

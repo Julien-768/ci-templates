@@ -1,42 +1,32 @@
-# CI job for Markdown linting
-#
-# Uses markdownlint-cli (Node-based) to check Markdown files for style issues.
-#
-# MK_PATH (optional)
-# ------------------
-# Root directory where Markdown files are searched.
-# Defaults to "docs" if not set.
-# Use "." to lint the whole repository.
-#
-# Configuration files (repository root)
-# ------------------------------------
-# - .markdownlint.json      → rule configuration
-# - .markdownlintignore     → file exclusions (native support in markdownlint-cli)
-#
-# Notes
-# -----
-# - Uses glob pattern: "${MK_PATH}/**/*.md"
-# - If you lint the whole repo (MK_PATH="."), exclude generated/vendor dirs
-#   in .markdownlintignore (e.g., node_modules/, .pio/, .git/).
-#
-# --------------------------------------------------
+# markdownlint.gitlab-ci.yml
+# Shared GitLab CI template for Markdown linting (markdownlint-cli).
+# Variable (optional):
+# - MK_PATH: Root directory to lint (default: "docs"; use "." to lint the whole repo).
+# Configuration (repo root):
+# - .markdownlint.json (rules)
+# - .markdownlintignore (exclusions; auto-read by markdownlint-cli)
+# Notes: Uses glob "${MK_PATH:-docs}/**/*.md".
 
+# --------------------------------------------------
+# Hidden template: Markdown lint job
+# --------------------------------------------------
 .markdown-lint-template:
   stage: lint
   image: node:18
+
   before_script:
     - npm config set fund false
     - npm config set audit false
     - npm i -D markdownlint-cli
+
   script:
     - |
       set -eu
-      ROOT="${MK_PATH:-docs}"
-
       # markdownlint-cli automatically reads .markdownlintignore if present
-      npx markdownlint \
-        --config .markdownlint.json \
-        "${ROOT}/**/*.md"
+      npx markdownlint --config .markdownlint.json "${MK_PATH:-docs}/**/*.md"
 
+# --------------------------------------------------
+# Concrete job exposed to consuming projects
+# --------------------------------------------------
 Markdown Lint:
   extends: .markdown-lint-template
