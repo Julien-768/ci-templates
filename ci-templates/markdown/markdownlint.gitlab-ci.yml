@@ -2,15 +2,35 @@
 #
 # Uses markdownlint-cli2 to check Markdown files for style issues.
 #
-# MK_PATH (optional) defines the root directory where Markdown files are searched.
-# Defaults to "docs" if not set. Use "." to lint the whole repository.
+# MK_PATH (optional)
+# ------------------
+# Defines the root directory where Markdown files are searched.
+# Defaults to "docs" if not set.
+# Use "." to lint the whole repository.
 #
+# Example (in consuming project):
+#   variables:
+#     MK_PATH: "."
+#
+# Configuration files
+# -------------------
 # The job respects:
 # - .markdownlint.json      → rule configuration
-# - .markdownlintignore     → file exclusions (e.g. CHANGELOG.md, .pio/)
+# - .markdownlintignore     → file exclusions
 #
-# This implementation avoids using `find` so that markdownlint-cli2
-# can properly handle glob patterns and ignore files.
+# If .markdownlintignore exists, it is explicitly passed via
+# --ignore-path to guarantee exclusion of directories such as:
+#   - node_modules/
+#   - .pio/
+#   - .git/
+#
+# Implementation details
+# ----------------------
+# - Does NOT use `find`
+# - Uses glob pattern: "${MK_PATH}/**/*.md"
+# - Relies on markdownlint-cli2 native glob + ignore handling
+# - Safe if .markdownlintignore is missing
+#
 # --------------------------------------------------
 
 .markdown-lint-template:
@@ -24,7 +44,16 @@
     - |
       set -e
       ROOT="${MK_PATH:-docs}"
-      npx markdownlint-cli2 --config .markdownlint.json -- "${ROOT}/**/*.md"
+
+      IGNORE_OPT=""
+      if [ -f .markdownlintignore ]; then
+        IGNORE_OPT="--ignore-path .markdownlintignore"
+      fi
+
+      npx markdownlint-cli2 \
+        --config .markdownlint.json \
+        ${IGNORE_OPT} \
+        -- "${ROOT}/**/*.md"
 
 Markdown Lint:
   extends: .markdown-lint-template
