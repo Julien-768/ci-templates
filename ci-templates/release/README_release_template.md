@@ -125,7 +125,7 @@ For this reason, the `gitlab-release` job is configured as **non-blocking** (`al
 
 - CI pipelines remain green and predictable across GitLab instances
 
-### Recommendation__
+### Recommendation
 
 Projects should rely on:
 
