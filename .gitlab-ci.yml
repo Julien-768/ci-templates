@@ -31,7 +31,7 @@ include:
 
   # --- Build stage ---
   - local: "templates/platformio/template.yml"
-  - local: "templates/gcc-embedded/template.yml"
+  - local: "templates/gcc/template.yml"
 
   # --- Test / Pages stages ---
   - local: "templates/mkdocs/template.yml"
