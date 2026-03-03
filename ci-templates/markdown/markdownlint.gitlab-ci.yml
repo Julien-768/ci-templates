@@ -2,9 +2,8 @@
 #
 # Uses markdownlint-cli2 to check Markdown files for style issues.
 #
-# By default, all Markdown files in the repository are linted.
-# The optional LINT_PATH variable can be used to restrict linting
-# to a specific subset of files (e.g. "docs/**/*.md").
+# MK_PATH (optional) defines the root directory where Markdown files are searched.
+# Defaults to "docs" if not set. Use "." to lint the whole repository.
 #
 # The job respects:
 # - .markdownlint.json      → rule configuration
@@ -12,16 +11,20 @@
 #
 # This implementation avoids using `find` so that markdownlint-cli2
 # can properly handle glob patterns and ignore files.
-#
 # --------------------------------------------------
 
 .markdown-lint-template:
   stage: lint
   image: node:18
   before_script:
+    - npm config set fund false
+    - npm config set audit false
     - npm i -D markdownlint-cli2
   script:
-    npx markdownlint-cli2 --config .markdownlint.json -- "${LINT_PATH:-**/*.md}"
+    - |
+      set -e
+      ROOT="${MK_PATH:-docs}"
+      npx markdownlint-cli2 --config .markdownlint.json -- "${ROOT}/**/*.md"
 
 Markdown Lint:
   extends: .markdown-lint-template
