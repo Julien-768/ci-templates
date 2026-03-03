@@ -1,6 +1,6 @@
 # CI job for Markdown linting
 #
-# Uses markdownlint-cli2 to check Markdown files for style issues.
+# Uses markdownlint-cli to check Markdown files for style issues.
 #
 # MK_PATH (optional)
 # ------------------
@@ -8,17 +8,17 @@
 # Defaults to "docs" if not set.
 # Use "." to lint the whole repository.
 #
-# Ignore handling
-# ---------------
-# markdownlint-cli2 does NOT support markdownlint-cli's --ignore-path.
-# Instead, it supports negated glob patterns (prefix with "!" or "#").
-# We reuse .markdownlintignore by converting each line into a negated glob.
+# Configuration files
+# -------------------
+# The job respects:
+# - .markdownlint.json      → rule configuration
+# - .markdownlintignore     → file exclusions (native support in markdownlint-cli)
 #
-# Example .markdownlintignore:
-#   **/CHANGELOG.md
-#   node_modules/
-#   .git/
-#   .pio/
+# Implementation details
+# ----------------------
+# - Uses glob pattern: "${MK_PATH}/**/*.md"
+# - No custom ignore conversion needed
+# - Safe if .markdownlintignore is missing
 #
 # --------------------------------------------------
 
@@ -28,32 +28,16 @@
   before_script:
     - npm config set fund false
     - npm config set audit false
-    - npm i -D markdownlint-cli2
+    - npm i -D markdownlint-cli
   script:
     - |
       set -eu
       ROOT="${MK_PATH:-docs}"
 
-      # Base glob (what to lint)
-      set -- "${ROOT}/**/*.md"
-
-      # Convert .markdownlintignore entries into negated globs understood by markdownlint-cli2
-      if [ -f .markdownlintignore ]; then
-        while IFS= read -r line || [ -n "$line" ]; do
-          # Trim whitespace
-          line="$(printf '%s' "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
-          # Skip empty lines and comments
-          [ -z "$line" ] && continue
-          case "$line" in \#*) continue ;; esac
-          # Add as negated glob (# is recommended for cross-shell compatibility)
-          set -- "$@" "#$line"
-        done < .markdownlintignore
-      fi
-
-      # Run
-      npx markdownlint-cli2 \
+      # markdownlint-cli automatically reads .markdownlintignore if present
+      npx markdownlint \
         --config .markdownlint.json \
-        -- "$@"
+        "${ROOT}/**/*.md"
 
 Markdown Lint:
   extends: .markdown-lint-template
