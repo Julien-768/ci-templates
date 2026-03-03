@@ -50,5 +50,5 @@ variables:
   PYLINT_RCFILE: "pyproject.toml" # optional path to the Pylint configuration file
   LINT_PATH: "src" # optional path to the linting files
   MD_PATH: "." # lint all Markdown files in the repository (default if unset)
-  MK_PATH: "docs" # MkDocs project directory (contains mkdocs.yml + requirements.txt)
+  MK_PATH: "src" # MkDocs project directory (contains mkdocs.yml + requirements.txt)
   ZIP_PREFIX: "release" # optional prefix for the release zip file
