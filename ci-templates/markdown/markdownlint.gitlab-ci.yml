@@ -12,7 +12,7 @@
 # --------------------------------------------------
 .markdown-lint-template:
   stage: lint
-  image: node:18
+  image: node:20
 
   before_script:
     - npm config set fund false
