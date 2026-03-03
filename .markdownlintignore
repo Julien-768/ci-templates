@@ -1,4 +1,4 @@
 **/CHANGELOG.md
-.git/
 .markdownlintignore
 .markdownlint.json
+.git/

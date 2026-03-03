@@ -20,23 +20,20 @@
 #
 # Notes about ignores
 # -------------------
-# - If MK_PATH is ".", the repository root is linted and files like CHANGELOG.md
-#   will be included unless excluded in .markdownlintignore.
-# - Some environments can end up linting markdownlint dotfiles; we explicitly
-#   ignore them via CLI to avoid false positives (e.g., MD041 on .markdownlintignore).
+# - If MK_PATH is ".", the repository root is linted.
+# - Files such as CHANGELOG.md must be excluded via .markdownlintignore.
+# - It is recommended to also exclude:
+#     .markdownlintignore
+#     .markdownlint.json
+#     node_modules/
+#     .git/
+#     .pio/
 #
 # Implementation details
 # ----------------------
 # - Uses glob pattern: "${MK_PATH}/**/*.md"
 # - Relies on markdownlint-cli2 native glob + ignore handling
 # - Safe if .markdownlintignore is missing
-#
-# Recommended .markdownlintignore entries
-# --------------------------------------
-#   **/CHANGELOG.md
-#   .git/
-#   node_modules/
-#   .pio/
 #
 # --------------------------------------------------
 
@@ -60,8 +57,6 @@
       npx markdownlint-cli2 \
         --config .markdownlint.json \
         ${IGNORE_OPT} \
-        --ignore ".markdownlintignore" \
-        --ignore ".markdownlint.json" \
         -- "${ROOT}/**/*.md"
 
 Markdown Lint:
