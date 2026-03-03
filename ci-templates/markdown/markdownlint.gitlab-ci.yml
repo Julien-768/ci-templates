@@ -1,6 +1,15 @@
 # CI job for Markdown linting
 #
-# Uses markdownlint-cli to check Markdown files for style issues.
+# Purpose
+# -------
+# Lints Markdown files with markdownlint using the official Docker image
+# maintained by David Anson (author/maintainer of markdownlint).
+#
+# Why a dedicated image?
+# ----------------------
+# - No npm install in CI (faster, less noise)
+# - No dependency/deprecation warnings from transient npm packages
+# - Reproducible environment when pinning the image tag
 #
 # MK_PATH (optional)
 # ------------------
@@ -8,34 +17,43 @@
 # Defaults to "docs" if not set.
 # Use "." to lint the whole repository.
 #
-# Configuration files
-# -------------------
-# The job respects:
-# - .markdownlint.json      → rule configuration
-# - .markdownlintignore     → file exclusions (native support in markdownlint-cli)
+# Example (in consuming project):
+#   variables:
+#     MK_PATH: "."
 #
-# Implementation details
-# ----------------------
-# - Uses glob pattern: "${MK_PATH}/**/*.md"
-# - No custom ignore conversion needed
-# - Safe if .markdownlintignore is missing
+# Configuration files (repository root)
+# ------------------------------------
+# - .markdownlint.json      → rule configuration (recommended)
+# - .markdownlintignore     → file exclusions (optional)
+#
+# Common exclusions to put in .markdownlintignore:
+#   **/CHANGELOG.md
+#   node_modules/
+#   .pio/
+#   .git/
+#
+# Notes
+# -----
+# - This job uses a glob pattern: "${MK_PATH}/**/*.md"
+# - If you lint the whole repo (MK_PATH="."), be sure to exclude generated
+#   or vendor directories in .markdownlintignore.
+#
+# Image pinning
+# -------------
+# For maximum stability, replace ":latest" with a fixed tag, e.g.:
+#   image: davidanson/markdownlint-cli:0.44.0
 #
 # --------------------------------------------------
 
 .markdown-lint-template:
   stage: lint
-  image: node:18
-  before_script:
-    - npm config set fund false
-    - npm config set audit false
-    - npm i -D markdownlint-cli
+  image: davidanson/markdownlint-cli:latest
   script:
     - |
       set -eu
       ROOT="${MK_PATH:-docs}"
 
-      # markdownlint-cli automatically reads .markdownlintignore if present
-      npx markdownlint \
+      markdownlint \
         --config .markdownlint.json \
         "${ROOT}/**/*.md"
 
