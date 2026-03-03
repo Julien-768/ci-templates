@@ -3,6 +3,7 @@
   "version": "0.1.2",
   "private": true,
   "devDependencies": {
+    "markdownlint-cli": "^0.48.0",
     "standard-version": "^9.5.0"
   }
 }
