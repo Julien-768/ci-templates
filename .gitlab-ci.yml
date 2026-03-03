@@ -26,7 +26,7 @@ include:
 
   # --- Lint stage ---
   - local: "templates/python/template.yml"
-  - local: "templates/markdownlint/template.yml"
+  - local: "templates/markdown/template.yml"
   - local: "templates/eslint-prettier/template.yml"
 
   # --- Build stage ---
