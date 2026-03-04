@@ -43,12 +43,10 @@
     paths:
     - lib/
 
-  before_script:
+  script:
   - apt-get update
   - apt-get install -y --no-install-recommends ca-certificates git make findutils gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
   - update-ca-certificates
-
-  script:
   - |
     if [ -z "$GCC_MAKE_DIR" ]; then
       echo "ERROR: GCC_MAKE_DIR not set"
