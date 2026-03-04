@@ -8,7 +8,6 @@ to automate version bumping, tagging, zipping and publishing a GitLab release.
 The template provides **two jobs**:
 
 1. **`release`**
-
    - Runs only on the `main` branch when a commit is pushed.
    - Skips commits of type `chore(release):` to avoid infinite loops.
    - Bumps the version using `standard-version`.
@@ -94,7 +93,6 @@ This can happen even when:
 ### How the template handles this
 
 - The `release` job is **authoritative**:
-
   - version bump
 
   - changelog
@@ -108,7 +106,6 @@ This can happen even when:
   These steps always run when conditions are met.
 
 - The `gitlab-release` **job is best-effort**:
-
   - It attempts to publish a GitLab Release via release-cli
 
   - If the GitLab instance refuses Release creation, the job may fail
@@ -120,7 +117,6 @@ For this reason, the `gitlab-release` job is configured as **non-blocking** (`al
 ### Practical consequences
 
 - Your project still gets a **valid release**:
-
   - Git tag `vX.Y.Z`
 
   - ZIP archive available as a pipeline artifact

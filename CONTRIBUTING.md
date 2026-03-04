@@ -63,7 +63,6 @@ All components MUST follow this exact layout:
   `template.yml`
 
 - Other filenames like:
-
   - `.gitlab-ci.yml`
   - `clang.gitlab-ci.yml`
   - `component.yml`
@@ -160,7 +159,6 @@ Instead:
 
 Use hidden jobs (e.g., .setup_environment) or explicit script sections for reusable logic.
 Ensures clarity, control, and maintainability.
-
 
 ---
 
