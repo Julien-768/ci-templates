@@ -1,0 +1,72 @@
+repos:
+
+  # Versioning: Commit Messages
+  - repo: https://github.com/commitizen-tools/commitizen.git
+    rev: v4.4.1
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
+  # Lint: All files
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+        description: ensures that a file is either empty, or ends with one newline.
+      - id: trailing-whitespace
+        description: trims trailing whitespace.
+
+  # Lint: Json, Toml, Yaml, Requirements.txt
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-json
+        description: checks json files for parseable syntax.
+        # - id: pretty-format-json
+        #   description: sets a standard for formatting json files.
+        # NOT COMPATIBLE WITH PRETTIER, PRETTIER DOES BETTER
+        # args: [--autofix, --no-sort-keys]
+      - id: check-toml
+        description: checks toml files for parseable syntax.
+      - id: check-yaml
+        description: checks yaml files for parseable syntax.
+      - id: requirements-txt-fixer
+        description: sorts entries in requirements.txt.
+
+  # Lint: html, css
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-lxml
+    rev: v1.1.0
+    hooks:
+      - id: forbid-html-img-without-alt-text
+        description: List every <img> tag without a alt= or data-ng-attr-alt= attribute
+      # - id: forbid-non-std-html-attributes
+      #   description: Detect any non-standard attribute that is not prefixed with data-
+      - id: detect-missing-css-classes
+        description: Detect unused or missing CSS classes definitions, and abort if any of the later ones is found
+        args:
+          - --css-files-dir
+          - \docs\
+          - --html-files-dir
+          - \docs\
+      - id: html-tags-blacklist
+        description: interdire les éléments et attributs nuisant à l'accessibilité, selon les recommendations d'Access42
+      - id: html-attributes-blacklist
+        description: interdire les éléments et attributs nuisant à l'accessibilité, selon les recommendations d'Access42
+
+  # Lint: Markdown
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.44.0
+    hooks:
+      - id: markdownlint
+        description: Fixes the style of Markdown/Commonmark files.
+
+  # Autoformat: Python
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    rev: 25.1.0
+    hooks:
+      - id: black
+        # It is recommended to specify the latest version of Python
+        # supported by your project here, or alternatively use
+        # pre-commit's default_language_version, see
+        # https://pre-commit.com/#top_level-default_language_version
+        language_version: python3.13
