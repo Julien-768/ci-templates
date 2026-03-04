@@ -133,6 +133,8 @@ For example:
 
 ## 🏗 Design Principles
 
+### The `ci-gitlab.yml`
+
 The `ci-gitlab.yml` file must include all jobs from the template and must execute successfully for all jobs. This ensures that the CI pipeline is robust and all defined jobs are functioning correctly.
 
 - **Reusable Components**
@@ -144,6 +146,21 @@ The `ci-gitlab.yml` file must include all jobs from the template and must execut
 - **No Project-Specific Logic**
 
 Components must be generic and reusable across projects.
+
+### Avoid before_script
+
+Do not use before_script in catalog templates.
+Why?
+
+Unpredictable execution order and global side effects.
+Reduces flexibility and reusability.
+Introduces hidden dependencies and complicates debugging.
+
+Instead:
+
+Use hidden jobs (e.g., .setup_environment) or explicit script sections for reusable logic.
+Ensures clarity, control, and maintainability.
+
 
 ---
 
