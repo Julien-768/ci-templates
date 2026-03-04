@@ -1,0 +1,6 @@
+**/CHANGELOG.md
+.markdownlintignore
+.markdownlint.json
+.git/
+node_modules/
+**/node_modules/

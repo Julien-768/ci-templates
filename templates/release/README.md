@@ -90,7 +90,7 @@ This can happen even when:
 
 - the push succeeds.
 
-**How the template handles this**
+### How the template handles this
 
 - The `release` job is **authoritative**:
   - version bump
@@ -114,7 +114,7 @@ This can happen even when:
 
 For this reason, the `gitlab-release` job is configured as **non-blocking** (`allow_failure: true`) in the template.
 
-**Practical consequences**
+### Practical consequences
 
 - Your project still gets a **valid release**:
   - Git tag `vX.Y.Z`
@@ -125,7 +125,7 @@ For this reason, the `gitlab-release` job is configured as **non-blocking** (`al
 
 - CI pipelines remain green and predictable across GitLab instances
 
-**Recommendation**
+### Recommendation
 
 Projects should rely on:
 

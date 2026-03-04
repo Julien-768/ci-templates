@@ -1,17 +1,31 @@
-# CI job for Markdown linting
-# Uses markdownlint-cli2 to check Markdown files for style issues.
-# LINT_PATH (optional) allows specifying a subset of files to lint.
-# Defaults to all Markdown files in 'docs/' if not set.
+# markdownlint.gitlab-ci.yml
+# Shared GitLab CI template for Markdown linting (markdownlint-cli).
+# Variable (optional):
+# - MD_PATH: Root directory to lint (default: ".", use "docs" to restrict).
+# Config (repo root):
+# - .markdownlint.json (rules)
+# - .markdownlintignore (exclusions; auto-read)
+# Notes: Uses glob "${MD_PATH:-.}/**/*.md".
 
-# Définir une ancre pour la configuration Markdown Lint
+# --------------------------------------------------
+# Hidden template: Markdown lint job
+# --------------------------------------------------
 .markdown-lint-template:
   stage: lint
-  image: node:18
-  before_script:
-    - npm i -D markdownlint-cli2
-  script:
-    find "${LINT_PATH:-docs}" -type f -name "*.md" -exec npx markdownlint-cli2 --config .markdownlint.json {} +
+  image: node:20
 
-# Utiliser l'ancre dans le job
+  before_script:
+    - npm config set fund false
+    - npm config set audit false
+    - npm i -D markdownlint-cli
+
+  script:
+    - |
+      set -eu
+      npx markdownlint --config .markdownlint.json "${MD_PATH:-.}/**/*.md"
+
+# --------------------------------------------------
+# Concrete job exposed to consuming projects
+# --------------------------------------------------
 Markdown Lint:
   extends: .markdown-lint-template

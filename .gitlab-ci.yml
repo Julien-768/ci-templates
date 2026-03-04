@@ -48,6 +48,7 @@ variables:
   CLANG_FORMAT_FILE: ".clang-format.yml" # optional path to the clang-format configuration file
   DOXYFILE_PATH: "src" # optional path to the Doxygen configuration file
   PYLINT_RCFILE: "pyproject.toml" # optional path to the Pylint configuration file
-  LINT_PATH: "src" # optional path to the linting files
-  MK_PATH: "src" # optional path to the Markdown directory
+  LINT_PATH: "src" # optional path for source-code linting (non-Markdown)
+  MD_PATH: "." # optional root for Markdown linting (default: lint all)
+  MK_PATH: "src" # MkDocs project directory (contains mkdocs.yml + requirements.txt)
   ZIP_PREFIX: "release" # optional prefix for the release zip file
