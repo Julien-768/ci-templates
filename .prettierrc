@@ -1,0 +1,8 @@
+{
+  "printWidth": 80,
+  "htmlWhitespaceSensitivity": "ignore",
+  "singleQuote": false,
+  "plugins": ["@prettier/plugin-xml"],
+  "xmlSelfClosingSpace": true,
+  "xmlWhitespaceSensitivity": "ignore"
+}

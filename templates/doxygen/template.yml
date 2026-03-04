@@ -80,8 +80,3 @@ doxygen:
 
     # Disable in all other cases
     - when: never
-
-
-
-
-

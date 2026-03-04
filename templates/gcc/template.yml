@@ -41,58 +41,18 @@
   cache:
     key: gcc-deps
     paths:
-      - lib/
-
-  before_script:
-    - apt-get update
-    - apt-get install -y --no-install-recommends
-        ca-certificates
-        git make findutils
-        gcc-arm-none-eabi
-        binutils-arm-none-eabi
-        libnewlib-arm-none-eabi
-    - update-ca-certificates
+    - lib/
 
   script:
-    - |
-      if [ -z "$GCC_MAKE_DIR" ]; then
-        echo "ERROR: GCC_MAKE_DIR not set"
-        exit 1
-      fi
-    - |
-      make -C "$GCC_MAKE_DIR" \
-        SDK_PATH="$SDK_PATH" \
-        $EXTRA_MAKE_ARGS
-
-#   (e.g. "TARGET=foo VERBOSE=1").
-#
-
-.gcc-compile-template:
-  stage: build
-  image: debian:stable-slim
-
-  cache:
-    key: gcc-deps
-    paths:
-      - lib/
-
-  before_script:
-    - apt-get update
-    - apt-get install -y --no-install-recommends
-        ca-certificates
-        git make findutils
-        gcc-arm-none-eabi
-        binutils-arm-none-eabi
-        libnewlib-arm-none-eabi
-    - update-ca-certificates
-
-  script:
-    - |
-      if [ -z "$GCC_MAKE_DIR" ]; then
-        echo "ERROR: GCC_MAKE_DIR not set"
-        exit 1
-      fi
-    - |
-      make -C "$GCC_MAKE_DIR" \
-        SDK_PATH="$SDK_PATH" \
-        $EXTRA_MAKE_ARGS
+  - apt-get update
+  - apt-get install -y --no-install-recommends ca-certificates git make findutils gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+  - update-ca-certificates
+  - |
+    if [ -z "$GCC_MAKE_DIR" ]; then
+      echo "ERROR: GCC_MAKE_DIR not set"
+      exit 1
+    fi
+  - |
+    make -C "$GCC_MAKE_DIR" \
+      SDK_PATH="$SDK_PATH" \
+      $EXTRA_MAKE_ARGS

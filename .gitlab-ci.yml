@@ -13,35 +13,35 @@
 #
 
 stages:
-  - format
-  - lint
-  - build
-  - test
-  - pages
-  - release
+- format
+- lint
+- build
+- test
+- pages
+- release
 
 include:
-  # --- Format stage ---
-  - local: "templates/clang/template.yml"
+# --- Format stage ---
+- local: "templates/clang/template.yml"
 
-  # --- Lint stage ---
-  - local: "templates/python/template.yml"
-  - local: "templates/markdown/template.yml"
-  - local: "templates/eslint/template.yml"
+# --- Lint stage ---
+- local: "templates/python/template.yml"
+- local: "templates/markdown/template.yml"
+- local: "templates/eslint/template.yml"
 
-  # --- Build stage ---
-  - local: "templates/platformio/template.yml"
-  - local: "templates/gcc/template.yml"
+# --- Build stage ---
+- local: "templates/platformio/template.yml"
+- local: "templates/gcc/template.yml"
 
-  # --- Test / Pages stages ---
-  - local: "templates/mkdocs/template.yml"
-  - local: "templates/mike/template.yml"
+# --- Test / Pages stages ---
+- local: "templates/mkdocs/template.yml"
+- local: "templates/mike/template.yml"
 
-  # --- Pages stage ---
-  - local: "templates/doxygen/template.yml"
+# --- Pages stage ---
+- local: "templates/doxygen/template.yml"
 
-  # --- Release stage ---
-  - local: "templates/release/template.yml"
+# --- Release stage ---
+- local: "templates/release/template.yml"
 
 variables:
   CLANG_PATH: "src" # optional path to the C/C++ source files
