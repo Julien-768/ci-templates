@@ -1,0 +1,21 @@
+{
+  "//": "Example markdownlint configuration provided with the template.",
+  "//1": "Projects using this template are encouraged to adapt these rules to their needs.",
+
+  "default": true,
+
+  "//2": "Allow flexible list indentation",
+  "MD007": false,
+
+  "//3": "Disable line-length enforcement (useful for documentation and tables)",
+  "MD013": false,
+
+  "//4": "Allow repeated headings in structured documentation",
+  "MD024": false,
+
+  "//5": "Allow inline HTML (icons, badges, formatting)",
+  "MD033": false,
+
+  "//6": "Relax whitespace-related checks that may conflict with formatting tools",
+  "whitespace": false
+}
