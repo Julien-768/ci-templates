@@ -1,0 +1,15 @@
+# Example ignore file provided with the markdownlint template.
+# Adjust this list according to your project's structure.
+
+# Dependency directories
+node_modules/
+**/node_modules/
+
+# Generated documentation or build outputs
+dist/
+build/
+public/
+
+# Version control and tooling directories
+.git/
+.pio/
