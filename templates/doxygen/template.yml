@@ -1,54 +1,39 @@
-# doxygen.gitlab-ci.yml
+# template.yml
 #
-# Shared GitLab CI template for Doxygen documentation generation.
-#
-# Variables used by this template (optional unless stated otherwise):
-#
-# - DOXYFILE_PATH:
-#   Path to the directory containing the project's `doxygen/` folder.
+# Shared GitLab CI component for Doxygen documentation generation.
+# Input:
+# - doxyfile_path: path to the directory containing the project's `doxygen/` folder.
 #   Default: "."
-#
-# Documentation is generated only when explicitly requested via the
-# "publication" keyword in the commit message.
-#
-# Expected project layout:
-# - Each consuming project provides a `doxygen/Doxyfile` (or equivalent)
-#   which @INCLUDEs the shared `Doxyfile.base` fetched from the
-#   ci-templates repository.
-#
-# This job uses an Alpine Linux image, installs Doxygen,
-# and publishes the generated documentation as GitLab Pages artifacts.
+# Documentation is generated only when the commit message contains "publication".
+
+spec:
+  inputs:
+    doxyfile_path:
+      default: "."
+      description: Path to the directory containing the project's `doxygen/` folder
+
+---
 
 .doxygen-template:
   stage: pages
   image: alpine:latest
 
   variables:
-    # Path where the project stores the "doxygen/" directory
-    DOXYFILE_PATH: "."
-
-    # External CI templates repository
     CI_TEMPLATES_PROJECT: "iphc/ci-templates"
-
-    # Ref (branch / tag / commit) used to fetch Doxyfile.base
     CI_TEMPLATES_REF: "develop"
 
   script:
     - apk add --no-cache doxygen graphviz curl
-
-    - echo "Running Doxygen in ${DOXYFILE_PATH}"
-    - cd "${DOXYFILE_PATH}"
-
+    - echo "Running Doxygen in $[[ inputs.doxyfile_path ]]"
+    - cd "$[[ inputs.doxyfile_path ]]"
     - mkdir -p doxygen
     - >
       curl --fail --location
       "$CI_SERVER_URL/$CI_TEMPLATES_PROJECT/-/raw/$CI_TEMPLATES_REF/templates/doxygen/Doxyfile.base"
       -o doxygen/Doxyfile.base
-
     - doxygen doxygen/Doxyfile
-
     - cd "$CI_PROJECT_DIR"
-    - mv "${DOXYFILE_PATH}/doxygen/documentation/html/" public/
+    - mv "$[[ inputs.doxyfile_path ]]/doxygen/documentation/html" public
 
   artifacts:
     paths:
@@ -56,12 +41,9 @@
 
 doxygen:
   extends: .doxygen-template
-
   rules:
     - if: '$CI_COMMIT_TAG'
       when: never
-
     - if: '$CI_COMMIT_MESSAGE =~ /publication/i'
       when: on_success
-
     - when: never
