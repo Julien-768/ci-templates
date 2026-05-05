@@ -1,62 +1,70 @@
-# release.gitlab-ci.yml
+# release/template.yml
 #
-# Shared GitLab CI template implementing a complete release workflow:
-# version bumping, changelog generation, Git tagging, release archive
-# creation and (optional) GitLab Release publication.
-#
-# Variables:
-# - CI_PUSH_TOKEN (recommended): push commits/tags. If missing => dry-run (no push).
-# - CI_BOT_EMAIL (optional): default ci@example.com
-# - CI_BOT_NAME  (optional): default CI Bot
-# - ZIP_PREFIX   (optional): default CI_PROJECT_NAME
-#
-# Requirements:
-# - package.json at repo root
+# GitLab CI/CD Component Catalog template for release automation.
+# Bumps version, updates changelog, tags, archives and optionally publishes a GitLab Release.
+# Triggered only on main push when commit title contains: release: trigger
+# Inputs: stage, ci_push_token, ci_bot_email, ci_bot_name, zip_prefix.
+
+spec:
+  inputs:
+    stage:
+      default: release
+    ci_push_token:
+      default: ""
+    ci_bot_email:
+      default: "ci@example.com"
+    ci_bot_name:
+      default: "CI Bot"
+    zip_prefix:
+      default: ""
+---
 
 .release-template:
-  stage: release
+  stage: $[[ inputs.stage ]]
   image: node:20
 
   script:
   - |
     set -e
 
-    # 1) Install dependencies and configure Git identity
     npm install
-    git config --global user.email "${CI_BOT_EMAIL:-ci@example.com}"
-    git config --global user.name "${CI_BOT_NAME:-CI Bot}"
+    git config --global user.email "$[[ inputs.ci_bot_email ]]"
+    git config --global user.name "$[[ inputs.ci_bot_name ]]"
 
-    # Ensure local tags match remote tags (avoid stale tags on runners)
     git fetch --prune
     git tag -l | xargs -r git tag -d
     git fetch --tags --prune --prune-tags
 
-    # 2) Bump version, generate changelog and create Git tag
-    npx standard-version --message "chore(release): %s"
+    BEFORE_RELEASE_COMMIT="$(git rev-parse HEAD)"
 
-    # 3) Compute tag from git (robust) and create release archive
+    if ! npx standard-version --message "chore(release): %s"; then
+      echo "Release failed. Rolling back local changes."
+      git reset --hard "$BEFORE_RELEASE_COMMIT"
+      git clean -fd
+      exit 1
+    fi
+
     TAG="$(git describe --tags --abbrev=0)"
     VERSION="${TAG#v}"
 
+    ZIP_PREFIX="$[[ inputs.zip_prefix ]]"
     ZIP_PREFIX="${ZIP_PREFIX:-$CI_PROJECT_NAME}"
     ZIP_NAME="${ZIP_PREFIX}-${TAG}.zip"
 
     echo "Creating archive for ${TAG} -> ${ZIP_NAME}"
     git archive --format=zip --output "$ZIP_NAME" "$TAG"
 
-    # Export variables for downstream jobs
     echo "VERSION=${VERSION}" > tag.env
     echo "TAG=${TAG}" >> tag.env
     echo "ZIP_NAME=${ZIP_NAME}" >> tag.env
 
-    # 4) Push changes and tags (if token is available)
-    if [ -z "${CI_PUSH_TOKEN:-}" ]; then
-      echo "⚠️ No CI_PUSH_TOKEN provided."
+    if [ -z "$[[ inputs.ci_push_token ]]" ]; then
+      echo "No ci_push_token provided."
       echo "Dry-run mode: commit/tag/archive generated locally, but push is skipped."
       exit 0
     fi
 
-    git remote set-url origin "https://gitlab-ci-token:${CI_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+    git remote set-url origin "https://gitlab-ci-token:$[[ inputs.ci_push_token ]]@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
     git push -o ci.skip origin "HEAD:${CI_COMMIT_REF_NAME}"
     git push -o ci.skip origin --tags
 
@@ -71,7 +79,7 @@
   - if: '$CI_COMMIT_TAG'
     when: never
 
-  - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE  =~ /release: trigger/'
+  - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TITLE =~ /release: trigger/'
     exists:
     - package.json
     when: on_success
@@ -79,7 +87,7 @@
   - when: never
 
 .gitlab-release-template:
-  stage: release
+  stage: $[[ inputs.stage ]]
   image: registry.gitlab.com/gitlab-org/release-cli:latest
 
   needs:
@@ -96,7 +104,6 @@
     fi
 
     echo "Creating GitLab release for tag $TAG (best-effort)"
-    ls -la
 
     ASSET_URL="$CI_PROJECT_URL/-/jobs/artifacts/$CI_COMMIT_REF_NAME/download?job=release"
 
@@ -105,7 +112,7 @@
       --name "Release $TAG" \
       --description "$(printf '%s\n\nSource archive: %s\n' "$CI_COMMIT_MESSAGE" "$ASSET_URL")" \
     || {
-      echo "⚠️ GitLab release creation failed (ignored)."
+      echo "GitLab release creation failed (ignored)."
       exit 0
     }
 
@@ -113,7 +120,7 @@
   - if: '$CI_COMMIT_TAG'
     when: never
 
-  - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_MESSAGE  =~ /release: trigger/'
+  - if: '$CI_COMMIT_BRANCH == "main" && $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TITLE =~ /release: trigger/'
     when: on_success
 
   - when: never
