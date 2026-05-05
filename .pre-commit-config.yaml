@@ -22,14 +22,11 @@ repos:
     hooks:
       - id: check-json
         description: checks json files for parseable syntax.
-        # - id: pretty-format-json
-        #   description: sets a standard for formatting json files.
-        # NOT COMPATIBLE WITH PRETTIER, PRETTIER DOES BETTER
-        # args: [--autofix, --no-sort-keys]
       - id: check-toml
         description: checks toml files for parseable syntax.
       - id: check-yaml
         description: checks yaml files for parseable syntax.
+        args: [--allow-multiple-documents]
       - id: requirements-txt-fixer
         description: sorts entries in requirements.txt.
 

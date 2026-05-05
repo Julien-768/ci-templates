@@ -38,6 +38,7 @@ Define the stages including pages:
 stages:
   - pages
 ```
+
 No job definition is required locally.
 
 Including the component is sufficient to enable documentation generation.
@@ -87,11 +88,11 @@ git commit -m "docs: update API documentation publication"
 
 - The job runs in an Alpine container with:
 
-- ```doxygen```
+- `doxygen`
 
-- ```graphviz```
+- `graphviz`
 
-- ```curl```
+- `curl`
 
 - The shared Doxyfile.base is fetched from the ci-templates repository
 
@@ -102,10 +103,9 @@ git commit -m "docs: update API documentation publication"
 ### ⚠️ Behavior Notes
 
 - The job is skipped:
+  - on tag pipelines
 
-    - on tag pipelines
-
-    - if the commit message does not contain publication
+  - if the commit message does not contain publication
 
 - The job publishes artifacts but does not configure GitLab Pages itself
 
