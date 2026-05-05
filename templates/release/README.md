@@ -5,23 +5,25 @@ to automate version bumping, tagging, zipping and publishing a GitLab release.
 
 ## ✅ What it does
 
+This template automates the release process for projects.
+When triggered, it bumps the version, updates the changelog, creates a Git tag, and generates a ZIP archive of the source code.
+It can also publish a GitLab Release with the generated artifact.
+
 The template provides **two jobs**:
 
 1. **`release`**
    - Runs only on the `main` branch when a pushed commit title contains `release: trigger`.
-   - Does not run for ordinary commits such as `feat:`, `fix:`, `revert:` or `chore(release):`.
    - Bumps the version using `standard-version`.
    - Generates or updates `CHANGELOG.md`.
    - Commits the version bump and changelog.
    - Tags the commit with `vX.Y.Z`.
-   - Archives the source tree at that tag into a ZIP file (`release-vX.Y.Z.zip`).
-   - Pushes the commit and the tag, preferably with `ci.skip` to avoid creating redundant pipelines from the CI bot push.
-   - Exports environment variables `VERSION`, `TAG`, and `ZIP_NAME` to a `.env` file.
+   - Archives the source tree at that tag into a ZIP file (`<project>-vX.Y.Z.zip`).
+   - Pushes the commit and the tag.
 
 2. **`gitlab_release`**
-   - Only runs in the same pipeline as the `release` job (not on tags directly).
-   - Publishes a GitLab release using `release-cli`.
-   - Reuses the zip archive as a release asset.
+   - Runs in the same pipeline as the `release` job (not on tags directly).
+   - Publishes a GitLab Release using `release-cli`.
+   - Reuses the generated ZIP archive as a release asset.
 
 ---
 
@@ -31,12 +33,6 @@ The `.gitlab-ci.yml` must include the following:
 
 ```yaml
 include:
-  - project: "iphc/ci-templates"
-    file: "/ci-templates/clang.gitlab-ci.yml"
-    ref: "<commit-sha>"
-  - project: "iphc/ci-templates"
-    file: "/ci-templates/doxygen.gitlab-ci.yml"
-    ref: "<commit-sha>"
   - project: "iphc/ci-templates"
     file: "/ci-templates/release.gitlab-ci.yml"
     ref: "<commit-sha>"
