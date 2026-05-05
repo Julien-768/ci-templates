@@ -5,7 +5,7 @@ to automate version bumping, tagging, zipping and publishing a GitLab release.
 
 ## ✅ What it does
 
-This template automates the release process for projects.
+This template automates the release process for projects. **It uns only on the `main` branch when a pushed commit title contains `release: trigger`.**
 When triggered, it bumps the version, updates the changelog, creates a Git tag, and generates a ZIP archive of the source code.
 It can also publish a GitLab Release with the generated artifact.
 
