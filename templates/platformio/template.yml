@@ -36,17 +36,16 @@ spec:
   - pip install --no-cache-dir -U platformio
 
   - |
+    PIO_ARGS="--project-dir $[[ inputs.project_dir ]] --project-conf $[[ inputs.project_conf ]]"
+
     if [ -n "$[[ inputs.environments ]]" ]; then
       for env in $[[ inputs.environments ]]; do
-        pio run \
-          --project-dir "$[[ inputs.project_dir ]]" \
-          --project-conf "$[[ inputs.project_conf ]]" \
-          --environment "$env"
+        echo "Building PlatformIO environment: ${env}"
+        pio run ${PIO_ARGS} --environment "${env}"
       done
     else
-      pio run \
-        --project-dir "$[[ inputs.project_dir ]]" \
-        --project-conf "$[[ inputs.project_conf ]]"
+      echo "Building PlatformIO default environment(s)"
+      pio run ${PIO_ARGS}
     fi
 
 pio-build:
