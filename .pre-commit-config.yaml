@@ -16,23 +16,19 @@ repos:
   - id: trailing-whitespace
     description: trims trailing whitespace.
 
-# Lint: Json, Toml, Yaml, Requirements.txt
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
-  hooks:
-  - id: check-json
-    description: checks json files for parseable syntax.
-    # - id: pretty-format-json
-    #   description: sets a standard for formatting json files.
-    # NOT COMPATIBLE WITH PRETTIER, PRETTIER DOES BETTER
-    # args: [--autofix, --no-sort-keys]
-  - id: check-toml
-    description: checks toml files for parseable syntax.
-  - id: check-yaml
-    description: checks yaml files for parseable syntax.
-    args: [ --allow-multiple-documents ]
-  - id: requirements-txt-fixer
-    description: sorts entries in requirements.txt.
+  # Lint: Json, Toml, Yaml, Requirements.txt
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-json
+        description: checks json files for parseable syntax.
+      - id: check-toml
+        description: checks toml files for parseable syntax.
+      - id: check-yaml
+        description: checks yaml files for parseable syntax.
+        args: [--allow-multiple-documents]
+      - id: requirements-txt-fixer
+        description: sorts entries in requirements.txt.
 
 # Lint: html, css
 - repo: https://github.com/Lucas-C/pre-commit-hooks-lxml

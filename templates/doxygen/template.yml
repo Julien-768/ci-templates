@@ -1,82 +1,49 @@
-# doxygen.gitlab-ci.yml
+# template.yml
 #
-# Shared GitLab CI template for Doxygen documentation generation.
-#
-# Variables used by this template (optional unless stated otherwise):
-#
-# - DOXYFILE_PATH:
-#   Path to the directory containing the Doxygen configuration file.
-#   Default: "src"
-#
-# Documentation is generated only when explicitly requested via the
-# "publication" keyword in the commit message.
-#
-# Expected project layout:
-# - Each project provides a `doxygen/Doxyfile` (or equivalent) which
-#   @INCLUDEs the shared `Doxyfile.base` from this repository.
-#
-# This job uses an Alpine Linux image, installs Doxygen,
-# and publishes the generated documentation as GitLab Pages artifacts.
+# Shared GitLab CI component for Doxygen documentation generation.
+# Input:
+# - doxyfile_path: path to the directory containing the project's `doxygen/` folder.
+#   Default: "."
+# Documentation is generated only when the commit message contains "publication".
 
+spec:
+  inputs:
+    doxyfile_path:
+      default: "."
+      description: Path to the directory containing the project's `doxygen/` folder
 
-# --------------------------------------------------
-# Hidden template: Doxygen documentation build
-# --------------------------------------------------
+---
+
 .doxygen-template:
   stage: pages
   image: alpine:latest
 
   variables:
-    # Path where the project stores the "doxygen/" directory
-    # Default is repository root
-    DOXYFILE_PATH: "."
-
-    # External CI templates repository
     CI_TEMPLATES_PROJECT: "iphc/ci-templates"
-
-    # Ref (branch / tag / commit) used to fetch Doxyfile.base
-    CI_TEMPLATES_REF: "main"
+    CI_TEMPLATES_REF: "develop"
 
   script:
-    # Install required tools
     - apk add --no-cache doxygen graphviz curl
-
-    - echo "Running Doxygen in ${DOXYFILE_PATH}"
-    - cd "${DOXYFILE_PATH}"
-
-    # Fetch shared IPHC Doxyfile.base (public raw URL)
+    - echo "Running Doxygen in $[[ inputs.doxyfile_path ]]"
+    - cd "$[[ inputs.doxyfile_path ]]"
     - mkdir -p doxygen
     - >
       curl --fail --location
-      "$CI_SERVER_URL/$CI_TEMPLATES_PROJECT/-/raw/$CI_TEMPLATES_REF/doxygen/Doxyfile.base"
+      "$CI_SERVER_URL/$CI_TEMPLATES_PROJECT/-/raw/$CI_TEMPLATES_REF/templates/doxygen/Doxyfile.base"
       -o doxygen/Doxyfile.base
-
-    # Run Doxygen using project-specific Doxyfile
     - doxygen doxygen/Doxyfile
-
-    # Publish generated HTML documentation as GitLab Pages artifact
     - cd "$CI_PROJECT_DIR"
-    - mv "${DOXYFILE_PATH}/doxygen/documentation/html/" public/
+    - mv "$[[ inputs.doxyfile_path ]]/doxygen/documentation/html" public
 
   artifacts:
     paths:
       - public/
 
-# --------------------------------------------------
-# Concrete job exposed to consuming projects
-# --------------------------------------------------
 doxygen:
   extends: .doxygen-template
-
   rules:
-    # Never run on tag pipelines
     - if: '$CI_COMMIT_TAG'
       when: never
-
-    # Run only when explicitly requested by keyword in commit message
-    # (case-insensitive match)
     - if: '$CI_COMMIT_MESSAGE =~ /publication/i'
       when: on_success
-
-    # Disable in all other cases
     - when: never
