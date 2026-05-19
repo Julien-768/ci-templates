@@ -52,6 +52,7 @@ variables:
   MD_PATH: "." # optional root for Markdown linting (default: lint all)
   MK_PATH: "src" # MkDocs project directory (contains mkdocs.yml + requirements.txt)
   ZIP_PREFIX: "release" # optional prefix for the release zip file
-  PLATFORMIO_PROJECT_DIR: src
-  PLATFORMIO_PROJECT_CONF: platformio.ini
-  PLATFORMIO_ENVIRONMENTS: "clangtidy"
+  PIO_ENV: "clangtidy" # optional PlatformIO environment for clang-tidy job
+  PLATFORMIO_PROJECT_DIR: src # optional PlatformIO project directory (default: .)
+  PLATFORMIO_PROJECT_CONF: platformio.ini # optional PlatformIO configuration file (default: platformio.ini)
+  PLATFORMIO_ENVIRONMENTS: "clangtidy" # optional PlatformIO environments to build (default: all)
