@@ -30,10 +30,10 @@ The `.gitlab-ci.yml` must include the following:
 
 ```yaml
 include:
-  - project: 'iphc/ci-templates'
-    file: '/templates/platformio/template.yml'
-    ref: '327f7427b319e949574807c798b88bc5d8adaf0f'
-````
+  - project: "iphc/ci-templates"
+    file: "/templates/platformio/template.yml"
+    ref: "327f7427b319e949574807c798b88bc5d8adaf0f"
+```
 
 Define the stages in this order:
 
@@ -65,11 +65,11 @@ Use a custom `platformio.ini` location:
 
 ```yaml
 include:
-    - project: 'iphc/ci-templates'
-      file: '/templates/platformio/template.yml'
-      ref: '327f7427b319e949574807c798b88bc5d8adaf0f'
-      inputs:
-        project_conf: firmware/platformio.ini
+  - project: "iphc/ci-templates"
+    file: "/templates/platformio/template.yml"
+    ref: "327f7427b319e949574807c798b88bc5d8adaf0f"
+    inputs:
+      project_conf: firmware/platformio.ini
 ```
 
 ---
@@ -79,7 +79,7 @@ include:
 Use a custom PlatformIO project root:
 
 ```yaml
-      project_dir: firmware
+project_dir: firmware
 ```
 
 ---
@@ -89,7 +89,7 @@ Use a custom PlatformIO project root:
 Build only selected PlatformIO environments:
 
 ```yaml
-      environments: "esp32 debug"
+environments: "esp32 debug"
 ```
 
 This executes:
@@ -106,7 +106,6 @@ pio run --environment debug
 - If `environments` is empty, all environments defined in `platformio.ini` are built.
 - The job is skipped automatically if the configured `project_conf` file does not exist.
 - The component installs:
-
   - Python dependencies
   - PlatformIO Core
   - Node.js (required by some PlatformIO platforms)
