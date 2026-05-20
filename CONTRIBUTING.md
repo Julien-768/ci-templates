@@ -87,7 +87,6 @@ Each `template.yml` must:
 3.  Define at least one job
 4.  Each variable must have a `description` field
 
-
 ## ✅ Minimal Valid Example
 
     ``` yaml
