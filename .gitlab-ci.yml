@@ -31,6 +31,11 @@ include:
 
 # --- Build stage ---
 - local: "templates/platformio/template.yml"
+  inputs:
+    environments: "clangtidy"
+    project_dir: "."
+    project_conf: "platformio.ini"
+
 - local: "templates/gcc/template.yml"
 
 # --- Test / Pages stages ---
@@ -52,3 +57,4 @@ variables:
   MD_PATH: "." # optional root for Markdown linting (default: lint all)
   MK_PATH: "src" # MkDocs project directory (contains mkdocs.yml + requirements.txt)
   ZIP_PREFIX: "release" # optional prefix for the release zip file
+  PIO_ENV: "clangtidy" # optional PlatformIO environment for clang-tidy job
