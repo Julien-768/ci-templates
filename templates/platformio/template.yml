@@ -1,11 +1,6 @@
 # platformio template
 #
 # Shared GitLab CI component for building PlatformIO firmware.
-# Inputs:
-# - stage: CI stage used by the build job. Default: build
-# - project_conf: PlatformIO config file path. Default: platformio.ini
-# - project_dir: PlatformIO project directory. Default: .
-# - environments: Optional PlatformIO environments to build. Default: ""
 
 spec:
   inputs:
@@ -13,13 +8,13 @@ spec:
       description: "CI stage used for the PlatformIO build job."
       default: build
 
-    project_conf:
-      description: "Path to the PlatformIO configuration file."
-      default: platformio.ini
-
     project_dir:
-      description: "Root directory of the PlatformIO project."
+      description: "Root directory of the PlatformIO project, usually the directory containing platformio.ini."
       default: .
+
+    project_conf:
+      description: "Path to the PlatformIO configuration file, relative to the job working directory."
+      default: platformio.ini
 
     environments:
       description: "Optional list of PlatformIO environments to build."

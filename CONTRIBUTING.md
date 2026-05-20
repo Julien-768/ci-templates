@@ -85,6 +85,8 @@ Each `template.yml` must:
 1.  Contain a `spec:` section
 2.  Be separated by `---`
 3.  Define at least one job
+4.  Each variable must have a `description` field
+
 
 ## ✅ Minimal Valid Example
 
@@ -93,6 +95,7 @@ Each `template.yml` must:
     inputs:
         stage:
         default: build
+        description: "CI stage used for the job."
 
     ---
 
@@ -108,7 +111,7 @@ If `spec:` is missing, the component will NOT be detected by GitLab.
 
 ## Template Headers
 
-Each CI template file should include a header that describes the purpose of the template, any variables used, and their default values. Keep headers concise and limit them to a maximum of 10 lines to avoid excessive length.
+Each CI template file should include a header that describes the purpose of the template. Keep headers concise and limit them to a maximum of 10 lines to avoid excessive length.
 
 For example:
 
@@ -116,16 +119,6 @@ For example:
     # clang.gitlab-ci.yml
     #
     # Shared GitLab CI configuration for running clang-format and clang-tidy.
-    #
-    # Variables used by this template (optional unless stated otherwise):
-    #
-    # - CLANG_PATH:
-    #   Directory to scan for C/C++ source files.
-    #   Default: "."
-    #
-    # - CLANG_FORMAT_FILE:
-    #   Path to the clang-format configuration file.
-    #   Default: ".clang-format"
     ```
 
 ---
