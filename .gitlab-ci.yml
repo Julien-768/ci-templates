@@ -33,7 +33,7 @@ include:
 - local: "templates/platformio/template.yml"
   inputs:
     environments: "clangtidy"
-    project_dir: "src"
+    project_dir: "."
     project_conf: "platformio.ini"
 
 - local: "templates/gcc/template.yml"
