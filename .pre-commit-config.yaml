@@ -5,7 +5,7 @@ repos:
   rev: v4.4.1
   hooks:
   - id: commitizen
-    stages: [ commit-msg ]
+    stages: [commit-msg]
 
 # Lint: All files
 - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -15,20 +15,15 @@ repos:
     description: ensures that a file is either empty, or ends with one newline.
   - id: trailing-whitespace
     description: trims trailing whitespace.
-
-  # Lint: Json, Toml, Yaml, Requirements.txt
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
-    hooks:
-      - id: check-json
-        description: checks json files for parseable syntax.
-      - id: check-toml
-        description: checks toml files for parseable syntax.
-      - id: check-yaml
-        description: checks yaml files for parseable syntax.
-        args: [--allow-multiple-documents]
-      - id: requirements-txt-fixer
-        description: sorts entries in requirements.txt.
+  - id: check-json
+    description: checks json files for parseable syntax.
+  - id: check-toml
+    description: checks toml files for parseable syntax.
+  - id: check-yaml
+    description: checks yaml files for parseable syntax.
+    args: [--allow-multiple-documents]
+  - id: requirements-txt-fixer
+    description: sorts entries in requirements.txt.
 
 # Lint: html, css
 - repo: https://github.com/Lucas-C/pre-commit-hooks-lxml
@@ -62,8 +57,4 @@ repos:
   rev: 25.1.0
   hooks:
   - id: black
-    # It is recommended to specify the latest version of Python
-    # supported by your project here, or alternatively use
-    # pre-commit's default_language_version, see
-    # https://pre-commit.com/#top_level-default_language_version
     language_version: python3.13
