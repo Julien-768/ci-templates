@@ -9,10 +9,9 @@ This template validates Python source files by compiling them.
 The template provides **one job**:
 
 1. **`python-compile`**
-
-   * Installs the Python package using `pip install .`.
-   * Compiles Python files using `compileall`.
-   * Fails the pipeline if syntax errors are detected.
+   - Installs the Python package using `pip install .`.
+   - Compiles Python files using `compileall`.
+   - Fails the pipeline if syntax errors are detected.
 
 ---
 
@@ -60,15 +59,15 @@ include:
 
 ## 🧠 Important Notes
 
-* The component requires a Python project installable through:
+- The component requires a Python project installable through:
 
 ```bash
 pip install .
 ```
 
-* Compilation validates Python syntax but does not execute tests.
-* Runtime errors are not detected by this component.
-* This component is complementary to linting and unit testing.
+- Compilation validates Python syntax but does not execute tests.
+- Runtime errors are not detected by this component.
+- This component is complementary to linting and unit testing.
 
 ---
 

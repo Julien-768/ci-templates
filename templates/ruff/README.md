@@ -9,11 +9,10 @@ This template automates Python code quality checks using Ruff.
 The template provides **one job**:
 
 1. **`ruff`**
-
-   * Installs Ruff.
-   * Runs `ruff check .` to perform linting.
-   * Runs `ruff format --check .` to verify formatting.
-   * Fails the pipeline if linting or formatting issues are detected.
+   - Installs Ruff.
+   - Runs `ruff check .` to perform linting.
+   - Runs `ruff format --check .` to verify formatting.
+   - Fails the pipeline if linting or formatting issues are detected.
 
 ---
 
@@ -62,10 +61,10 @@ include:
 
 ## 🧠 Important Notes
 
-* Ruff configuration is automatically loaded from `pyproject.toml` when present.
-* The component validates both linting and formatting.
-* Formatting issues are reported but not automatically fixed.
-* To automatically fix issues locally, run:
+- Ruff configuration is automatically loaded from `pyproject.toml` when present.
+- The component validates both linting and formatting.
+- Formatting issues are reported but not automatically fixed.
+- To automatically fix issues locally, run:
 
 ```bash
 ruff check . --fix
@@ -80,5 +79,5 @@ No artifacts are generated.
 
 The job succeeds when:
 
-* all linting checks pass;
-* all files respect the configured formatting rules.
+- all linting checks pass;
+- all files respect the configured formatting rules.
