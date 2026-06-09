@@ -20,6 +20,10 @@ spec:
       description: "Python source directory to compile."
       default: src
 
+    install_project:
+      description: "Whether to install the project before compiling Python files."
+      default: "false"
+
 ---
 
 .python-compile-template:
@@ -28,7 +32,10 @@ spec:
 
   script:
   - cd $[[ inputs.project_dir ]]
-  - pip install .
+  - |
+    if [ "$[[ inputs.install_project ]]" = "true" ]; then
+      pip install .
+    fi
   - python -m compileall -q $[[ inputs.source_dir ]]
 
 python-compile:
