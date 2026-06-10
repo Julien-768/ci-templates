@@ -1,0 +1,42 @@
+# Python compile template
+#
+# Shared GitLab CI component for validating Python source files.
+
+spec:
+  inputs:
+    stage:
+      description: "CI stage used for the Python compile job."
+      default: test
+
+    image:
+      description: "Python Docker image used to run the compile check."
+      default: python:3.12
+
+    project_dir:
+      description: "Root directory of the Python project."
+      default: "."
+
+    source_dir:
+      description: "Python source directory to compile."
+      default: src
+
+    install_project:
+      description: "Whether to install the project before compiling Python files."
+      default: "false"
+
+---
+
+.python-compile-template:
+  stage: $[[ inputs.stage ]]
+  image: $[[ inputs.image ]]
+
+  script:
+  - cd $[[ inputs.project_dir ]]
+  - |
+    if [ "$[[ inputs.install_project ]]" = "true" ]; then
+      pip install .
+    fi
+  - python -m compileall -q $[[ inputs.source_dir ]]
+
+python-compile:
+  extends: .python-compile-template

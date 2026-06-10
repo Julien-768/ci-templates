@@ -26,6 +26,7 @@ include:
 
 # --- Lint stage ---
 - local: "templates/python/template.yml"
+- local: "templates/ruff/template.yml"
 - local: "templates/markdown/template.yml"
 - local: "templates/eslint/template.yml"
 
@@ -38,7 +39,12 @@ include:
 
 - local: "templates/gcc/template.yml"
 
-# --- Test / Pages stages ---
+# --- Test stage ---
+- local: "templates/python-compile/template.yml"
+  inputs:
+    source_dir: "."
+    install_project: "false"
+
 - local: "templates/mkdocs/template.yml"
 - local: "templates/mike/template.yml"
 

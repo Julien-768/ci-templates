@@ -1,0 +1,40 @@
+# ruff template
+#
+# Shared GitLab CI component for linting and formatting Python code with Ruff.
+
+spec:
+  inputs:
+    stage:
+      description: "CI stage used for the Ruff lint job."
+      default: lint
+
+    image:
+      description: "Python Docker image used to run Ruff."
+      default: python:3.12
+
+    project_dir:
+      description: "Root directory where Ruff commands are executed."
+      default: .
+
+    ruff_version:
+      description: "Optional Ruff version to install. Leave empty to install the latest version."
+      default: ""
+
+---
+.ruff-template:
+  stage: $[[ inputs.stage ]]
+  image: $[[ inputs.image ]]
+
+  script:
+  - |
+    if [ -n "$[[ inputs.ruff_version ]]" ]; then
+      pip install --no-cache-dir "ruff==$[[ inputs.ruff_version ]]"
+    else
+      pip install --no-cache-dir ruff
+    fi
+  - cd $[[ inputs.project_dir ]]
+  - ruff check .
+  - ruff format --check .
+
+ruff:
+  extends: .ruff-template
