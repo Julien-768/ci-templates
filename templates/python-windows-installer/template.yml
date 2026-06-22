@@ -28,6 +28,10 @@ spec:
       description: "Directory where the installer will be saved."
       default: "release"
 
+    app_version:
+      description: "Version of the application (passed to Inno Setup)."
+      default: "0.1.0"
+
 ---
 .windows-installer-template:
   stage: $[[ inputs.stage ]]
@@ -54,7 +58,7 @@ spec:
     - xvfb-run -a wine "$WINE_PYTHON" -m pip install -e .
     - xvfb-run -a wine "$WINE_PYTHON" -m PyInstaller $[[ inputs.pyinstaller_spec ]]
     - mkdir -p $[[ inputs.output_dir ]]
-    - xvfb-run -a wine "$HOME/.wine/drive_c/Program Files/Inno Setup 6/ISCC.exe" $[[ inputs.inno_script ]]
+    - xvfb-run -a wine "$HOME/.wine/drive_c/Program Files/Inno Setup 6/ISCC.exe" $[[ inputs.inno_script ]] /dAppVersion=$[[ inputs.app_version ]]
 
   artifacts:
     paths:
