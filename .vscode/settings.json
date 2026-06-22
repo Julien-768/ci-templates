@@ -1,3 +1,7 @@
 {
-  "markdownlint.config": ".markdownlint.json"
+  "markdownlint.config": ".markdownlint.json",
+  "toml.validate": true,
+  "toml.schemas": {
+    "https://json.schemastore.org/pyproject.json": ["pyproject.toml"]
+  }
 }
