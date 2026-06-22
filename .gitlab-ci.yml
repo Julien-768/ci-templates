@@ -39,15 +39,15 @@ include:
   - local: "templates/gcc/template.yml"
 
   # --- Test the windows-installer template ---
-  - local: "templates/python-windows-installer/template.yml"  # <-- Ajout du template à tester
+  - local: "templates/python-windows-installer/template.yml"  # <-- Indentation corrigée
     inputs:
       stage: build
       image: python:3.13-slim
-      project_dir: "."  # Chemin racine du projet de test (à adapter si nécessaire)
-      pyinstaller_spec: "tests/dummy_app.spec"  # Fichier .spec de test
-      inno_script: "tests/dummy_installer.iss"  # Script Inno Setup de test
-      output_dir: "tests/release"  # Dossier de sortie pour l'installateur
-      app_version: "0.0.1-test"  # Version de test
+      project_dir: "."  # Racine du projet
+      pyinstaller_spec: "tests/dummy_app.spec"  # Fichier .spec dans tests/
+      inno_script: "packaging/windows/installer.iss"  # Fichier .iss dans packaging/windows/
+      output_dir: "release"  # Dossier de sortie à la racine
+      app_version: "0.0.1-test"
 
   # --- Test stage ---
   - local: "templates/python-compile/template.yml"
