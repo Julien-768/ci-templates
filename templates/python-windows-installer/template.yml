@@ -1,0 +1,65 @@
+# Windows installer template for Python GUI projects
+#
+# Shared GitLab CI component for building .exe with PyInstaller and Inno Setup.
+
+spec:
+  inputs:
+    stage:
+      description: "CI stage used for the installer job."
+      default: build
+
+    image:
+      description: "Docker image used for building the installer."
+      default: python:3.13-slim
+
+    project_dir:
+      description: "Root directory of the project."
+      default: "."
+
+    pyinstaller_spec:
+      description: "Path to the PyInstaller spec file."
+      default: "rfid_door_gui.spec"
+
+    inno_script:
+      description: "Path to the Inno Setup script (.iss file)."
+      default: "packaging/windows/installer.iss"
+
+    output_dir:
+      description: "Directory where the installer will be saved."
+      default: "release"
+
+---
+.windows-installer-template:
+  stage: $[[ inputs.stage ]]
+  image: $[[ inputs.image ]]
+  tags:
+    - ccin2p3
+    - x64
+  before_script:
+    - dpkg --add-architecture i386
+    - apt-get update
+    - apt-get install -y wine wine32:i386 wget file xvfb
+    - wine --version
+    - wineboot --init
+    - wget -O /tmp/innosetup.exe "https://jrsoftware.org/download.php/is.exe"
+    - xvfb-run -a wine /tmp/innosetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+    - wget -O /tmp/python-installer.exe "https://www.python.org/ftp/python/3.13.9/python-3.13.9.exe"
+    - xvfb-run -a wine /tmp/python-installer.exe /quiet InstallAllUsers=0 PrependPath=1 Include_test=0 /log C:\\python-install.log || true
+    - export WINE_PYTHON="$HOME/.wine/drive_c/users/root/AppData/Local/Programs/Python/Python313-32/python.exe"
+    - xvfb-run -a wine "$WINE_PYTHON" -m pip install --upgrade pip
+    - xvfb-run -a wine "$WINE_PYTHON" -m pip install pyinstaller
+
+  script:
+    - cd $[[ inputs.project_dir ]]
+    - xvfb-run -a wine "$WINE_PYTHON" -m pip install -e .
+    - xvfb-run -a wine "$WINE_PYTHON" -m PyInstaller $[[ inputs.pyinstaller_spec ]]
+    - mkdir -p $[[ inputs.output_dir ]]
+    - xvfb-run -a wine "$HOME/.wine/drive_c/Program Files/Inno Setup 6/ISCC.exe" $[[ inputs.inno_script ]]
+
+  artifacts:
+    paths:
+      - $[[ inputs.output_dir ]]/*.exe
+    expire_in: 1 week
+
+windows-installer:
+  extends: .windows-installer-template
