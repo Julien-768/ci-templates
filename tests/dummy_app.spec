@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 a = Analysis(
-    ["tests/dummy_app.py"],
+    ["tests/dummy_app.py"],  # <-- Chemin relatif CORRIGÉ (pas de "tests/tests/")
     pathex=["."],
     binaries=[],
     datas=[],
@@ -29,5 +29,5 @@ exe = EXE(
     upx=True,
     upx_exclude=[],
     runtime_tmpdir=None,
-    console=True,  # Mode console pour simplifier le test
+    console=True,
 )
