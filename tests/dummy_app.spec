@@ -1,8 +1,11 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
+
+script_path = os.path.join(os.environ.get("CI_PROJECT_DIR", "."), "tests", "dummy_app.py")
 
 a = Analysis(
-    ["tests/dummy_app.py"],  # <-- Chemin relatif CORRIGÉ (pas de "tests/tests/")
-    pathex=["."],
+    [script_path],  # Chemin absolu
+    pathex=[os.environ.get("CI_PROJECT_DIR", ".")],
     binaries=[],
     datas=[],
     hiddenimports=[],
