@@ -1,58 +1,68 @@
 # .gitlab-ci.yml
-#
+
 # This GitLab CI configuration file sets up the pipeline stages and includes the
 # shared CI templates from this repository (local includes).
 #
 # Stages:
 # - format: code formatting checks (clang-format / clang-tidy)
 # - lint: static checks (python, markdownlint, eslint/prettier)
-# - build: firmware builds (PlatformIO, GNU Arm Embedded)
+# - build: firmware builds (PlatformIO, GNU Arm Embedded, Windows installer)
 # - test: documentation build/tests (mkdocs)
 # - pages: publication jobs (mike, doxygen)
 # - release: versioning/tagging/archive/release publication
-#
 
 stages:
-- format
-- lint
-- build
-- test
-- pages
-- release
+  - format
+  - lint
+  - build
+  - test
+  - pages
+  - release
 
 include:
-# --- Format stage ---
-- local: "templates/clang/template.yml"
+  # --- Format stage ---
+  - local: "templates/clang/template.yml"
 
-# --- Lint stage ---
-- local: "templates/python/template.yml"
-- local: "templates/ruff/template.yml"
-- local: "templates/markdown/template.yml"
-- local: "templates/eslint/template.yml"
+  # --- Lint stage ---
+  - local: "templates/python/template.yml"
+  - local: "templates/ruff/template.yml"
+  - local: "templates/markdown/template.yml"
+  - local: "templates/eslint/template.yml"
 
-# --- Build stage ---
-- local: "templates/platformio/template.yml"
-  inputs:
-    environments: "clangtidy"
-    project_dir: "."
-    project_conf: "platformio.ini"
+  # --- Build stage ---
+  - local: "templates/platformio/template.yml"
+    inputs:
+      environments: "clangtidy"
+      project_dir: "."
+      project_conf: "platformio.ini"
 
-- local: "templates/gcc/template.yml"
+  - local: "templates/gcc/template.yml"
 
-# --- Test stage ---
-- local: "templates/python-compile/template.yml"
-  inputs:
-    source_dir: "."
-    install_project: "false"
+  # --- Test the windows-installer template ---
+  - local: "templates/python-windows-installer/template.yml"  # <-- Ajout du template à tester
+    inputs:
+      stage: build
+      image: python:3.13-slim
+      project_dir: "."  # Chemin racine du projet de test (à adapter si nécessaire)
+      pyinstaller_spec: "tests/dummy_app.spec"  # Fichier .spec de test
+      inno_script: "tests/dummy_installer.iss"  # Script Inno Setup de test
+      output_dir: "tests/release"  # Dossier de sortie pour l'installateur
+      app_version: "0.0.1-test"  # Version de test
 
-- local: "templates/mkdocs/template.yml"
-- local: "templates/mike/template.yml"
+  # --- Test stage ---
+  - local: "templates/python-compile/template.yml"
+    inputs:
+      source_dir: "."
+      install_project: "false"
 
-# --- Pages stage ---
-- local: "templates/doxygen/template.yml"
+  - local: "templates/mkdocs/template.yml"
+  - local: "templates/mike/template.yml"
 
-# --- Release stage ---
-- local: "templates/release/template.yml"
+  # --- Pages stage ---
+  - local: "templates/doxygen/template.yml"
+
+  # --- Release stage ---
+  - local: "templates/release/template.yml"
 
 variables:
   CLANG_PATH: "src" # optional path to the C/C++ source files
