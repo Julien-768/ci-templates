@@ -19,7 +19,10 @@ DisableProgramGroupPage=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
+; Fichier .exe généré par PyInstaller (à ajouter si nécessaire)
+; Source: "dist\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "tests\dummy_app.spec"; DestDir: "{app}"; Flags: ignoreversion
+Source: "tests\dummy_app.py"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
