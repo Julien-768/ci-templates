@@ -47,7 +47,7 @@ include:
       pyinstaller_spec: "tests/dummy_app.spec"
       inno_script: "packaging/windows/installer.iss"
       output_dir: "release"
-      app_version: "0.0.1-test"  # Utilise une version fixe ou une variable définie
+      app_version: "0.0.1-test"  # Use a fixed version or a defined variable
 
   # --- Test stage ---
   - local: "templates/python-compile/template.yml"
