@@ -38,11 +38,8 @@ include:
 
   - local: "templates/gcc/template.yml"
 
-  # --- Test the windows-installer template ---
   - local: "templates/python-windows-installer/template.yml"
     inputs:
-      stage: build
-      image: python:3.13-slim
       project_dir: "."
       pyinstaller_spec: "tests/dummy_app.spec"
       inno_script: "packaging/windows/installer.iss"
