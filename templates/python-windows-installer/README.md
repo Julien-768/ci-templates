@@ -15,8 +15,8 @@ This template automates the creation of a Windows installer (`.exe`) for Python 
 
 The component provides:
 
-* **`.windows-installer-template`**: Reusable job for building Windows installers.
-* **`windows-installer`**: Concrete job that extends the template.
+- **`.windows-installer-template`**: Reusable job for building Windows installers.
+- **`windows-installer`**: Concrete job that extends the template.
 
 ---
 
@@ -62,9 +62,9 @@ No additional job definition is required locally. Including the component is suf
 
 ## 🧠 Important Notes
 
-* **Python compatibility:** The default image uses Python 3.13. Ensure that your application and its dependencies are compatible with this version.
+- **Python compatibility:** The default image uses Python 3.13. Ensure that your application and its dependencies are compatible with this version.
 
-* **Inno Setup and application version:** The `.iss` script must be compatible with Inno Setup 6. The template passes the value of the `app_version` input to Inno Setup through the command line:
+- **Inno Setup and application version:** The `.iss` script must be compatible with Inno Setup 6. The template passes the value of the `app_version` input to Inno Setup through the command line:
 
   ```text
   /dAppVersion=<app_version>
