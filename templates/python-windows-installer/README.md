@@ -25,7 +25,8 @@ And **one concrete job**:
 
 ## 🔁 Pipeline overview
 
-The `.gitlab-ci.yml` must include the following:
+This template **provides a whole configuration** for building Windows installers.
+To use it, simply include it in your `.gitlab-ci.yml`:
 
 ```yaml
 include:
