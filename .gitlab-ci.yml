@@ -48,10 +48,6 @@ include:
       inno_script: "packaging/windows/installer.iss"
       output_dir: "release"
       app_version: "0.0.1-test"  # Utilise une version fixe ou une variable définie
-    artifacts:
-      paths:
-        - release/*.exe
-      expire_in: 1 week
 
   # --- Test stage ---
   - local: "templates/python-compile/template.yml"

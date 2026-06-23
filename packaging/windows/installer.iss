@@ -8,7 +8,7 @@ AppName={#AppName}
 AppVersion={#AppVersion}
 DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
-OutputDir=..\..\release  ; Remonte de 2 niveaux depuis packaging/windows/
+OutputDir=..\..\release
 OutputBaseFilename={#AppName}_Setup_v{#AppVersion}
 Compression=lzma
 SolidCompression=yes
@@ -19,7 +19,6 @@ DisableProgramGroupPage=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-; Chemins relatifs à la racine du projet (iphc/ci-templates/)
 Source: "..\..\tests\dummy_app.spec"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\tests\dummy_app.py"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\dist\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
