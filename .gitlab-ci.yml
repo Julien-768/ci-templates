@@ -6,7 +6,7 @@
 # Stages:
 # - format: code formatting checks (clang-format / clang-tidy)
 # - lint: static checks (python, markdownlint, eslint/prettier)
-# - build: firmware builds (PlatformIO, GNU Arm Embedded, Windows installer)
+# - build: firmware (PlatformIO, GNU Arm Embedded) and application (Windows installer) builds
 # - test: documentation build/tests (mkdocs)
 # - pages: publication jobs (mike, doxygen)
 # - release: versioning/tagging/archive/release publication

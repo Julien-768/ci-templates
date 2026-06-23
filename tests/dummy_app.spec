@@ -4,7 +4,7 @@ import os
 script_path = os.path.join(os.environ.get("CI_PROJECT_DIR", "."), "tests", "dummy_app.py")
 
 a = Analysis(
-    [script_path],  # Chemin absolu
+    [script_path],
     pathex=[os.environ.get("CI_PROJECT_DIR", ".")],
     binaries=[],
     datas=[],
