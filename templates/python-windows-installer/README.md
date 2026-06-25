@@ -28,18 +28,15 @@ Include the component in your `.gitlab-ci.yml`:
 include:
   - project: "iphc/ci-templates"
     file: "/templates/python-windows-installer/template.yml"
-    ref: "feature/installer-windows" # Use "main" or "develop" when appropriate
+    ref: "feature/installer-windows"  # Use "main" or "develop" when appropriate
     inputs:
       stage: build
       image: python:3.13-slim
       project_dir: "."
-      pyinstaller_spec: "rfid_door_gui.spec"
-      inno_script: "packaging/windows/installer.iss"
-      output_dir: "release"
-      app_version: "$CI_COMMIT_TAG" # Use this only in tag pipelines
-
-stages:
-  - build
+      pyinstaller_spec: "dummy_app.spec"  # Default: dummy_app.spec (in template directory)
+      inno_script: "installer.iss"       # Default: installer.iss (in template directory)
+      output_dir: "release"               # Default: release/
+      app_version: "\$CI_COMMIT_TAG"      # Optional: Use CI tag or fixed version
 ```
 
 No additional job definition is required locally. Including the component is sufficient to enable Windows installer builds.
@@ -48,15 +45,15 @@ No additional job definition is required locally. Including the component is suf
 
 ## 🔧 Inputs
 
-| Input              | Description                                   | Default                           |
-| ------------------ | --------------------------------------------- | --------------------------------- |
-| `stage`            | CI stage used for the installer job.          | `build`                           |
-| `image`            | Docker image used for building the installer. | `python:3.13-slim`                |
-| `project_dir`      | Root directory of the project.                | `.`                               |
-| `pyinstaller_spec` | Path to the PyInstaller `.spec` file.         | `rfid_door_gui.spec`              |
-| `inno_script`      | Path to the Inno Setup `.iss` script.         | `packaging/windows/installer.iss` |
-| `output_dir`       | Directory where the installer is saved.       | `release`                         |
-| `app_version`      | Application version passed to Inno Setup.     | `0.1.0`                           |
+| Input              | Description                                   | Default            |
+| ------------------ | --------------------------------------------- | ------------------ |
+| `stage`            | CI stage used for the installer job.          | `build`            |
+| `image`            | Docker image used for building the installer. | `python:3.13-slim` |
+| `project_dir`      | Root directory of the project.                | `.`                |
+| `pyinstaller_spec` | Path to the PyInstaller `.spec` file.         | `dummy_app.spec`   |
+| `inno_script`      | Path to the Inno Setup `.iss` script.         | `installer.iss`    |
+| `output_dir`       | Directory where the installer is saved.       | `release`          |
+| `app_version`      | Application version passed to Inno Setup.     | `0.1.0`            |
 
 ---
 
