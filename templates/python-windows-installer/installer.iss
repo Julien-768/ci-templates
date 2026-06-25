@@ -20,8 +20,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: "dummy_app.spec"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../src/dummy_app.py"; DestDir: "{app}"; Flags: ignoreversion
-Source: "../../dist/DummyApp.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../src/main.py"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../dist/MainApp.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"

@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 a = Analysis(
-    ["../../src/dummy_app.py"],  # Chemin relatif depuis templates/python-windows-installer/
-    pathex=["../.."],              # Remonte de 2 niveaux pour accéder à src/
+    ["../../src/main.py"],
+    pathex=["../.."],
     binaries=[],
     datas=[],
     hiddenimports=[],
@@ -18,7 +18,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name="DummyApp",
+    name="MainApp",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
