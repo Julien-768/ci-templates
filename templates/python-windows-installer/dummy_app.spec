@@ -1,24 +1,17 @@
 # -*- mode: python ; coding: utf-8 -*-
-import os
-
-script_path = os.path.join(os.environ.get("CI_PROJECT_DIR", "."), "tests", "dummy_app.py")
-
 a = Analysis(
-    [script_path],
-    pathex=[os.environ.get("CI_PROJECT_DIR", ".")],
+    ["../../src/dummy_app.py"],  # Chemin relatif depuis templates/python-windows-installer/
+    pathex=["../.."],              # Remonte de 2 niveaux pour accéder à src/
     binaries=[],
     datas=[],
     hiddenimports=[],
     hookspath=[],
-    hooksconfig={},
     runtime_hooks=[],
     excludes=[],
     noarchive=False,
     optimize=0,
 )
-
 pyz = PYZ(a.pure)
-
 exe = EXE(
     pyz,
     a.scripts,

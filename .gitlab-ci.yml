@@ -41,10 +41,10 @@ include:
   - local: "templates/python-windows-installer/template.yml"
     inputs:
       project_dir: "."
-      pyinstaller_spec: "tests/dummy_app.spec"
-      inno_script: "packaging/windows/installer.iss"
+      pyinstaller_spec: "templates/python-windows-installer/dummy_app.spec"
+      inno_script: "templates/python-windows-installer/installer.iss"
       output_dir: "release"
-      app_version: "0.0.1-test"  # Use a fixed version or a defined variable
+      app_version: "0.0.1-test"
 
   # --- Test stage ---
   - local: "templates/python-compile/template.yml"

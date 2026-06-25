@@ -18,15 +18,15 @@ spec:
 
     pyinstaller_spec:
       description: "Path to the PyInstaller spec file."
-      default: "rfid_door_gui.spec"
+      default: "dummy_app.spec"
 
     inno_script:
       description: "Path to the Inno Setup script (.iss file)."
-      default: "packaging/windows/installer.iss"
+      default: "installer.iss"
 
     output_dir:
       description: "Directory where the installer will be saved."
-      default: "release"
+      default: "../../release"
 
     app_version:
       description: "Version of the application (passed to Inno Setup)."

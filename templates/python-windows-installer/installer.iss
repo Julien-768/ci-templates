@@ -19,9 +19,9 @@ DisableProgramGroupPage=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "..\..\tests\dummy_app.spec"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\tests\dummy_app.py"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\dist\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "dummy_app.spec"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../src/dummy_app.py"; DestDir: "{app}"; Flags: ignoreversion
+Source: "../../dist/DummyApp.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
