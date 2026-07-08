@@ -78,6 +78,7 @@ spec:
     - ccin2p3
     - x64
 
+
   before_script:
 
     - dpkg --add-architecture i386
@@ -87,25 +88,45 @@ spec:
     - wine --version
     - wineboot --init
 
+
     # Install Inno Setup
     - wget -O /tmp/innosetup.exe https://jrsoftware.org/download.php/is.exe
-    - xvfb-run -a wine /tmp/innosetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+
+    - |
+      xvfb-run -a wine \
+        /tmp/innosetup.exe \
+        /VERYSILENT \
+        /SUPPRESSMSGBOXES \
+        /NORESTART
+
 
     # Install Python Windows
     - wget -O /tmp/python-installer.exe https://www.python.org/ftp/python/3.13.9/python-3.13.9.exe
 
-    - xvfb-run -a wine \
+    - |
+      xvfb-run -a wine \
         /tmp/python-installer.exe \
         /quiet \
         InstallAllUsers=0 \
         PrependPath=1 \
         Include_test=0 \
-        /log C:\\python-install.log || true
+        /log C:\\python-install.log
 
-    - export WINE_PYTHON="$HOME/.wine/drive_c/users/root/AppData/Local/Programs/Python/Python313-32/python.exe"
+
+    # Find installed Python
+    - find "$HOME/.wine" -name python.exe
+
+
+    # Set Python path
+    - export WINE_PYTHON=$(find "$HOME/.wine" -name python.exe | head -n 1)
+
+    - echo "Using Python: $WINE_PYTHON"
+
 
     - xvfb-run -a wine "$WINE_PYTHON" -m pip install --upgrade pip
+
     - xvfb-run -a wine "$WINE_PYTHON" -m pip install pyinstaller
+
 
 
   script:
@@ -140,7 +161,8 @@ spec:
 
 
     # Build executable
-    - xvfb-run -a wine \
+    - |
+      xvfb-run -a wine \
         "$WINE_PYTHON" \
         -m PyInstaller \
         "$[[ inputs.pyinstaller_spec ]]"
@@ -149,15 +171,19 @@ spec:
     # Build Windows installer
     - mkdir -p "$[[ inputs.output_dir ]]"
 
-    - xvfb-run -a wine \
+
+    - |
+      xvfb-run -a wine \
         "$HOME/.wine/drive_c/Program Files/Inno Setup 6/ISCC.exe" \
         "$[[ inputs.inno_script ]]"
+
 
 
   artifacts:
     paths:
       - $[[ inputs.output_dir ]]/*.exe
     expire_in: 1 week
+
 
 
 windows-installer:
