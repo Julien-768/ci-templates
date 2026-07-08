@@ -13,7 +13,7 @@ AppVersion={#AppVersion}
 DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
 
-OutputDir=@OUTPUT_DIR@
+OutputDir={#SourcePath}\@OUTPUT_DIR@
 OutputBaseFilename={#AppName}_Setup_v{#AppVersion}
 
 Compression=lzma

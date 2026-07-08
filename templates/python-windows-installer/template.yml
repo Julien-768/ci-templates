@@ -80,58 +80,39 @@ spec:
     - x64
 
   before_script:
-
     - dpkg --add-architecture i386
     - apt-get update
     - apt-get install -y wine wine32:i386 wget file xvfb
-
     - wine --version
     - wineboot --init
 
     # Install Inno Setup
     - wget -O /tmp/innosetup.exe "https://jrsoftware.org/download.php/is.exe"
+    - xvfb-run -a wine /tmp/innosetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 
-    - |
-      xvfb-run -a wine /tmp/innosetup.exe \
-        /VERYSILENT \
-        /SUPPRESSMSGBOXES \
-        /NORESTART
-
-
-    # Install Python Windows
-    - wget -O /tmp/python-installer.exe "https://www.python.org/ftp/python/3.13.9/python-3.13.9.exe"
+    # Install Python
+    - wget -O /tmp/python-installer.exe "https://www.python.org/ftp/python/3.13.14/python-3.13.14.exe"
     - xvfb-run -a wine /tmp/python-installer.exe /quiet InstallAllUsers=0 PrependPath=1 Include_test=0 /log C:\\python-install.log || true
+    - export WINE_PYTHON=$(find ~/.wine/drive_c -name "python.exe" | head -n 1)
+    - test -f "$WINE_PYTHON" || { echo "Python not found in Wine"; exit 1; }
 
-    # Install build tools
-    - |
-      xvfb-run -a wine \
-        "$HOME/.wine/drive_c/users/root/AppData/Local/Programs/Python/Python313-32/python.exe" \
-        -m pip install --upgrade pip
-
-    - |
-      xvfb-run -a wine \
-        "$HOME/.wine/drive_c/users/root/AppData/Local/Programs/Python/Python313-32/python.exe" \
-        -m pip install pyinstaller
-
+    # Install pip and PyInstaller
+    - xvfb-run -a wine "$WINE_PYTHON" -m pip install --upgrade pip
+    - xvfb-run -a wine "$WINE_PYTHON" -m pip install pyinstaller
 
   script:
-
     - cd $[[ inputs.project_dir ]]
 
-
     # Generate PyInstaller spec
-    - |
-      sed \
+    - sed \
         -e "s|@MAIN_SCRIPT@|$[[ inputs.main_script ]]|g" \
         -e "s|@PROJECT_ROOT@|$[[ inputs.project_root ]]|g" \
         -e "s|@EXE_NAME@|$[[ inputs.exe_name ]]|g" \
         "$CI_PROJECT_DIR/$[[ inputs.template_dir ]]/$[[ inputs.pyinstaller_template ]]" \
         > "$[[ inputs.pyinstaller_spec ]]"
 
-
     # Generate Inno Setup script
-    - |
-      sed \
+    - sed \
         -e "s|@APP_NAME@|$[[ inputs.app_name ]]|g" \
         -e "s|@EXE_NAME@|$[[ inputs.exe_name ]]|g" \
         -e "s|@APP_VERSION@|$[[ inputs.app_version ]]|g" \
@@ -140,32 +121,20 @@ spec:
         "$CI_PROJECT_DIR/$[[ inputs.template_dir ]]/$[[ inputs.inno_template ]]" \
         > "$[[ inputs.inno_script ]]"
 
-
     # Install project dependencies
-    - |
-      xvfb-run -a wine \
-        "$HOME/.wine/drive_c/users/root/AppData/Local/Programs/Python/Python313-32/python.exe" \
-        -m pip install -e .
-
+    - xvfb-run -a wine "$WINE_PYTHON" -m pip install -e .
 
     # Build executable
-    - |
-      xvfb-run -a wine \
-        "$HOME/.wine/drive_c/users/root/AppData/Local/Programs/Python/Python313-32/python.exe" \
-        -m PyInstaller \
-        "$[[ inputs.pyinstaller_spec ]]"
-
+    - xvfb-run -a wine "$WINE_PYTHON" -m PyInstaller "$[[ inputs.pyinstaller_spec ]]"
 
     # Build installer
-    - mkdir -p "$[[ inputs.output_dir ]]"
-
-    - xvfb-run -a wine "$HOME/.wine/drive_c/Program Files/Inno Setup 6/ISCC.exe" "/builds/$CI_PROJECT_PATH/$[[ inputs.inno_script ]]"
+    - mkdir -p "$CI_PROJECT_DIR/$[[ inputs.output_dir ]]"
+    - export INNO_SCRIPT_WIN=$(winepath -w "$CI_PROJECT_DIR/$[[ inputs.inno_script ]]")
+    - xvfb-run -a wine "$HOME/.wine/drive_c/Program Files/Inno Setup 6/ISCC.exe" "$INNO_SCRIPT_WIN"
 
   artifacts:
     paths:
-      - $[[ inputs.output_dir ]]/*.exe
-    expire_in: 1 week
-
+      - "$CI_PROJECT_DIR/$[[ inputs.output_dir ]]/*.exe"
 
 windows-installer:
   extends: .windows-installer-template
