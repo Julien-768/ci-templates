@@ -1,0 +1,36 @@
+#define AppName "@APP_NAME@"
+#define AppExeName "@EXE_NAME@.exe"
+#define AppVersion "@APP_VERSION@"
+
+
+[Setup]
+
+AppId={{@APP_ID@}
+
+AppName={#AppName}
+AppVersion={#AppVersion}
+
+DefaultDirName={autopf}\{#AppName}
+DefaultGroupName={#AppName}
+
+OutputDir=@OUTPUT_DIR@
+OutputBaseFilename={#AppName}_Setup_v{#AppVersion}
+
+Compression=lzma
+SolidCompression=yes
+WizardStyle=modern
+
+
+[Files]
+
+Source: "../../dist/@EXE_NAME@.exe"; DestDir: "{app}"; Flags: ignoreversion
+
+
+[Icons]
+
+Name: "{group}\{#AppName}"; Filename: "{app}\{#AppExeName}"
+
+
+[Run]
+
+Filename: "{app}\{#AppExeName}"; Description: "Launch {#AppName}"; Flags: nowait postinstall skipifsilent
