@@ -1,3 +1,4 @@
+---
 # ============================================================
 # Windows installer template for Python GUI projects
 #
@@ -14,7 +15,7 @@ spec:
 
     image:
       description: "Docker image used for building the installer."
-      default: python:3.13-slim
+      default: python:3.13-slim-bookworm
 
     project_dir:
       description: "Root directory of the project."
@@ -100,8 +101,9 @@ spec:
         /NORESTART
 
 
-    # Install Python Windows
-    - wget -O /tmp/python-installer.exe https://www.python.org/ftp/python/3.13.9/python-3.13.9.exe
+    # Install Python for Windows
+    - wget -O /tmp/python-installer.exe \
+        https://www.python.org/ftp/python/3.13.9/python-3.13.9.exe
 
     - |
       xvfb-run -a wine \
@@ -113,18 +115,13 @@ spec:
         /log C:\\python-install.log
 
 
-    # Find installed Python
-    - find "$HOME/.wine" -name python.exe
-
-
-    # Set Python path
-    - export WINE_PYTHON=$(find "$HOME/.wine" -name python.exe | head -n 1)
-
+    # Detect installed Python
+    - WINE_PYTHON=$(find "$HOME/.wine" -name python.exe | head -n 1)
     - echo "Using Python: $WINE_PYTHON"
 
 
+    # Install Python tools
     - xvfb-run -a wine "$WINE_PYTHON" -m pip install --upgrade pip
-
     - xvfb-run -a wine "$WINE_PYTHON" -m pip install pyinstaller
 
 
@@ -135,6 +132,7 @@ spec:
 
 
     # Install project dependencies
+    - WINE_PYTHON=$(find "$HOME/.wine" -name python.exe | head -n 1)
     - xvfb-run -a wine "$WINE_PYTHON" -m pip install -e .
 
 
@@ -162,6 +160,8 @@ spec:
 
     # Build executable
     - |
+      WINE_PYTHON=$(find "$HOME/.wine" -name python.exe | head -n 1)
+
       xvfb-run -a wine \
         "$WINE_PYTHON" \
         -m PyInstaller \
@@ -170,7 +170,6 @@ spec:
 
     # Build Windows installer
     - mkdir -p "$[[ inputs.output_dir ]]"
-
 
     - |
       xvfb-run -a wine \
