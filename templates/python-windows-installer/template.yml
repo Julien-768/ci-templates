@@ -69,6 +69,7 @@ spec:
       description: "Installer output directory."
       default: "release"
 
+---
 
 .windows-installer-template:
   stage: $[[ inputs.stage ]]
