@@ -23,7 +23,7 @@ WizardStyle=modern
 
 [Files]
 
-Source: "../../dist/@EXE_NAME@.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#SourcePath}\dist\@EXE_NAME@.exe"; DestDir: "{app}"; Flags: ignoreversion
 
 
 [Icons]

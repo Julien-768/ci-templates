@@ -159,11 +159,7 @@ spec:
     # Build installer
     - mkdir -p "$[[ inputs.output_dir ]]"
 
-    - |
-      xvfb-run -a wine \
-        "$HOME/.wine/drive_c/Program Files/Inno Setup 6/ISCC.exe" \
-        "$[[ inputs.inno_script ]]"
-
+    - xvfb-run -a wine "$HOME/.wine/drive_c/Program Files/Inno Setup 6/ISCC.exe" "/builds/$CI_PROJECT_PATH/$[[ inputs.inno_script ]]"
 
   artifacts:
     paths:
