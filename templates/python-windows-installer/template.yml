@@ -104,22 +104,10 @@ spec:
     - cd $[[ inputs.project_dir ]]
 
     # Generate PyInstaller spec
-    - sed \
-        -e "s|@MAIN_SCRIPT@|$[[ inputs.main_script ]]|g" \
-        -e "s|@PROJECT_ROOT@|$[[ inputs.project_root ]]|g" \
-        -e "s|@EXE_NAME@|$[[ inputs.exe_name ]]|g" \
-        "$CI_PROJECT_DIR/$[[ inputs.template_dir ]]/$[[ inputs.pyinstaller_template ]]" \
-        > "$[[ inputs.pyinstaller_spec ]]"
+    - sed -e "s|@MAIN_SCRIPT@|$[[ inputs.main_script ]]|g" -e "s|@PROJECT_ROOT@|$[[ inputs.project_root ]]|g" -e "s|@EXE_NAME@|$[[ inputs.exe_name ]]|g" "$CI_PROJECT_DIR/$[[ inputs.template_dir ]]/$[[ inputs.pyinstaller_template ]]" > "$[[ inputs.pyinstaller_spec ]]"
 
     # Generate Inno Setup script
-    - sed \
-        -e "s|@APP_NAME@|$[[ inputs.app_name ]]|g" \
-        -e "s|@EXE_NAME@|$[[ inputs.exe_name ]]|g" \
-        -e "s|@APP_VERSION@|$[[ inputs.app_version ]]|g" \
-        -e "s|@APP_ID@|$[[ inputs.app_id ]]|g" \
-        -e "s|@OUTPUT_DIR@|$[[ inputs.output_dir ]]|g" \
-        "$CI_PROJECT_DIR/$[[ inputs.template_dir ]]/$[[ inputs.inno_template ]]" \
-        > "$[[ inputs.inno_script ]]"
+    - sed -e "s|@APP_NAME@|$[[ inputs.app_name ]]|g" -e "s|@EXE_NAME@|$[[ inputs.exe_name ]]|g" -e "s|@APP_VERSION@|$[[ inputs.app_version ]]|g" -e "s|@APP_ID@|$[[ inputs.app_id ]]|g" -e "s|@OUTPUT_DIR@|$[[ inputs.output_dir ]]|g" "$CI_PROJECT_DIR/$[[ inputs.template_dir ]]/$[[ inputs.inno_template ]]" > "$[[ inputs.inno_script ]]"
 
     # Install project dependencies
     - xvfb-run -a wine "$WINE_PYTHON" -m pip install -e .
