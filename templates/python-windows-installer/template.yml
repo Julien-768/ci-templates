@@ -69,6 +69,7 @@ spec:
       description: "Installer output directory."
       default: "release"
 
+---
 
 .windows-installer-template:
   stage: $[[ inputs.stage ]]
@@ -133,8 +134,6 @@ spec:
       xvfb-run -a wine "$WINE_PYTHON" \
         -m pip install pyinstaller
 
-
-
   script:
 
     - cd $[[ inputs.project_dir ]]
@@ -187,14 +186,10 @@ spec:
         "$HOME/.wine/drive_c/Program Files/Inno Setup 6/ISCC.exe" \
         "$[[ inputs.inno_script ]]"
 
-
-
   artifacts:
     paths:
       - $[[ inputs.output_dir ]]/*.exe
     expire_in: 1 week
-
-
 
 windows-installer:
   extends: .windows-installer-template
