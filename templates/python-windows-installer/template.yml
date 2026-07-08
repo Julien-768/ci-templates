@@ -7,6 +7,7 @@
 
 spec:
   inputs:
+
     stage:
       description: "CI stage used for the installer job."
       default: build
@@ -18,6 +19,10 @@ spec:
     project_dir:
       description: "Root directory of the project."
       default: "."
+
+    template_dir:
+      description: "Directory containing PyInstaller and Inno Setup templates."
+      default: "templates/python-windows-installer"
 
     app_name:
       description: "Application name displayed in installer."
@@ -36,12 +41,12 @@ spec:
       default: DUMMY-APP-TEST-0001
 
     main_script:
-      description: "Python entry point."
-      default: "../../src/main.py"
+      description: "Python entry point relative to project_dir."
+      default: "src/main.py"
 
     project_root:
       description: "Project root passed to PyInstaller."
-      default: "../.."
+      default: "."
 
     pyinstaller_template:
       description: "PyInstaller template file."
@@ -61,8 +66,9 @@ spec:
 
     output_dir:
       description: "Installer output directory."
-      default: "../../release"
+      default: "release"
 
+---
 
 .windows-installer-template:
   stage: $[[ inputs.stage ]]
@@ -73,6 +79,7 @@ spec:
     - x64
 
   before_script:
+
     - dpkg --add-architecture i386
     - apt-get update
     - apt-get install -y wine wine32:i386 wget file xvfb
@@ -84,9 +91,16 @@ spec:
     - wget -O /tmp/innosetup.exe https://jrsoftware.org/download.php/is.exe
     - xvfb-run -a wine /tmp/innosetup.exe /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 
-    # Install Python for Windows
+    # Install Python Windows
     - wget -O /tmp/python-installer.exe https://www.python.org/ftp/python/3.13.9/python-3.13.9.exe
-    - xvfb-run -a wine /tmp/python-installer.exe /quiet InstallAllUsers=0 PrependPath=1 Include_test=0 /log C:\\python-install.log || true
+
+    - xvfb-run -a wine \
+        /tmp/python-installer.exe \
+        /quiet \
+        InstallAllUsers=0 \
+        PrependPath=1 \
+        Include_test=0 \
+        /log C:\\python-install.log || true
 
     - export WINE_PYTHON="$HOME/.wine/drive_c/users/root/AppData/Local/Programs/Python/Python313-32/python.exe"
 
@@ -95,7 +109,9 @@ spec:
 
 
   script:
+
     - cd $[[ inputs.project_dir ]]
+
 
     # Install project dependencies
     - xvfb-run -a wine "$WINE_PYTHON" -m pip install -e .
@@ -107,7 +123,7 @@ spec:
         -e "s|@MAIN_SCRIPT@|$[[ inputs.main_script ]]|g" \
         -e "s|@PROJECT_ROOT@|$[[ inputs.project_root ]]|g" \
         -e "s|@EXE_NAME@|$[[ inputs.exe_name ]]|g" \
-        "$[[ inputs.pyinstaller_template ]]" \
+        "$CI_PROJECT_DIR/$[[ inputs.template_dir ]]/$[[ inputs.pyinstaller_template ]]" \
         > "$[[ inputs.pyinstaller_spec ]]"
 
 
@@ -119,16 +135,19 @@ spec:
         -e "s|@APP_VERSION@|$[[ inputs.app_version ]]|g" \
         -e "s|@APP_ID@|$[[ inputs.app_id ]]|g" \
         -e "s|@OUTPUT_DIR@|$[[ inputs.output_dir ]]|g" \
-        "$[[ inputs.inno_template ]]" \
+        "$CI_PROJECT_DIR/$[[ inputs.template_dir ]]/$[[ inputs.inno_template ]]" \
         > "$[[ inputs.inno_script ]]"
 
 
     # Build executable
-    - xvfb-run -a wine "$WINE_PYTHON" -m PyInstaller "$[[ inputs.pyinstaller_spec ]]"
+    - xvfb-run -a wine \
+        "$WINE_PYTHON" \
+        -m PyInstaller \
+        "$[[ inputs.pyinstaller_spec ]]"
 
 
     # Build Windows installer
-    - mkdir -p $[[ inputs.output_dir ]]
+    - mkdir -p "$[[ inputs.output_dir ]]"
 
     - xvfb-run -a wine \
         "$HOME/.wine/drive_c/Program Files/Inno Setup 6/ISCC.exe" \
