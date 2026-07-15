@@ -1,58 +1,67 @@
 # .gitlab-ci.yml
-#
+
 # This GitLab CI configuration file sets up the pipeline stages and includes the
 # shared CI templates from this repository (local includes).
 #
 # Stages:
 # - format: code formatting checks (clang-format / clang-tidy)
 # - lint: static checks (python, markdownlint, eslint/prettier)
-# - build: firmware builds (PlatformIO, GNU Arm Embedded)
+# - build: firmware (PlatformIO, GNU Arm Embedded) and application (Windows installer) builds
 # - test: documentation build/tests (mkdocs)
 # - pages: publication jobs (mike, doxygen)
 # - release: versioning/tagging/archive/release publication
-#
 
 stages:
-- format
-- lint
-- build
-- test
-- pages
-- release
+  - format
+  - lint
+  - build
+  - test
+  - pages
+  - release
 
 include:
-# --- Format stage ---
-- local: "templates/clang/template.yml"
+  # --- Format stage ---
+  - local: "templates/clang/template.yml"
 
-# --- Lint stage ---
-- local: "templates/python/template.yml"
-- local: "templates/ruff/template.yml"
-- local: "templates/markdown/template.yml"
-- local: "templates/eslint/template.yml"
+  # --- Lint stage ---
+  - local: "templates/python/template.yml"
+  - local: "templates/ruff/template.yml"
+  - local: "templates/markdown/template.yml"
+  - local: "templates/eslint/template.yml"
 
-# --- Build stage ---
-- local: "templates/platformio/template.yml"
-  inputs:
-    environments: "clangtidy"
-    project_dir: "."
-    project_conf: "platformio.ini"
+  # --- Build stage ---
+  - local: "templates/platformio/template.yml"
+    inputs:
+      environments: "clangtidy"
+      project_dir: "."
+      project_conf: "platformio.ini"
 
-- local: "templates/gcc/template.yml"
+  - local: "templates/gcc/template.yml"
 
-# --- Test stage ---
-- local: "templates/python-compile/template.yml"
-  inputs:
-    source_dir: "."
-    install_project: "false"
+  - local: "templates/python-windows-installer/template.yml"
+    inputs:
+      project_dir: "."
+      app_name: DummyApp
+      exe_name: MainApp
+      app_version: "0.0.1-test"
+      app_id: DUMMY-APP-TEST-0001
+      main_script: "src/main.py"
+      output_dir: "release"
 
-- local: "templates/mkdocs/template.yml"
-- local: "templates/mike/template.yml"
+  # --- Test stage ---
+  - local: "templates/python-compile/template.yml"
+    inputs:
+      source_dir: "."
+      install_project: "false"
 
-# --- Pages stage ---
-- local: "templates/doxygen/template.yml"
+  - local: "templates/mkdocs/template.yml"
+  - local: "templates/mike/template.yml"
 
-# --- Release stage ---
-- local: "templates/release/template.yml"
+  # --- Pages stage ---
+  - local: "templates/doxygen/template.yml"
+
+  # --- Release stage ---
+  - local: "templates/release/template.yml"
 
 variables:
   CLANG_PATH: "src" # optional path to the C/C++ source files

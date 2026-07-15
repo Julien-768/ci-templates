@@ -1,0 +1,27 @@
+# -*- mode: python ; coding: utf-8 -*-
+
+a = Analysis(
+    ["@MAIN_SCRIPT@"],
+    pathex=["@PROJECT_ROOT@"],
+    binaries=[],
+    datas=[],
+    hiddenimports=[],
+    hookspath=[],
+    runtime_hooks=[],
+    excludes=[],
+)
+
+pyz = PYZ(a.pure)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.datas,
+    [],
+    name="@EXE_NAME@",
+    debug=False,
+    strip=False,
+    upx=True,
+    console=True,
+)
