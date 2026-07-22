@@ -1,103 +1,96 @@
-# MarkdownLint CI Template (GitLab CI)
+# Markdown Lint
 
-This template adds a GitLab CI job to lint Markdown files using `markdownlint-cli`.
+A **GitLab CI/CD Component Catalog** template for linting Markdown files using [`markdownlint-cli`](https://github.com/DavidAnson/markdownlint-cli).
+This component ensures consistent Markdown formatting across your project.
 
-It is designed to be reusable across projects and runs in a Node.js container (Node 20).
+---
 
-## What it does
+## 📌 Usage
 
-- Installs `markdownlint-cli` at job runtime
-- Lints Markdown files under a configurable directory (`MD_PATH`)
-- Uses `.markdownlint.json` for rules
-- Uses `.markdownlintignore` for exclusions (automatically read by markdownlint-cli)
+### Include the Component
 
-## How to integrate
-
-### 1) Include the template in your `.gitlab-ci.yml`
-
-If you use this repository as a central templates repo, include the component like this:
+Add this component to your `.gitlab-ci.yml`:
 
 ```yaml
 include:
-  - project: "iphc/ci-templates"
-    ref: "develop" # or a tag / stable ref
-    file: "templates/markdownlint/template.yml"
+  - component: templates/markdownlint/template.yml
+    inputs:
+      MD_PATH: "."  # Optional: Directory to lint (default: project root)
 ```
 
-If your organization uses another project path or ref, adjust accordingly.
+---
 
-### 2) Ensure you have a `lint` stage
+## ⚙️ Inputs
 
-The job runs in the `lint` stage. Make sure your pipeline defines it:
+| Input   | Default | Description                                      |
+|---------|---------|--------------------------------------------------|
+| `MD_PATH` | `.`     | Root directory to lint (e.g., `"docs"` for docs only). |
 
-```yaml
-stages:
-  - lint
-```
+---
 
-### How to use
+## 📂 Required Files
 
-By default, the template lints all Markdown files under `MD_PATH` (defaults to `.`).
+Place these files in your **repository root** for the template to work:
 
-#### Lint the whole repository (recommended)
+### 1. `.markdownlint.json` *(Required)*
 
-```yaml
-variables:
-  MD_PATH: "."
-```
-
-#### Lint only documentation
-
-```yaml
-variables:
-MD_PATH: "docs"
-```
-
-#### Required configuration files
-
-Place these files at the **repository root**:
-
-`.markdownlint.json` **(required)**
-
-Example minimal config:
+Defines the linting rules. Example:
 
 ```json
 {
   "default": true,
-  "MD013": false
+  "MD013": false  // Disable line length rule (80 chars)
 }
 ```
 
-`.markdownlintignore` **(recommended)**
+### 2. `.markdownlintignore` *(Recommended)*
 
-Example:
+Excludes directories/files from linting. Example:
 
 ```text
 node_modules/
 **/node_modules/
-public/
+.git/
 dist/
 build/
+public/
 .pio/
-.git/
 ```
 
-`markdownlint-cli` automatically reads `.markdownlintignore` if present.
+> **Note**: `markdownlint-cli` automatically reads `.markdownlintignore` if present.
 
-#### Template job name
+---
 
-The template exposes a concrete job named:
+## 🔧 Example Configurations
 
-- `Markdown Lint`
-
-If you want a different name, you can define your own job extending the hidden template (see below).
-
-### Advanced: Custom job (rules, allow_failure, etc.)
-
-You can extend the hidden job template and add your own rules:
+### Lint the Entire Repository
 
 ```yaml
-Markdown Lint (custom):
+include:
+  - component: templates/markdownlint/template.yml
+    inputs:
+      MD_PATH: "."
+```
+
+### Lint Only Documentation
+
+```yaml
+include:
+  - component: templates/markdownlint/template.yml
+    inputs:
+      MD_PATH: "docs"
+```
+
+---
+
+## 🛠️ Customization
+
+### Extend the Template
+
+To customize the job (e.g., change `rules` or `allow_failure`), extend the hidden template:
+
+```yaml
+Markdown Lint (Custom):
   extends: .markdown-lint-template
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -105,24 +98,31 @@ Markdown Lint (custom):
     - when: never
 ```
 
-The hidden template is called `.markdown-lint-template`.
+> **Hidden Template Name**: `.markdown-lint-template`
 
-### Troubleshooting
+---
 
-#### It lints vendor/generated directories
+## 🚨 Troubleshooting
 
-Add them to `.markdownlintignore`, e.g. `node_modules/`.
+### ❌ Lints `node_modules/` or Generated Files
 
-#### Job fails due to Node compatibility
+**Solution**: Add them to `.markdownlintignore`:
 
-This template runs with `node:20` by default.
+```text
+node_modules/
+**/node_modules/
+dist/
+build/
+```
 
-#### No Markdown files found
+### ❌ No Markdown Files Found
 
-Check `MD_PATH` and ensure it points to the correct folder.
+**Solution**: Verify `MD_PATH` points to a directory containing `.md` files.
 
-### Notes
+---
+---
 
-- The job installs dependencies at runtime (`npm i -D markdownlint-cli`).
+## 📝 Notes
 
-- Keep `.markdownlint.json` and `.markdownlintignore` in the repo root for consistent behavior across projects.
+- For consistent behavior, place `.markdownlint.json` and `.markdownlintignore` in the **repository root**.
+- This template follows the [GitLab CI/CD Component Catalog](https://docs.gitlab.com/ee/ci/components/) structure.
