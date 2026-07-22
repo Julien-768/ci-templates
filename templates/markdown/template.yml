@@ -12,17 +12,15 @@
 # --------------------------------------------------
 .markdown-lint-template:
   stage: lint
-  image: node:20
-
-  before_script:
-    - npm config set fund false
-    - npm config set audit false
-    - npm i -D markdownlint-cli
+  image: node:22
 
   script:
-    - |
-      set -eu
-      npx markdownlint --config .markdownlint.json "${MD_PATH:-.}/**/*.md"
+  - npm config set fund false
+  - npm config set audit false
+  - npm i -D markdownlint-cli
+  - |
+    set -eu
+    npx markdownlint --config .markdownlint.json --ignore-path .markdownlintignore "${MD_PATH:-.}/**/*.md"
 
 # --------------------------------------------------
 # Concrete job exposed to consuming projects

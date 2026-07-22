@@ -10,3 +10,5 @@ node_modules/
 
 .vscode/
 .pio/
+.ai/
+.tmp/
