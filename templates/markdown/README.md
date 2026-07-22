@@ -22,8 +22,8 @@ include:
 
 ## ⚙️ Inputs
 
-| Input   | Default | Description                                      |
-|---------|---------|--------------------------------------------------|
+| Input     | Default | Description                                            |
+| --------- | ------- | ------------------------------------------------------ |
 | `MD_PATH` | `.`     | Root directory to lint (e.g., `"docs"` for docs only). |
 
 ---
