@@ -15,7 +15,7 @@ Add this component to your `.gitlab-ci.yml`:
 include:
   - component: templates/markdownlint/template.yml
     inputs:
-      MD_PATH: "."  # Optional: Directory to lint (default: project root)
+      MD_PATH: "." # Optional: Directory to lint (default: project root)
 ```
 
 ---
@@ -32,18 +32,18 @@ include:
 
 Place these files in your **repository root** for the template to work:
 
-### 1. `.markdownlint.json` *(Required)*
+### 1. `.markdownlint.json` _(Required)_
 
 Defines the linting rules. Example:
 
 ```json
 {
   "default": true,
-  "MD013": false  // Disable line length rule (80 chars)
+  "MD013": false // Disable line length rule (80 chars)
 }
 ```
 
-### 2. `.markdownlintignore` *(Recommended)*
+### 2. `.markdownlintignore` _(Recommended)_
 
 Excludes directories/files from linting. Example:
 
@@ -120,6 +120,7 @@ build/
 **Solution**: Verify `MD_PATH` points to a directory containing `.md` files.
 
 ---
+
 ---
 
 ## 📝 Notes
