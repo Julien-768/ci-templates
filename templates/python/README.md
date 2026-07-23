@@ -44,8 +44,8 @@ Disable specific tools by setting their input variables to `false`:
 include:
   - component: templates/python/template.yml
     inputs:
-      RUN_BLACK: "false"   # Disable black
-      RUN_PYLINT: "false"  # Disable pylint
+      RUN_BLACK: "false" # Disable black
+      RUN_PYLINT: "false" # Disable pylint
 ```
 
 ---
@@ -85,7 +85,7 @@ include:
       RUN_ISORT: "true"
       RUN_BLACK: "true"
       RUN_FLAKE8: "true"
-      RUN_PYLINT: "false"  # Disable pylint
+      RUN_PYLINT: "false" # Disable pylint
 ```
 
 ---

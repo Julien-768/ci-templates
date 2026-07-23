@@ -9,6 +9,7 @@ This template automates C and C++ code quality checks using LLVM Clang tools.
 The template provides **two jobs**:
 
 1. **`clang-format`**
+
    - Installs `clang-format` version 22.
    - Scans C and C++ source files.
    - Runs `clang-format --dry-run --Werror`.

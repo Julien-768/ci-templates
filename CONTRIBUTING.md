@@ -63,6 +63,7 @@ All components MUST follow this exact layout:
   `template.yml`
 
 - Other filenames like:
+
   - `.gitlab-ci.yml`
   - `clang.gitlab-ci.yml`
   - `component.yml`
