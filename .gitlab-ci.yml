@@ -32,7 +32,7 @@ include:
     RUN_BLACK: "true" # Enable/disable black
     RUN_FLAKE8: "true" # Enable/disable flake8
     RUN_PYLINT: "true" # Enable/disable pylint
-    PYLINT_RCFILE: "$PYLINT_RCFILE" # Use the global variable defined below
+    PYLINT_RCFILE: "pyproject.toml"
 
 - local: "templates/ruff/template.yml"
 - local: "templates/markdown/template.yml"
