@@ -12,64 +12,70 @@
 # - release: versioning/tagging/archive/release publication
 
 stages:
-  - format
-  - lint
-  - build
-  - build-exe
-  - build-installer
-  - test
-  - pages
-  - release
+- format
+- lint
+- build
+- build-exe
+- build-installer
+- test
+- pages
+- release
 
 include:
-  # --- Format stage ---
-  - local: "templates/clang/template.yml"
+# --- Format stage ---
+- local: "templates/clang/template.yml"
 
-  # --- Lint stage ---
-  - local: "templates/python/template.yml"
-  - local: "templates/ruff/template.yml"
-  - local: "templates/markdown/template.yml"
-  - local: "templates/eslint/template.yml"
+# --- Lint stage ---
+- local: "templates/python/template.yml"
+  inputs:
+    RUN_ISORT: "true" # Enable/disable isort
+    RUN_BLACK: "true" # Enable/disable black
+    RUN_FLAKE8: "true" # Enable/disable flake8
+    RUN_PYLINT: "true" # Enable/disable pylint
+    PYLINT_RCFILE: "$PYLINT_RCFILE" # Use the global variable defined below
 
-  # --- Build stage ---
-  - local: "templates/platformio/template.yml"
-    inputs:
-      environments: "clangtidy"
-      project_dir: "."
-      project_conf: "platformio.ini"
+- local: "templates/ruff/template.yml"
+- local: "templates/markdown/template.yml"
+- local: "templates/eslint/template.yml"
 
-  - local: "templates/gcc/template.yml"
+# --- Build stage ---
+- local: "templates/platformio/template.yml"
+  inputs:
+    environments: "clangtidy"
+    project_dir: "."
+    project_conf: "platformio.ini"
 
-  - local: "templates/python-windows-installer/template.yml"
-    inputs:
-      project_dir: "."
-      app_name: DummyApp
-      exe_name: MainApp
-      app_version: "0.0.1-test"
-      app_id: DUMMY-APP-TEST-0001
-      main_script: "src/main.py"
-      output_dir: "release"
+- local: "templates/gcc/template.yml"
 
-  # --- Test stage ---
-  - local: "templates/python-compile/template.yml"
-    inputs:
-      source_dir: "."
-      install_project: "false"
+- local: "templates/python-windows-installer/template.yml"
+  inputs:
+    project_dir: "."
+    app_name: DummyApp
+    exe_name: MainApp
+    app_version: "0.0.1-test"
+    app_id: DUMMY-APP-TEST-0001
+    main_script: "src/main.py"
+    output_dir: "release"
 
-  - local: "templates/mkdocs/template.yml"
-  - local: "templates/mike/template.yml"
+# --- Test stage ---
+- local: "templates/python-compile/template.yml"
+  inputs:
+    source_dir: "."
+    install_project: "false"
 
-  # --- Pages stage ---
-  - local: "templates/doxygen/template.yml"
+- local: "templates/mkdocs/template.yml"
+- local: "templates/mike/template.yml"
 
-  # --- Release stage ---
-  - local: "templates/release/template.yml"
+# --- Pages stage ---
+- local: "templates/doxygen/template.yml"
+
+# --- Release stage ---
+- local: "templates/release/template.yml"
 
 variables:
   CLANG_PATH: "src" # optional path to the C/C++ source files
   CLANG_FORMAT_FILE: ".clang-format.yml" # optional path to the clang-format configuration file
   DOXYFILE_PATH: "src" # optional path to the Doxygen configuration file
-  PYLINT_RCFILE: "pyproject.toml" # optional path to the Pylint configuration file
   LINT_PATH: "src" # optional path for source-code linting (non-Markdown)
   MD_PATH: "." # optional root for Markdown linting (default: lint all)
   MK_PATH: "src" # MkDocs project directory (contains mkdocs.yml + requirements.txt)
