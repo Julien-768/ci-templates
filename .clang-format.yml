@@ -1,12 +1,12 @@
 BasedOnStyle: Google
 
-# Limite de colonne pour la largeur des lignes
+# Maximum line length
 ColumnLimit: 150
 
-# Alignement des affectations consécutives
+# Align consecutive assignments
 AlignConsecutiveAssignments: true
 
-# Gestion des accolades
+# Brace wrapping configuration
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterClass: true
@@ -20,21 +20,22 @@ BraceWrapping:
   BeforeElse: false
   IndentBraces: true
 
-# Commentaires
+# Comment formatting
 PenaltyBreakComment: 10000
 MaxEmptyLinesToKeep: 1
 AlignTrailingComments: true
 
+# Include handling
 SortIncludes: false
 
-# Alignement et indentation
+# Alignment and indentation
 AlignAfterOpenBracket: Align
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
 IndentCaseLabels: true
 
-# Autres réglages
+# Other formatting options
 BreakBeforeBinaryOperators: None
 BreakStringLiterals: true
 DerivePointerAlignment: false
@@ -42,5 +43,6 @@ KeepEmptyLinesAtTheStartOfBlocks: true
 AllowShortBlocksOnASingleLine: Empty
 AllowShortFunctionsOnASingleLine: None
 
+# Penalties
 PenaltyBreakBeforeFirstCallParameter: 30000
 PenaltyBreakString: 0
