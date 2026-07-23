@@ -28,7 +28,7 @@ spec:
   - pip install isort
   - isort . --check-only
   rules:
-  - if: '$RUN_ISORT == "true"'
+  - if: '$[[ inputs.RUN_ISORT ]] == "true"'
 
 .black-template:
   stage: lint
@@ -38,7 +38,7 @@ spec:
   - pip install black[jupyter]
   - black --check .
   rules:
-  - if: '$RUN_BLACK == "true"'
+  - if: '$[[ inputs.RUN_BLACK ]] == "true"'
 
 .flake8-template:
   stage: lint
@@ -48,7 +48,7 @@ spec:
   - pip install flake8-pyproject
   - flake8 .
   rules:
-  - if: '$RUN_FLAKE8 == "true"'
+  - if: '$[[ inputs.RUN_FLAKE8 ]] == "true"'
 
 .pylint-template:
   stage: lint
@@ -61,10 +61,10 @@ spec:
       echo "No Python files found. Skipping pylint."
       exit 0
     else
-      echo "$PY_FILES" | xargs pylint --rcfile="${PYLINT_RCFILE:-pyproject.toml}"
+      echo "$PY_FILES" | xargs pylint --rcfile="$[[ inputs.PYLINT_RCFILE ]]"
     fi
   rules:
-  - if: '$RUN_PYLINT == "true"'
+  - if: '$[[ inputs.RUN_PYLINT ]] == "true"'
 
 # Jobs concrets (étendus depuis les templates)
 isort:
