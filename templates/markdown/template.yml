@@ -4,7 +4,7 @@
 # - MD_PATH: Root directory to lint (default: ".", use "docs" to restrict).
 # Config (repo root):
 # - .markdownlint.json (rules)
-# - .markdownlintignore (exclusions; auto-read)
+# - .markdownlintignore (optional exclusions; used only if present)
 # Notes: Uses glob "${MD_PATH:-.}/**/*.md".
 
 # --------------------------------------------------
@@ -20,7 +20,11 @@
   - npm i -D markdownlint-cli
   - |
     set -eu
-    npx markdownlint --config .markdownlint.json --ignore-path .markdownlintignore "${MD_PATH:-.}/**/*.md"
+    IGNORE_ARGS=""
+    if [ -f .markdownlintignore ]; then
+      IGNORE_ARGS="--ignore-path .markdownlintignore"
+    fi
+    npx markdownlint --config .markdownlint.json $IGNORE_ARGS "${MD_PATH:-.}/**/*.md"
 
 # --------------------------------------------------
 # Concrete job exposed to consuming projects
