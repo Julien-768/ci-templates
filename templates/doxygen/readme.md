@@ -103,6 +103,7 @@ git commit -m "docs: update API documentation publication"
 ### ⚠️ Behavior Notes
 
 - The job is skipped:
+
   - on tag pipelines
 
   - if the commit message does not contain publication

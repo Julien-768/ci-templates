@@ -1,41 +1,72 @@
-# python.gitlab-ci.yml
+# Python Linting Template
+# GitLab CI configuration for Python linting (isort, black, flake8, pylint).
+# Each tool can be enabled/disabled individually via inputs.
 
-# This GitLab CI configuration file sets up jobs to run various linting tools on Python source files.
-# The jobs use a Python image and install the necessary linting tools.
-# The PYLINT_RCFILE variable can be set to specify the path to the pylint configuration file. If not set, it defaults to pyproject.toml.
+spec:
+  inputs:
+    RUN_ISORT:
+      default: "true"
+      description: "Enable isort linting. Set to 'false' to skip."
+    RUN_BLACK:
+      default: "true"
+      description: "Enable black linting. Set to 'false' to skip."
+    RUN_FLAKE8:
+      default: "true"
+      description: "Enable flake8 linting. Set to 'false' to skip."
+    RUN_PYLINT:
+      default: "true"
+      description: "Enable pylint linting. Set to 'false' to skip."
+    PYLINT_RCFILE:
+      default: "pyproject.toml"
+      description: "Path to the pylint configuration file. Defaults to pyproject.toml."
+---
 
-# Définition des templates
 .isort-template:
   stage: lint
   image: python:latest
   script:
-    - pip install isort
-    - isort . --check-only
+  - pip install isort
+  - isort . --check-only
+  rules:
+  - if: '$[[ inputs.RUN_ISORT ]] == "true"'
 
 .black-template:
   stage: lint
   image: python:latest
   script:
-    - pip install black
-    - pip install black[jupyter]
-    - black --check .
+  - pip install black
+  - pip install black[jupyter]
+  - black --check .
+  rules:
+  - if: '$[[ inputs.RUN_BLACK ]] == "true"'
 
 .flake8-template:
   stage: lint
   image: python:latest
   script:
-    - pip install flake8
-    - pip install flake8-pyproject
-    - flake8 .
+  - pip install flake8
+  - pip install flake8-pyproject
+  - flake8 .
+  rules:
+  - if: '$[[ inputs.RUN_FLAKE8 ]] == "true"'
 
 .pylint-template:
   stage: lint
   image: python:latest
   script:
-    - pip install pylint
-    - ls
-    - find . -type f -name "*.py" | xargs pylint --rcfile="${PYLINT_RCFILE:-pyproject.toml}"
+  - pip install pylint
+  - |
+    PY_FILES=$(find . -type f -name "*.py")
+    if [ -z "$PY_FILES" ]; then
+      echo "No Python files found. Skipping pylint."
+      exit 0
+    else
+      echo "$PY_FILES" | xargs pylint --rcfile="$[[ inputs.PYLINT_RCFILE ]]"
+    fi
+  rules:
+  - if: '$[[ inputs.RUN_PYLINT ]] == "true"'
 
+# Jobs concrets (étendus depuis les templates)
 isort:
   extends: .isort-template
 

@@ -5,52 +5,35 @@ repos:
   rev: v4.4.1
   hooks:
   - id: commitizen
-    stages: [commit-msg]
+    stages: [ commit-msg ]
 
 # Lint: All files
 - repo: https://github.com/pre-commit/pre-commit-hooks
   rev: v5.0.0
   hooks:
   - id: end-of-file-fixer
-    description: ensures that a file is either empty, or ends with one newline.
   - id: trailing-whitespace
-    description: trims trailing whitespace.
   - id: check-json
-    description: checks json files for parseable syntax.
   - id: check-toml
-    description: checks toml files for parseable syntax.
   - id: check-yaml
-    description: checks yaml files for parseable syntax.
-    args: [--allow-multiple-documents]
+    args: [ --allow-multiple-documents ]
   - id: requirements-txt-fixer
-    description: sorts entries in requirements.txt.
 
 # Lint: html, css
 - repo: https://github.com/Lucas-C/pre-commit-hooks-lxml
   rev: v1.1.0
   hooks:
   - id: forbid-html-img-without-alt-text
-    description: List every <img> tag without a alt= or data-ng-attr-alt= attribute
-  # - id: forbid-non-std-html-attributes
-  #   description: Detect any non-standard attribute that is not prefixed with data-
   - id: detect-missing-css-classes
-    description: Detect unused or missing CSS classes definitions, and abort if any of the later ones is found
-    args:
-    - --css-files-dir
-    - \docs\
-    - --html-files-dir
-    - \docs\
+    args: [ --css-files-dir, \docs\, --html-files-dir, \docs\ ]
   - id: html-tags-blacklist
-    description: interdire les éléments et attributs nuisant à l'accessibilité, selon les recommendations d'Access42
   - id: html-attributes-blacklist
-    description: interdire les éléments et attributs nuisant à l'accessibilité, selon les recommendations d'Access42
 
 # Lint: Markdown
 - repo: https://github.com/igorshubovych/markdownlint-cli
   rev: v0.44.0
   hooks:
   - id: markdownlint
-    description: Fixes the style of Markdown/Commonmark files.
 
 # Autoformat: Python
 - repo: https://github.com/psf/black-pre-commit-mirror
@@ -58,3 +41,11 @@ repos:
   hooks:
   - id: black
     language_version: python3.13
+
+# Autoformat: Prettier
+- repo: https://github.com/rbubley/mirrors-prettier
+  rev: v3.5.3 # check https://github.com/rbubley/mirrors-prettier/tags for latest
+  hooks:
+  - id: prettier
+    types_or: [ javascript, css, scss, html, json, yaml, markdown ]
+    args: [ --write ]
