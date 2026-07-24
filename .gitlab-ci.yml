@@ -37,6 +37,14 @@ include:
 - local: "templates/eslint/template.yml"
 
 # --- Build stage ---
+
+- local: "templates/sphinx/template.yml"
+  inputs:
+    project_dir: "."
+    python_source_dir: "src"
+    source_dir: "src/docs/source"
+    build_dir: "src/docs/build/html"
+
 - local: "templates/platformio/template.yml"
   inputs:
     environments: "clangtidy"
