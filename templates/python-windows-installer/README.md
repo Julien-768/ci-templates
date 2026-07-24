@@ -8,16 +8,16 @@ This documentation explains how to use the **Python Windows Installer** componen
 
 This template automates the creation of a Windows installer (`.exe`) for Python applications.
 
-It operates in two distinct stages to ensure clean isolation and reliability:
+It operates in two distinct steps to ensure clean isolation and reliability:
 
-1. `build-exe`: Uses a Linux environment with Wine to install Windows Python, PyInstaller, and builds the standalone executable from a `.spec` file.
-2. `build-installer`: Uses a dedicated Inno Setup Docker image to compile the final Windows installer from a .iss script.
+1. `python-pyinstaller`: Uses a Linux environment with Wine to install Windows Python, PyInstaller, and builds the standalone executable from a `.spec` file.
+2. `python-inno-setup`: Uses a dedicated Inno Setup Docker image to compile the final Windows installer from a `.iss` script.
 3. Publishes the generated installer as a CI artifact.
 
 The component provides two concrete jobs that run sequentially:
 
-- **`build-exe`**: Generates the raw executable.
-- **`build-installer`**: Packages the executable into a user-friendly installer.
+- **`python-pyinstaller`**: Generates the raw executable.
+- **`python-inno-setup`**: Packages the executable into a user-friendly installer.
 
 ---
 
@@ -29,7 +29,7 @@ Include the component in your `.gitlab-ci.yml`:
 include:
   - project: "iphc/ci-templates"
     file: "/templates/python-windows-installer/template.yml"
-    ref: "feature/installer-windows" # Use "main" or "develop" when appropriate
+    ref: "develop"
     inputs:
       project_dir: "."
       template_dir: "templates/python-windows-installer" # Directory containing template files (spec.in, iss.in)
@@ -44,6 +44,7 @@ include:
       app_id: "DUMMY-APP-TEST-0001" # Windows application identifier
       main_script: "src/main.py" # Python entry point relative to project directory
       project_root: "." # Project root passed to PyInstaller
+      stage: "build" # CI stage used for Windows build jobs
 ```
 
 No additional job definition is required locally. Including the component is sufficient to enable Windows installer builds.
@@ -67,6 +68,7 @@ No additional job definition is required locally. Including the component is suf
 | `app_id`               | Windows application identifier (GUID-like).              | `DUMMY-APP-TEST-0001`                |
 | `main_script`          | Python entry point relative to project directory.        | `src/main.py`                        |
 | `project_root`         | Project root passed to PyInstaller.                      | `.`                                  |
+| `stage`                | CI stage used for Windows build jobs.                    | `build`                              |
 
 ---
 
@@ -74,9 +76,9 @@ No additional job definition is required locally. Including the component is suf
 
 - **Fixed Windows Python Path:** The template installs Windows Python 3.13.1 to a fixed directory (`C:\Python313`) inside Wine to ensure reliable execution without relying on fragile dynamic path detection.
 
-- **Pipeline Stages:** The process is split into two stages (`build-exe` and `build-installer`) to separate the PyInstaller compilation (requiring Wine) from the Inno Setup compilation (using native Docker tooling).
+- **Pipeline Stages:** Both jobs run in the configurable `build` stage by default. The execution order is preserved using GitLab's `needs` keyword (`python-inno-setup` depends on `python-pyinstaller`).
 
-- **Inno Setup Paths:** The OutputDir in the .iss file uses {#SourcePath}\@OUTPUT_DIR@ to ensure the installer is generated in the correct directory.
+- **Inno Setup Paths:** The OutputDir in the `.iss` file uses `{#SourcePath}@OUTPUT_DIR@` to ensure the installer is generated in the correct directory.
 
 - **Python compatibility:** The default image uses Python 3.13. Ensure that your application and its dependencies are compatible with this version.
 
