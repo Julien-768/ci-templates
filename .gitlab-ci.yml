@@ -15,8 +15,6 @@ stages:
 - format
 - lint
 - build
-- build-exe
-- build-installer
 - test
 - pages
 - release

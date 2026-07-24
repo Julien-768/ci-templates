@@ -59,18 +59,18 @@ spec:
       type: string
       default: "release"
       description: "Installer output directory."
+    stage:
+      type: string
+      default: "build"
+      description: "CI stage used for Windows build jobs."
 
 ---
-
-stages:
-  - build-exe
-  - build-installer
 
 # ============================================================
 # Build Windows executable with PyInstaller via Wine
 # ============================================================
-build-exe:
-  stage: build-exe
+python-pyinstaller:
+  stage: $[[ inputs.stage ]]
   image: python:3.13-slim
   tags:
     - ccin2p3
@@ -119,8 +119,8 @@ build-exe:
 # ============================================================
 # Build installer with Inno Setup
 # ============================================================
-build-installer:
-  stage: build-installer
+python-inno-setup:
+  stage: $[[ inputs.stage ]]
   image:
     name: amake/innosetup:latest
     entrypoint: [""]
@@ -128,7 +128,7 @@ build-installer:
     - ccin2p3
     - x64
   needs:
-    - build-exe
+    - python-pyinstaller
   script:
     - "cd \"$[[ inputs.project_dir ]]\""
     # Generate Inno Setup script
