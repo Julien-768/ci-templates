@@ -9,6 +9,7 @@ This template automates Python code quality checks using Ruff.
 The template provides **one job**:
 
 1. **`ruff`**
+
    - Installs Ruff.
    - Runs `ruff check .` to perform linting.
    - Runs `ruff format --check .` to verify formatting.
@@ -16,7 +17,7 @@ The template provides **one job**:
 
 ---
 
-## 🔁 Pipeline overview
+## 🔁 Pipeline Overview
 
 The `.gitlab-ci.yml` must include the following:
 
@@ -32,7 +33,7 @@ stages:
   - lint
 ```
 
-No job definition is required locally.
+No additional job definition is required in the consuming project.
 
 Including the component is sufficient to enable Ruff checks.
 
@@ -40,12 +41,12 @@ Including the component is sufficient to enable Ruff checks.
 
 ## 🔧 Inputs
 
-| Input          | Description                                                         | Default       |
-| -------------- | ------------------------------------------------------------------- | ------------- |
-| `stage`        | CI stage used for the Ruff job.                                     | `lint`        |
-| `image`        | Python Docker image used to run Ruff.                               | `python:3.12` |
-| `project_dir`  | Root directory where Ruff commands are executed.                    | `.`           |
-| `ruff_version` | Ruff version to install. Leave empty to install the latest version. | `""`          |
+| Input          | Description                                                         | Default            |
+| -------------- | ------------------------------------------------------------------- | ------------------ |
+| `stage`        | CI stage used for the Ruff job.                                     | `lint`             |
+| `image`        | Python Docker image used to run Ruff.                               | `python:3.13-slim` |
+| `project_dir`  | Root directory where Ruff commands are executed.                    | `.`                |
+| `ruff_version` | Ruff version to install. Leave empty to install the latest version. | `""`               |
 
 Example:
 
@@ -53,9 +54,18 @@ Example:
 include:
   - component: "$CI_SERVER_FQDN/iphc/ci-templates/ruff@$CI_COMMIT_SHA"
     inputs:
-      image: python:3.13
+      image: python:3.13-slim
+      project_dir: src
       ruff_version: "0.12.0"
 ```
+
+---
+
+## ⚠️ Requirements
+
+The component expects at least one Python file to be present in `project_dir`.
+
+If no Python files are found, Ruff will not perform any checks.
 
 ---
 
@@ -70,6 +80,23 @@ include:
 ruff check . --fix
 ruff format .
 ```
+
+---
+
+## 🧪 Local Testing
+
+A minimal Python file can be used to validate the component during CI testing:
+
+```python
+def hello() -> None:
+    print("Hello Ruff")
+
+
+if __name__ == "__main__":
+    hello()
+```
+
+This ensures that both `ruff check` and `ruff format --check` are executed successfully during CI validation.
 
 ---
 

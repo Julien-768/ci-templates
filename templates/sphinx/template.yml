@@ -1,0 +1,62 @@
+# Sphinx documentation template
+#
+# Shared GitLab CI component for building Sphinx documentation.
+
+spec:
+  inputs:
+    stage:
+      description: "CI stage used for the Sphinx build job."
+      default: build
+
+    image:
+      description: "Python Docker image used to run the Sphinx build."
+      default: python:3.13-slim
+
+    project_dir:
+      description: "Root directory of the project."
+      default: "."
+
+    python_source_dir:
+      description: "Directory containing Python source files."
+      default: "src"
+
+    source_dir:
+      description: "Sphinx source directory (where conf.py is located)."
+      default: "docs/source"
+
+    build_dir:
+      description: "Output directory for the built HTML documentation."
+      default: "docs/build/html"
+
+    sphinx_version:
+      description: "Version of Sphinx to install."
+      default: "9.1.0"
+
+    sphinx_theme:
+      description: "Sphinx theme to install (e.g., sphinx-book-theme)."
+      default: "sphinx-book-theme"
+
+    sphinx_extensions:
+      description: "Additional Sphinx extensions to install (space-separated)."
+      default: "sphinxcontrib-mermaid"
+
+---
+
+.sphinx-template:
+  stage: $[[ inputs.stage ]]
+  image: $[[ inputs.image ]]
+
+  script:
+    - pip install --upgrade pip
+    - pip install sphinx==$[[ inputs.sphinx_version ]] $[[ inputs.sphinx_theme ]] $[[ inputs.sphinx_extensions ]]
+    - cd $[[ inputs.project_dir ]]
+    - sphinx-apidoc -o $[[ inputs.source_dir ]] $[[ inputs.project_dir ]]/$[[ inputs.python_source_dir ]]
+    - sphinx-build -b html $[[ inputs.source_dir ]] $[[ inputs.build_dir ]]
+
+  artifacts:
+    paths:
+      - $[[ inputs.build_dir ]]/
+    expire_in: 1 week
+
+sphinx-build:
+  extends: .sphinx-template
