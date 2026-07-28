@@ -24,7 +24,9 @@ spec:
 .platformio-build-template:
   stage: $[[ inputs.stage ]]
   image: python:3.11
+
   dependencies: []
+  needs: []
 
   script:
   - apt-get update

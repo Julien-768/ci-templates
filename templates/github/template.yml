@@ -20,6 +20,8 @@ spec:
 .sync_github_setup:
   image: alpine:latest
   dependencies: []
+  # needs: []
+
   variables:
     GIT_DEPTH: "0"
   script:
