@@ -14,8 +14,8 @@
 stages:
 - format
 - lint
-- build
 - test
+- build
 - pages
 - release
 - deploy
@@ -71,7 +71,7 @@ include:
 - local: "templates/release/template.yml"
 
 # --- Deploy stage ---
-# - local: "templates/github/template.yml"
+# - local: "templates/sync-github/template.yml"
 #   inputs:
 #     branches: "develop,main"
 #     github_repo: "TON_USER/TON_DEPOT" # à remplacer par le vrai chemin GitHub

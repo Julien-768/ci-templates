@@ -27,7 +27,9 @@ repository on every push.
 
 ```yaml
 include:
-  - component: gitlab.in2p3.fr/rfid.m0/rfid/sync-github@develop
+  - project: "iphc/ci-templates"
+    file: "/templates/sync-github/template.yml"
+    ref: develop
     inputs:
       branches: "develop,main"
       github_repo: "your-user/your-repo"
