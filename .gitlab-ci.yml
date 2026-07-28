@@ -72,12 +72,12 @@ include:
 - local: "templates/release/template.yml"
 
 # --- Deploy stage ---
-- local: "templates/sync-github/template.yml"
-  inputs:
-    branches: "develop,main"
-    github_repo: "TON_USER/TON_DEPOT" # à remplacer par le vrai chemin GitHub
-    # CI_PUSH_TOKEN: doit être défini en variable CI/CD protégée + masquée
-    # (Settings > CI/CD > Variables) — token GitHub avec scope "repo"
+# - local: "templates/github/template.yml"
+#   inputs:
+#     branches: "develop,main"
+#     github_repo: "TON_USER/TON_DEPOT" # à remplacer par le vrai chemin GitHub
+#     # CI_PUSH_TOKEN: doit être défini en variable CI/CD protégée + masquée
+#     # (Settings > CI/CD > Variables) — token GitHub avec scope "repo"
 
 variables:
   CLANG_PATH: "src" # optional path to the C/C++ source files
