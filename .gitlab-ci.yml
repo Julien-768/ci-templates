@@ -62,11 +62,10 @@ include:
     source_dir: "."
     install_project: "false"
 
-- local: "templates/mkdocs/template.yml"
-- local: "templates/mike/template.yml"
-
 # --- Pages stage ---
 - local: "templates/doxygen/template.yml"
+- local: "templates/mkdocs/template.yml"
+- local: "templates/mike/template.yml"
 
 # --- Release stage ---
 - local: "templates/release/template.yml"
