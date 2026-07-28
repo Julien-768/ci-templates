@@ -27,7 +27,7 @@
   - time git checkout $CI_COMMIT_SHA
   - echo "$HTTPS_REMOTE"
   - time mike deploy --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "${CI_COMMIT_TAG:-dev}" latest
-  - time mike set-default --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
+  - time mike set-default --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest
   - time git checkout "$PAGES_BRANCH" -- public
   - if [ -n "$MK_PATH" ]; then mv public $CI_PROJECT_DIR/public; fi
   artifacts:
