@@ -23,12 +23,12 @@ spec:
     install_project:
       description: "Whether to install the project before compiling Python files."
       default: "false"
-
 ---
 
 .python-compile-template:
   stage: $[[ inputs.stage ]]
   image: $[[ inputs.image ]]
+  dependencies: []
 
   script:
   - cd $[[ inputs.project_dir ]]
