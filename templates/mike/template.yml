@@ -26,15 +26,13 @@
   - time git fetch origin $PAGES_BRANCH && git checkout -b $PAGES_BRANCH origin/$PAGES_BRANCH || echo "Pages branch not deployed yet."
   - time git checkout $CI_COMMIT_SHA
   - echo "$HTTPS_REMOTE"
-  - time mike deploy --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "$CI_COMMIT_TAG" latest
+  - time mike deploy --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "${CI_COMMIT_TAG:-dev}" latest
   - time mike set-default --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
   - time git checkout "$PAGES_BRANCH" -- public
   - if [ -n "$MK_PATH" ]; then mv public $CI_PROJECT_DIR/public; fi
   artifacts:
     paths:
     - public
-  rules:
-  - if: "$CI_COMMIT_MESSAGE =~ /publication/"
 
 # Utiliser l'ancre dans le job mike_pages
 mike_pages:

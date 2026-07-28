@@ -13,10 +13,14 @@ Add this component to your `.gitlab-ci.yml`:
 
 ```yaml
 include:
-  - component: templates/markdownlint/template.yml
+  - project: "iphc/ci-templates"
+    file: "/templates/markdownlint/template.yml"
+    ref: "<commit-sha>"
     inputs:
       MD_PATH: "." # Optional: Directory to lint (default: project root)
 ```
+
+> **Tip**: Pin `ref` to a specific commit SHA (or tag) rather than a branch, to keep your pipeline stable against upstream changes.
 
 ---
 
@@ -67,7 +71,9 @@ public/
 
 ```yaml
 include:
-  - component: templates/markdownlint/template.yml
+  - project: "iphc/ci-templates"
+    file: "/templates/markdownlint/template.yml"
+    ref: "<commit-sha>"
     inputs:
       MD_PATH: "."
 ```
@@ -76,7 +82,9 @@ include:
 
 ```yaml
 include:
-  - component: templates/markdownlint/template.yml
+  - project: "iphc/ci-templates"
+    file: "/templates/markdownlint/template.yml"
+    ref: "<commit-sha>"
     inputs:
       MD_PATH: "docs"
 ```
@@ -121,9 +129,8 @@ build/
 
 ---
 
----
-
 ## 📝 Notes
 
 - For consistent behavior, place `.markdownlint.json` and `.markdownlintignore` in the **repository root**.
 - This template follows the [GitLab CI/CD Component Catalog](https://docs.gitlab.com/ee/ci/components/) structure.
+- Replace `<commit-sha>` with the actual pinned commit SHA (or tag) of `iphc/ci-templates` you want to use.
