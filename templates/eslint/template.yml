@@ -18,6 +18,8 @@
   stage: lint
   image: node:20-alpine
   dependencies: []
+  needs: []
+
   variables:
     # Fail fast on errors
     ESLINT_NO_DEV_ERRORS: "true"

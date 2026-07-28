@@ -23,6 +23,7 @@
   stage: format
   image: alpine:latest
   dependencies: []
+  needs: []
 
   script:
   - apk update

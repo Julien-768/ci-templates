@@ -28,7 +28,9 @@ spec:
 .python-compile-template:
   stage: $[[ inputs.stage ]]
   image: $[[ inputs.image ]]
+
   dependencies: []
+  needs: []
 
   script:
   - cd $[[ inputs.project_dir ]]

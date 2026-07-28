@@ -17,6 +17,7 @@ spec:
   stage: pages
   image: alpine:latest
   dependencies: []
+  needs: []
 
   variables:
     CI_TEMPLATES_PROJECT: "iphc/ci-templates"
