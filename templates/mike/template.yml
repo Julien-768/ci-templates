@@ -43,6 +43,9 @@
 
   - time mike set-default -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest
 
+  - git fetch origin $PAGES_BRANCH
+  - git ls-tree -r origin/$PAGES_BRANCH --name-only | head -50
+
 mike_pages:
   extends: .mike-pages-template
   # rules:
