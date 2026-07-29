@@ -24,23 +24,18 @@
 
   script:
   - cd ${MK_PATH:-.}
-  - time pip install -r requirements.txt
-  - time git config user.name "$GITLAB_USER_NAME"
-  - time git config user.email "$GITLAB_USER_EMAIL"
-  - time git fetch origin $PAGES_BRANCH && git checkout -b $PAGES_BRANCH origin/$PAGES_BRANCH || echo "Pages branch not deployed yet."
-  - time git checkout $CI_COMMIT_SHA
-  - echo "$HTTPS_REMOTE"
-  - pwd
-  - ls -la
-  - find . -maxdepth 2 -type d
-  - test -f mkdocs.yml || (echo "mkdocs.yml introuvable dans $PWD" && exit 1)
-  - time mike deploy --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "${CI_COMMIT_TAG:-dev}" latest
-  - time mike set-default --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest
-  # - time git fetch origin $PAGES_BRANCH
-  # - pwd
-  # - git ls-tree -r origin/$PAGES_BRANCH --name-only | head -30
-  # - time git checkout origin/$PAGES_BRANCH -- ":/public"
-  # - if [ -n "$MK_PATH" ]; then mv public $CI_PROJECT_DIR/public; fi
+  - pip install -r requirements.txt
+  - git config user.name "$GITLAB_USER_NAME"
+  - git config user.email "$GITLAB_USER_EMAIL"
+  - test -f mkdocs.yml || exit 1
+  - mike deploy --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "${CI_COMMIT_TAG:-dev}" latest
+  - mike set-default --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest
+  - cp -r public "$CI_PROJECT_DIR/public"
+  - find "$CI_PROJECT_DIR/public" -maxdepth 2 -type f | head -20
+
+artifacts:
+  paths:
+  - public
   artifacts:
     paths:
     - public
