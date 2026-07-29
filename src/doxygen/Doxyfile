@@ -1,0 +1,5 @@
+@INCLUDE = Doxyfile.base
+
+PROJECT_NAME = "My Project"
+OUTPUT_DIRECTORY = documentation
+INPUT = ..

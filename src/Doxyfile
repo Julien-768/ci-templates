@@ -1,3 +1,0 @@
-PROJECT_NAME = "My Project"
-OUTPUT_DIRECTORY = doxygen_output
-INPUT = .
