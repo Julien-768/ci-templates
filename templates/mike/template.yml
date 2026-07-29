@@ -30,6 +30,9 @@
   - time git fetch origin $PAGES_BRANCH && git checkout -b $PAGES_BRANCH origin/$PAGES_BRANCH || echo "Pages branch not deployed yet."
   - time git checkout $CI_COMMIT_SHA
   - echo "$HTTPS_REMOTE"
+  - pwd
+  - ls -la
+  - find . -maxdepth 2 -type d
   - cd "$MK_PATH"
   - test -f mkdocs.yml || (echo "mkdocs.yml introuvable dans $PWD" && exit 1)
   - time mike deploy --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "${CI_COMMIT_TAG:-dev}" latest
