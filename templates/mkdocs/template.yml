@@ -14,7 +14,7 @@
 
   script:
   - cd ${MK_PATH:-.}
-  - echo "Running MkDocs on ${MK_PATH:-.}"
+  - echo "Running on ${MK_PATH:-.}"
   - time pip install -r requirements.txt
   - time mkdocs build --strict --verbose --site-dir ${SITE_DIR} -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
   - if [ -n "$MK_PATH" ]; then mv ${SITE_DIR} $CI_PROJECT_DIR/${SITE_DIR}; fi
