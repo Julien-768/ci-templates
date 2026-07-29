@@ -30,7 +30,7 @@ spec:
     HTTPS_REMOTE: https://gitlab-ci-token:${CI_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
 
   script:
-  - ${MK_PATH:-.}
+  - cd ${MK_PATH:-.}
   - echo "Running on ${MK_PATH:-.}"
   - pip install -r requirements.txt
   - git config user.name "$GITLAB_USER_NAME"
