@@ -25,6 +25,9 @@ spec:
   stage: $[[ inputs.stage ]]
   image: python:3.11
 
+  dependencies: []
+  needs: []
+
   script:
   - apt-get update
   - apt-get install -y --no-install-recommends nodejs

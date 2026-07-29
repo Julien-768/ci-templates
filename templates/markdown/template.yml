@@ -13,6 +13,8 @@
 .markdown-lint-template:
   stage: lint
   image: node:22
+  dependencies: []
+  needs: []
 
   script:
   - npm config set fund false

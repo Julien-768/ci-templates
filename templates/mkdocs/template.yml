@@ -9,15 +9,18 @@
 
 .mkdocs-template:
   image: python:latest
+
+  needs: []
+
   script:
-    - cd ${MK_PATH:-.}
-    - echo "Running MkDocs on ${MK_PATH:-.}"
-    - time pip install -r requirements.txt
-    - time mkdocs build --strict --verbose --site-dir ${SITE_DIR} -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
-    - if [ -n "$MK_PATH" ]; then mv ${SITE_DIR} $CI_PROJECT_DIR/${SITE_DIR}; fi
+  - cd ${MK_PATH:-.}
+  - echo "Running MkDocs on ${MK_PATH:-.}"
+  - time pip install -r requirements.txt
+  - time mkdocs build --strict --verbose --site-dir ${SITE_DIR} -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
+  - if [ -n "$MK_PATH" ]; then mv ${SITE_DIR} $CI_PROJECT_DIR/${SITE_DIR}; fi
   artifacts:
     paths:
-      - ${SITE_DIR}
+    - ${SITE_DIR}
     expire_in: 24 hours
 
 mkdocs_test:
@@ -33,4 +36,4 @@ mkdocs_pages:
   variables:
     SITE_DIR: public
   rules:
-    - if: $CI_COMMIT_MESSAGE=~ /publication/
+  - if: $CI_COMMIT_MESSAGE=~ /publication/

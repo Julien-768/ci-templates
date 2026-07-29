@@ -37,6 +37,8 @@
 .gcc-compile-template:
   stage: build
   image: debian:stable-slim
+  dependencies: []
+  needs: []
 
   cache:
     key: gcc-deps

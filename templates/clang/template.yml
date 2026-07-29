@@ -22,27 +22,29 @@
 .clang-format-template:
   stage: format
   image: alpine:latest
+  dependencies: []
+  needs: []
 
   script:
-    - apk update
-    - apk add --no-cache findutils clang22-extra-tools
-    - ln -sf /usr/lib/llvm22/bin/clang-format /usr/local/bin/clang-format
-    - clang-format --version
-    - |
-      set -eu
+  - apk update
+  - apk add --no-cache findutils clang22-extra-tools
+  - ln -sf /usr/lib/llvm22/bin/clang-format /usr/local/bin/clang-format
+  - clang-format --version
+  - |
+    set -eu
 
-      CLANG_PATHS="${CLANG_PATH:-.}"
-      CLANG_FORMAT_FILE="${CLANG_FORMAT_FILE:-.clang-format}"
+    CLANG_PATHS="${CLANG_PATH:-.}"
+    CLANG_FORMAT_FILE="${CLANG_FORMAT_FILE:-.clang-format}"
 
-      echo "Running clang-format on ${CLANG_PATHS} (config: ${CLANG_FORMAT_FILE})"
+    echo "Running clang-format on ${CLANG_PATHS} (config: ${CLANG_FORMAT_FILE})"
 
-      # shellcheck disable=SC2086
-      find ${CLANG_PATHS} -type f \( -name '*.c' -o -name '*.h' \) \
-        -exec clang-format \
-          --dry-run \
-          --Werror \
-          --style="file:${CLANG_FORMAT_FILE}" \
-          {} +
+    # shellcheck disable=SC2086
+    find ${CLANG_PATHS} -type f \( -name '*.c' -o -name '*.h' \) \
+      -exec clang-format \
+        --dry-run \
+        --Werror \
+        --style="file:${CLANG_FORMAT_FILE}" \
+        {} +
 
 # --------------------------------------------------
 # Hidden template: clang-tidy (PlatformIO implementation)
@@ -57,17 +59,17 @@
   cache:
     key: platformio
     paths:
-      - .pio/
+    - .pio/
 
   script:
-    - |
-      set -eu
-      apt-get update
-      apt-get install -y --no-install-recommends git
-      pip install --no-cache-dir -U platformio
-      platformio --version
-      echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
-      pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
+  - |
+    set -eu
+    apt-get update
+    apt-get install -y --no-install-recommends git
+    pip install --no-cache-dir -U platformio
+    platformio --version
+    echo "Running PlatformIO check (clang-tidy) for env: ${PIO_ENV:-adafruit_feather_m0}"
+    pio check --environment "${PIO_ENV:-adafruit_feather_m0}"
 
 # --------------------------------------------------
 # Concrete jobs exposed to consuming projects
@@ -78,6 +80,6 @@ clang-format:
 clang-tidy:
   extends: .clang-tidy-template
   rules:
-    - exists:
-        - platformio.ini
-    - when: never
+  - exists:
+    - platformio.ini
+  - when: never

@@ -24,6 +24,10 @@ spec:
 .isort-template:
   stage: lint
   image: python:latest
+
+  dependencies: []
+  needs: []
+
   script:
   - pip install isort
   - isort . --check-only
@@ -33,6 +37,10 @@ spec:
 .black-template:
   stage: lint
   image: python:latest
+
+  dependencies: []
+  needs: []
+
   script:
   - pip install black
   - pip install black[jupyter]
@@ -43,6 +51,10 @@ spec:
 .flake8-template:
   stage: lint
   image: python:latest
+
+  dependencies: []
+  needs: []
+
   script:
   - pip install flake8
   - pip install flake8-pyproject
@@ -53,6 +65,10 @@ spec:
 .pylint-template:
   stage: lint
   image: python:latest
+
+  dependencies: []
+  needs: []
+
   script:
   - pip install pylint
   - |
