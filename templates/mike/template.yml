@@ -1,14 +1,22 @@
 # mike.gitlab-ci.yml
+#
+# Template for deploying documentation with MkDocs and Mike to GitLab Pages.
 
-# This GitLab CI configuration file sets up jobs to build and deploy documentation using MkDocs and Mike.
-# The mkdocs_test job builds the documentation and stores the output in the test directory.
-# The pages job deploys the documentation to GitLab Pages.
-# The PIP_CACHE_DIR variable is used to cache pip dependencies.
-# The PAGES_BRANCH variable specifies the branch used for GitLab Pages.
-# The HTTPS_REMOTE variable is used to authenticate with the GitLab repository.
-
-# .gitlab-ci.yml
-
+spec:
+  inputs:
+    MK_PATH:
+      description: "Path to the MkDocs project directory (default: current directory)."
+      default: "."
+    GITLAB_USER_NAME:
+      description: "Git user name for commits."
+      default: "GitLab CI"
+    GITLAB_USER_EMAIL:
+      description: "Git user email for commits."
+      default: "gitlab-ci@example.com"
+    CI_PUSH_TOKEN:
+      description: "GitLab CI token with push access to the repository."
+      default: ""
+---
 .mike-pages-template:
   stage: pages
   image: python:latest
@@ -22,31 +30,18 @@
     HTTPS_REMOTE: https://gitlab-ci-token:${CI_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
 
   script:
-  - cd ${MK_PATH:-.}
-  - time pip install -r requirements.txt
-
-  - time git config user.name "$GITLAB_USER_NAME"
-  - time git config user.email "$GITLAB_USER_EMAIL"
-
+  - cd ${MK_PATH}
+  - pip install -r requirements.txt
+  - git config user.name "$GITLAB_USER_NAME"
+  - git config user.email "$GITLAB_USER_EMAIL"
   - git fetch origin $PAGES_BRANCH || true
   - git checkout $CI_COMMIT_SHA
   - git branch -f $PAGES_BRANCH origin/$PAGES_BRANCH || true
-
-  - echo "$HTTPS_REMOTE"
-  - pwd
-  - ls -la
-  - find . -maxdepth 2 -type d
-
-  - test -f mkdocs.yml || (echo "mkdocs.yml is not found in $PWD" && exit 1)
-
-  - time mike deploy -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "${CI_COMMIT_TAG:-dev}" latest
-
-  - time mike set-default -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest
-
-  - git fetch origin $PAGES_BRANCH
-  - git ls-tree -r FETCH_HEAD --name-only | head -50
+  - test -f mkdocs.yml || (echo "mkdocs.yml not found in $PWD" && exit 1)
+  - mike deploy -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "${CI_COMMIT_TAG:-dev}" latest
+  - mike set-default -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest
 
 mike_pages:
   extends: .mike-pages-template
-  # rules:
-  # - if: "$CI_COMMIT_MESSAGE =~ /publication/"
+  rules:
+  - if: "$CI_COMMIT_MESSAGE =~ /publication/"

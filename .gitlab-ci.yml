@@ -12,13 +12,13 @@
 # - release: versioning/tagging/archive/release publication, GitHub sync
 
 stages:
-# - format
-# - lint
+- format
+- lint
 - test
-# - build
+- build
 - pages
-# - release
-# - deploy
+- release
+- deploy
 
 include:
 # --- Format stage ---
@@ -74,17 +74,19 @@ include:
 - local: "templates/doxygen/template.yml"
 - local: "templates/mkdocs/template.yml"
 - local: "templates/mike/template.yml"
+  inputs:
+    MK_PATH: "src" # MkDocs project directory (contains mkdocs.yml + requirements.txt)
 
 # --- Release stage ---
 - local: "templates/release/template.yml"
 
 # --- Deploy stage ---
-# - local: "templates/sync-github/template.yml"
-#   inputs:
-#     branches: "develop,main"
-#     github_repo: "TON_USER/TON_DEPOT" # à remplacer par le vrai chemin GitHub
-#     # CI_PUSH_TOKEN: doit être défini en variable CI/CD protégée + masquée
-#     # (Settings > CI/CD > Variables) — token GitHub avec scope "repo"
+- local: "templates/sync-github/template.yml"
+  inputs:
+    branches: "develop,main"
+    github_repo: "TON_USER/TON_DEPOT" # à remplacer par le vrai chemin GitHub
+    # CI_PUSH_TOKEN: doit être défini en variable CI/CD protégée + masquée
+    # (Settings > CI/CD > Variables) — token GitHub avec scope "repo"
 
 variables:
   CLANG_PATH: "src" # optional path to the C/C++ source files
