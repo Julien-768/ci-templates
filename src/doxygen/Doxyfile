@@ -1,4 +1,4 @@
-@INCLUDE = Doxyfile.base
+@INCLUDE = doxygen/Doxyfile.base
 
 PROJECT_NAME = "My Project"
 OUTPUT_DIRECTORY = documentation
