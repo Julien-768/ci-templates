@@ -71,9 +71,9 @@ include:
     install_project: "false"
 
 # --- Pages stage ---
-- local: "templates/doxygen/template.yml"
-  inputs:
-    doxyfile_path: "templates/doxygen" # optional path to the Doxygen configuration file
+# - local: "templates/doxygen/template.yml"
+#   inputs:
+#     doxyfile_path: "templates/doxygen" # optional path to the Doxygen configuration file
 - local: "templates/mkdocs/template.yml"
 - local: "templates/mike/template.yml"
   inputs:
