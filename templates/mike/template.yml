@@ -46,5 +46,5 @@
 mike_pages:
   extends: .mike-pages-template
   # Vous pouvez ajouter ou surcharger des paramètres spécifiques ici si nécessaire
-  rules:
-  - if: "$CI_COMMIT_MESSAGE =~ /publication/"
+  # rules:
+  # - if: "$CI_COMMIT_MESSAGE =~ /publication/"
