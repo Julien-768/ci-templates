@@ -52,7 +52,7 @@ Including the component is sufficient to enable documentation generation.
 Each project must provide its own Doxygen configuration:
 
 ```ascii
-<project-root>/
+<doxyfile_path>/
 └── doxygen/
     ├── Doxyfile
     └── ...
@@ -61,7 +61,17 @@ Each project must provide its own Doxygen configuration:
 The project `Doxyfile` must include the shared base configuration:
 
 ```ascii
-@INCLUDE = Doxyfile.base
+@INCLUDE = doxygen/Doxyfile.base
+```
+
+### Example Doxyfile
+
+```text
+@INCLUDE = doxygen/Doxyfile.base
+
+PROJECT_NAME     = "My Project"
+OUTPUT_DIRECTORY = doxygen/documentation
+INPUT            = ..
 ```
 
 ## ▶️ Triggering Documentation
@@ -114,7 +124,7 @@ git commit -m "docs: update API documentation publication"
 
 ## 📦 Output Location
 
-Generated documentation is moved to:
+Generated HTML documentation is moved to:
 
 ```ascii
 public/
