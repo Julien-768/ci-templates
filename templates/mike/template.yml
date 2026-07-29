@@ -9,7 +9,6 @@
 
 # .gitlab-ci.yml
 
-# Définir une ancre pour la configuration de mike_pages
 .mike-pages-template:
   stage: pages
   image: python:latest
@@ -29,7 +28,9 @@
   - time git config user.name "$GITLAB_USER_NAME"
   - time git config user.email "$GITLAB_USER_EMAIL"
 
-  - time git checkout $CI_COMMIT_SHA
+  - git fetch origin $PAGES_BRANCH || true
+  - git checkout $CI_COMMIT_SHA
+  - git branch -f $PAGES_BRANCH origin/$PAGES_BRANCH || true
 
   - echo "$HTTPS_REMOTE"
   - pwd
@@ -40,13 +41,9 @@
 
   - time mike deploy -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "${CI_COMMIT_TAG:-dev}" latest
 
-  - git fetch origin $PAGES_BRANCH
-  - git ls-tree -r origin/$PAGES_BRANCH --name-only | head -50
-
   - time mike set-default -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest
-  # Utiliser l'ancre dans le job mike_pages
+
 mike_pages:
   extends: .mike-pages-template
-  # Vous pouvez ajouter ou surcharger des paramètres spécifiques ici si nécessaire
   # rules:
   # - if: "$CI_COMMIT_MESSAGE =~ /publication/"
