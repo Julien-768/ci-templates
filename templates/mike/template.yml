@@ -47,9 +47,7 @@
   # - git ls-tree -r origin/$PAGES_BRANCH --name-only | head -30
   # - time git checkout origin/$PAGES_BRANCH -- ":/public"
   # - if [ -n "$MK_PATH" ]; then mv public $CI_PROJECT_DIR/public; fi
-  # # artifacts:
-  # #   paths:
-  # #   - public
+
 
   # Utiliser l'ancre dans le job mike_pages
 mike_pages:
