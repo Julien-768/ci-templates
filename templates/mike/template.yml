@@ -30,6 +30,7 @@
   - time git fetch origin $PAGES_BRANCH && git checkout -b $PAGES_BRANCH origin/$PAGES_BRANCH || echo "Pages branch not deployed yet."
   - time git checkout $CI_COMMIT_SHA
   - echo "$HTTPS_REMOTE"
+  - cd "$CI_PROJECT_DIR"
   - time mike deploy --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "${CI_COMMIT_TAG:-dev}" latest
   - time mike set-default --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest
   - time git fetch origin $PAGES_BRANCH
