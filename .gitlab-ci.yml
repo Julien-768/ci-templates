@@ -14,7 +14,7 @@
 stages:
 # - format
 # - lint
-# - test
+- test
 # - build
 - pages
 # - release
