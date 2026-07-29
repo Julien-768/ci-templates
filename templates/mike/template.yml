@@ -33,7 +33,9 @@
   - time mike deploy --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "${CI_COMMIT_TAG:-dev}" latest
   - time mike set-default --deploy-prefix public -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest
   - time git fetch origin $PAGES_BRANCH
-  - time git checkout origin/$PAGES_BRANCH -- public
+  - pwd
+  - git ls-tree -r origin/$PAGES_BRANCH --name-only | grep -m5 public
+  - time git checkout origin/$PAGES_BRANCH -- ":/public"
   - if [ -n "$MK_PATH" ]; then mv public $CI_PROJECT_DIR/public; fi
   artifacts:
     paths:

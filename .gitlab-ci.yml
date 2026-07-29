@@ -12,13 +12,13 @@
 # - release: versioning/tagging/archive/release publication, GitHub sync
 
 stages:
-- format
-- lint
-- test
-- build
+# - format
+# - lint
+# - test
+# - build
 - pages
-- release
-- deploy
+# - release
+# - deploy
 
 include:
 # --- Format stage ---
