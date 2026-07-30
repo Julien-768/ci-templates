@@ -41,6 +41,17 @@ spec:
   - test -f mkdocs.yml || (echo "mkdocs.yml not found in $PWD" && exit 1)
   - mike deploy -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "${CI_COMMIT_TAG:-dev}" latest
   - mike set-default -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest
+  # --- récupérer le contenu poussé sur gl-pages et le mettre en artifact public/ ---
+  - git fetch origin $PAGES_BRANCH
+  - rm -rf public
+  - mkdir public
+  - git --work-tree=public checkout origin/$PAGES_BRANCH -- .
+
+  artifacts:
+    paths:
+    - $MK_PATH/public
+
+  pages: true
 
 mike_pages:
   extends: .mike-pages-template
