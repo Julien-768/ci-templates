@@ -27,7 +27,7 @@ spec:
   variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
     PAGES_BRANCH: gl-pages
-    HTTPS_REMOTE: https://gitlab-ci-token:${CI_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+    HTTPS_REMOTE: "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
 
   script:
   - cd ${MK_PATH:-.}
