@@ -1,6 +1,7 @@
 # Mike Documentation Deployment Template
 
 **Deploys MkDocs documentation using [Mike](https://github.com/jimporter/mike) to GitLab Pages.**
+
 This template automates the deployment of versioned documentation with Mike, allowing you to serve multiple versions of your MkDocs site (e.g., `latest`, `dev`, or version tags) via GitLab Pages.
 
 ---
@@ -12,12 +13,14 @@ This template automates the deployment of versioned documentation with Mike, all
 - **Caching**: Uses `PIP_CACHE_DIR` to speed up dependency installation.
 - **Flexible Paths**: Customize the MkDocs project directory via `MK_PATH`.
 - **GitLab Pages Integration**: Deploys to the `gl-pages` branch by default.
+- **CI Job Token Authentication**: Uses the GitLab-provided `CI_JOB_TOKEN` to push the generated documentation.
 
 ---
 
 ## 🔧 Prerequisites
 
 1. **MkDocs Project**: Your repository must contain a valid `mkdocs.yml` file.
+
 2. **Mike Installed**: Ensure `mike` is listed in your `requirements.txt`:
 
    ```text
@@ -26,18 +29,25 @@ This template automates the deployment of versioned documentation with Mike, all
    mkdocs-material  # or your preferred theme
    ```
 
-3. **GitLab Token**: A **CI/CD token** with `write_repository` permissions is required for `CI_PUSH_TOKEN`.
+3. **GitLab CI Job Token Push Access**: The project must allow CI jobs to push to the repository.
+
+   In GitLab, enable:
+
+   **Settings → CI/CD → Job token permissions → Allow Git push requests to the repository**
+
+   The template uses the automatically provided `CI_JOB_TOKEN` for Git authentication. No personal access token or custom CI/CD token is required.
 
 ---
 
 ## 📥 Inputs
 
-| Input               | Description                                                                                                              | Default                 | Required |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------ | ----------------------- | -------- |
-| `MK_PATH`           | Relative path to the MkDocs project directory (from `$CI_PROJECT_DIR`).                                                  | `.`                     | No       |
-| `GITLAB_USER_NAME`  | Git user name for commits (used by Mike to push to `gl-pages`).                                                          | `GitLab CI`             | No       |
-| `GITLAB_USER_EMAIL` | Git user email for commits.                                                                                              | `gitlab-ci@example.com` | No       |
-| `CI_PUSH_TOKEN`     | GitLab [CI/CD token](https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html) with `write_repository` scope. | _None_                  | **Yes**  |
+| Input               | Description                                                             | Default                 | Required |
+| ------------------- | ----------------------------------------------------------------------- | ----------------------- | -------- |
+| `MK_PATH`           | Relative path to the MkDocs project directory (from `$CI_PROJECT_DIR`). | `.`                     | No       |
+| `GITLAB_USER_NAME`  | Git user name for commits (used by Mike to push to `gl-pages`).         | `GitLab CI`             | No       |
+| `GITLAB_USER_EMAIL` | Git user email for commits.                                             | `gitlab-ci@example.com` | No       |
+
+No token input is required. The template uses the GitLab-provided `CI_JOB_TOKEN`.
 
 ---
 
@@ -50,11 +60,11 @@ Include the template in your `.gitlab-ci.yml`:
 ```yaml
 include:
   - project: "iphc/ci-templates"
-    file: "/templates/mike/template.yml"
+    file: "/templates/mike/mike.gitlab-ci.yml"
     ref: "main" # or a specific tag/commit
-    inputs:
-      CI_PUSH_TOKEN: $CI_PUSH_TOKEN # Define this variable in GitLab CI/CD settings
 ```
+
+No token or additional authentication variable is required.
 
 ### Advanced Example
 
@@ -69,9 +79,7 @@ include:
       MK_PATH: "docs"
       GITLAB_USER_NAME: "MyBot"
       GITLAB_USER_EMAIL: "mybot@example.com"
-      CI_PUSH_TOKEN: $MY_CUSTOM_TOKEN
 
-# Trigger deployment manually or via tags
 mike_pages:
   extends: .mike-pages-template
   rules:
@@ -89,10 +97,37 @@ mike_pages:
 
 ---
 
+## 🔐 Authentication
+
+The template uses the GitLab-provided `CI_JOB_TOKEN` for authentication when pushing the versioned documentation.
+
+The remote repository is configured as:
+
+```yaml
+HTTPS_REMOTE: "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+```
+
+No personal access token, deploy token, or custom `CI/CD` variable is required.
+
+### Required GitLab Configuration
+
+Enable the following project setting:
+
+- **Settings → CI/CD → Job token permissions → Allow Git push requests to the repository**
+
+This allows the `CI_JOB_TOKEN` generated for the pipeline to push to the repository.
+
+---
+
 ## ⚠️ Notes
 
-1. **GitLab Pages Branch**: The template uses `gl-pages` as the default branch for GitLab Pages. Ensure this branch is **not protected** (or add the CI token to the allowed list).
-2. **Mike Configuration**: Your `mkdocs.yml` must be compatible with Mike. Example:
+1. **GitLab Pages Branch**: The template uses `gl-pages` as the default branch for GitLab Pages.
+
+2. **CI Job Token**: Authentication is performed using the automatically generated `CI_JOB_TOKEN`. The token is temporary and does not need to be manually created or stored as a CI/CD variable.
+
+3. **Protected Branches**: If `gl-pages` is protected, its branch protection rules must allow the CI job to perform the required push.
+
+4. **Mike Configuration**: Your `mkdocs.yml` must be compatible with Mike. Example:
 
    ```yaml
    site_name: My Docs
@@ -101,8 +136,7 @@ mike_pages:
          alias_type: symlink # Recommended for versioned docs
    ```
 
-3. **Token Security**: Store `CI_PUSH_TOKEN` as a [GitLab CI/CD variable](https://docs.gitlab.com/ee/ci/variables/) (masked and protected).
-4. **Debugging**: Uncomment the `echo` and `ls` commands in the template if you need to debug the deployment process.
+5. **Debugging**: Uncomment the `echo` and `ls` commands in the template if you need to debug the deployment process.
 
 ---
 
@@ -110,4 +144,4 @@ mike_pages:
 
 - [Mike Documentation](https://github.com/jimporter/mike)
 - [GitLab Pages](https://docs.gitlab.com/ee/user/projects/pages/)
-- [GitLab CI/CD Variables](https://docs.gitlab.com/ee/ci/variables/)
+- [GitLab CI/CD Job Token](https://docs.gitlab.com/ee/ci/jobs/ci_job_token/)

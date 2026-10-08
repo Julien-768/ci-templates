@@ -83,27 +83,36 @@ If this structure is not respected, GitLab will return:
 
 Each `template.yml` must:
 
-1.  Contain a `spec:` section
-2.  Be separated by `---`
-3.  Define at least one job
-4.  Each variable must have a `description` field
+1. Contain a `spec:` section.
+2. Be separated from the main CI configuration by `---`.
+3. Define at least one job.
+4. Each input must have a `description` field.
+5. Inputs declared under `spec:inputs` MUST be referenced explicitly using the `$[[ inputs.<name> ]]` syntax.
+
+Inputs are not automatically available as regular CI/CD variables. When an input is used by a job, it must be explicitly referenced with `$[[ inputs.<name> ]]`.
 
 ## ✅ Minimal Valid Example
 
-    ``` yaml
+    ```yaml
     spec:
     inputs:
         stage:
         default: build
         description: "CI stage used for the job."
-
     ---
-
     clang:
     stage: $[[ inputs.stage ]]
+    variables:
+        MY_VARIABLE: "example"
     script:
-        - echo "Running clang"
+        - echo "Stage: $[[ inputs.stage ]]"
+        - echo "Variable: $MY_VARIABLE"
     ```
+
+In this example:
+
+- `stage` is an **input** declared under `spec:inputs` and referenced with `$[[ inputs.stage ]]`.
+- `MY_VARIABLE` is a **CI/CD variable** and is referenced with `$MY_VARIABLE`.
 
 If `spec:` is missing, the component will NOT be detected by GitLab.
 
