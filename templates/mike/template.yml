@@ -13,9 +13,6 @@ spec:
     GITLAB_USER_EMAIL:
       description: "Git user email for commits."
       default: "gitlab-ci@example.com"
-    CI_PUSH_TOKEN:
-      description: "GitLab CI token with push access to the repository."
-      default: ""
 ---
 .mike-pages-template:
   stage: pages
@@ -27,33 +24,38 @@ spec:
   variables:
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
     PAGES_BRANCH: gl-pages
-    HTTPS_REMOTE: https://gitlab-ci-token:${CI_PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git
+    MK_PATH: "$[[ inputs.MK_PATH ]]"
+    GITLAB_USER_NAME: "$[[ inputs.GITLAB_USER_NAME ]]"
+    GITLAB_USER_EMAIL: "$[[ inputs.GITLAB_USER_EMAIL ]]"
+    HTTPS_REMOTE: "https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
 
   script:
-  - cd ${MK_PATH:-.}
-  - echo "Running on ${MK_PATH:-.}"
+  - cd "${MK_PATH}"
+  - echo "Running on ${MK_PATH}"
   - pip install -r requirements.txt
   - git config user.name "$GITLAB_USER_NAME"
   - git config user.email "$GITLAB_USER_EMAIL"
-  - git fetch origin $PAGES_BRANCH || true
-  - git checkout $CI_COMMIT_SHA
-  - git branch -f $PAGES_BRANCH origin/$PAGES_BRANCH || true
+  - git fetch origin "$PAGES_BRANCH" || true
+  - git checkout "$CI_COMMIT_SHA"
+  - git branch -f "$PAGES_BRANCH" "origin/$PAGES_BRANCH" || true
   - test -f mkdocs.yml || (echo "mkdocs.yml not found in $PWD" && exit 1)
   - mike deploy -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "${CI_COMMIT_TAG:-dev}" latest
   - mike set-default -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest
-  # --- récupérer le contenu poussé sur gl-pages et le mettre en artifact public/ ---
-  - git fetch origin $PAGES_BRANCH
+
+  # Retrieve the content pushed to gl-pages and expose it as the Pages artifact.
+  - cd "$CI_PROJECT_DIR"
+  - git fetch origin "$PAGES_BRANCH"
   - rm -rf public
   - mkdir public
-  - git --work-tree=public checkout origin/$PAGES_BRANCH -- .
+  - git --work-tree=public checkout "origin/$PAGES_BRANCH" -- .
 
   artifacts:
     paths:
-    - $MK_PATH/public
+    - public
 
   pages: true
 
 mike_pages:
   extends: .mike-pages-template
   rules:
-  - if: "$CI_COMMIT_MESSAGE =~ /publication/"
+  - if: '$CI_COMMIT_MESSAGE =~ /publication/'
