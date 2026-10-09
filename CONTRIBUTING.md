@@ -4,25 +4,25 @@ Thank you for considering contributing to our CI Templates Component
 Catalog repository.
 
 This repository is structured as a **GitLab CI/CD Component Catalog**
-project.\
+project.
 Please read the following guidelines carefully before contributing.
 
 ---
 
 ## 🚀 Contribution Workflow
 
-1.  **Fork the Repository**
-2.  **Clone Your Fork**
-3.  **Create a Feature Branch**
-    - Use a descriptive name (e.g. `feat/clang-improvements`)
-4.  **Implement Your Changes**
-5.  **Validate Templates Locally**
-6.  **Commit Changes**
-    - Use clear and descriptive commit messages
-7.  **Push Your Branch**
-8.  **Create a Merge Request**
-    - Target branch: `develop`
-9.  **Address Review Feedback**
+1. **Fork the Repository**
+2. **Clone Your Fork**
+3. **Create a Feature Branch**
+   - Use a descriptive name (e.g. `feat/clang-improvements`)
+4. **Implement Your Changes**
+5. **Validate Templates Locally**
+6. **Commit Changes**
+   - Use clear and descriptive commit messages
+7. **Push Your Branch**
+8. **Create a Merge Request**
+   - Target branch: `develop`
+9. **Address Review Feedback**
 10. **Sync Your Fork After Merge**
 
 ---
@@ -83,26 +83,29 @@ If this structure is not respected, GitLab will return:
 
 Each `template.yml` must:
 
-1.  Contain a `spec:` section
-2.  Be separated by `---`
-3.  Define at least one job
-4.  Each variable must have a `description` field
+1. Contain a `spec:` section
+2. Be separated by `---`
+3. Define at least one job
+4. Each input must have a `description` field
 
 ## ✅ Minimal Valid Example
 
-    ``` yaml
+    ```yaml
     spec:
-    inputs:
+      inputs:
         stage:
-        default: build
-        description: "CI stage used for the job."
+          default: build
+          description: "CI stage used for the job."
 
     ---
 
-    clang:
-    stage: $[[ inputs.stage ]]
-    script:
+    .clang-template:
+      stage: $[[ inputs.stage ]]
+      script:
         - echo "Running clang"
+
+    clang:
+      extends: .clang-template
     ```
 
 If `spec:` is missing, the component will NOT be detected by GitLab.
@@ -116,7 +119,7 @@ Each CI template file should include a header that describes the purpose of the 
 For example:
 
     ```yaml
-    # clang.gitlab-ci.yml
+    # clang/template.yml
     #
     # Shared GitLab CI configuration for running clang-format and clang-tidy.
     ```
@@ -139,9 +142,31 @@ The `ci-gitlab.yml` file must include all jobs from the template and must execut
 
 Components must be generic and reusable across projects.
 
-### Avoid before_script
+### Hidden Template Jobs
 
-Do not use before_script in catalog templates.
+When reusable job configuration is needed, components SHOULD define it in a
+hidden template job prefixed with a dot.
+
+The corresponding concrete job MUST extend the hidden template job.
+
+Example:
+
+    ```yaml
+    .outils-template:
+      image: alpine:latest
+      script:
+        - echo "Running tools"
+
+    outils:
+      extends: .outils-template
+    ```
+
+The hidden template job contains the reusable implementation, while the
+concrete job defines the job exposed and executed by consuming projects.
+
+### Avoid `before_script`
+
+Do not use `before_script` in catalog templates.
 Why?
 
 Unpredictable execution order and global side effects.
@@ -150,8 +175,8 @@ Introduces hidden dependencies and complicates debugging.
 
 Instead:
 
-Use hidden jobs (e.g., .setup_environment) or explicit script sections for reusable logic.
-Ensures clarity, control, and maintainability.
+Use hidden jobs (e.g., `.setup_environment`) or explicit `script` sections for reusable logic.
+This ensures clarity, control, and maintainability.
 
 ---
 
