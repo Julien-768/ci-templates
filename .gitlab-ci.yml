@@ -85,7 +85,7 @@ include:
 # --- Deploy stage ---
 - local: "templates/github-sync/template.yml"
   inputs:
-    branches: "develop,main,test_github_sync"
+    branches: "develop,main,github"
     github_repo: "Julien-768/ci-templates"
     stage: deploy
 
