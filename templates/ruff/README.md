@@ -1,110 +1,92 @@
-# GitLab CI Ruff Template – Documentation
+# Ruff
 
-This documentation explains how to use the Ruff component provided by `iphc/ci-templates` to lint and format Python source code.
-
-## ✅ What it does
-
-This template automates Python code quality checks using Ruff.
-
-The template provides **one job**:
-
-1. **`ruff`**
-
-   - Installs Ruff.
-   - Runs `ruff check .` to perform linting.
-   - Runs `ruff format --check .` to verify formatting.
-   - Fails the pipeline if linting or formatting issues are detected.
+Shared GitLab CI component for linting and formatting Python code with [Ruff](https://docs.astral.sh/ruff/).
+This component runs `ruff check` and `ruff format --check` to ensure code quality and consistency.
 
 ---
 
-## 🔁 Pipeline Overview
+## 📌 Features
 
-The `.gitlab-ci.yml` must include the following:
-
-```yaml
-include:
-  - component: "$CI_SERVER_FQDN/iphc/ci-templates/ruff@$CI_COMMIT_SHA"
-```
-
-Define the stages in this order:
-
-```yaml
-stages:
-  - lint
-```
-
-No additional job definition is required in the consuming project.
-
-Including the component is sufficient to enable Ruff checks.
+- **Linting**: Runs `ruff check .` to detect linting issues in Python code.
+- **Formatting**: Runs `ruff format --check .` to verify code formatting compliance.
+- **Read-only**: Does not modify files; only reports issues.
+- **Configurable**: Supports custom Ruff versions, Python images, and project directories.
+- **Pipeline Integration**: Fails the GitLab CI pipeline if linting or formatting issues are detected.
 
 ---
 
-## 🔧 Inputs
+## 🔧 Prerequisites
 
-| Input          | Description                                                         | Default            |
-| -------------- | ------------------------------------------------------------------- | ------------------ |
-| `stage`        | CI stage used for the Ruff job.                                     | `lint`             |
-| `image`        | Python Docker image used to run Ruff.                               | `python:3.13-slim` |
-| `project_dir`  | Root directory where Ruff commands are executed.                    | `.`                |
-| `ruff_version` | Ruff version to install. Leave empty to install the latest version. | `""`               |
+- A **Python project** with source files in the specified `project_dir`.
+- No additional tools or dependencies are required beyond Python and Ruff.
 
-Example:
+---
+
+## 📥 Inputs
+
+| Input          | Description                                                                  | Default            | Required |
+|----------------|------------------------------------------------------------------------------|--------------------|----------|
+| `stage`        | CI stage used for the Ruff job.                                             | `lint`            | No       |
+| `image`        | Python Docker image used to run Ruff.                                       | `python:3.13-slim`| No       |
+| `project_dir`  | Root directory where Ruff commands are executed.                           | `.`               | No       |
+| `ruff_version` | Optional Ruff version to install. Leave empty to use the latest version.   | `""`              | No       |
+
+---
+
+## 🚀 Usage
+
+### Basic Example
+
+Include the component in your `.gitlab-ci.yml` file:
 
 ```yaml
 include:
-  - component: "$CI_SERVER_FQDN/iphc/ci-templates/ruff@$CI_COMMIT_SHA"
+  - project: "iphc/ci-templates"
+    file: "/templates/ruff/template.yml"
+    ref: "<commit-sha>"
+```
+
+### Advanced Example
+
+Customize the Ruff job with specific inputs:
+
+```yaml
+include:
+  - project: "iphc/ci-templates"
+    file: "/templates/ruff/template.yml"
+    ref: "<commit-sha>"
     inputs:
-      image: python:3.13-slim
-      project_dir: src
-      ruff_version: "0.12.0"
+      stage: test
+      image: python:3.12-slim
+      project_dir: "src"
+      ruff_version: "0.15.18"
 ```
 
 ---
+## 📂 Jobs
 
-## ⚠️ Requirements
-
-The component expects at least one Python file to be present in `project_dir`.
-
-If no Python files are found, Ruff will not perform any checks.
-
----
-
-## 🧠 Important Notes
-
-- Ruff configuration is automatically loaded from `pyproject.toml` when present.
-- The component validates both linting and formatting.
-- Formatting issues are reported but not automatically fixed.
-- To automatically fix issues locally, run:
-
-```bash
-ruff check . --fix
-ruff format .
-```
+| Job   | Description                                      |
+|-------|--------------------------------------------------|
+| ruff  | Runs Ruff linting and formatting checks. Fails the pipeline if issues are detected. |
 
 ---
 
-## 🧪 Local Testing
+## 🔐 Authentication
 
-A minimal Python file can be used to validate the component during CI testing:
-
-```python
-def hello() -> None:
-    print("Hello Ruff")
-
-
-if __name__ == "__main__":
-    hello()
-```
-
-This ensures that both `ruff check` and `ruff format --check` are executed successfully during CI validation.
+No additional authentication is required. The component relies solely on the GitLab CI environment.
 
 ---
 
-## 📦 Outputs
+## ⚠️ Notes
 
-No artifacts are generated.
+- **Ruff Configuration**: Ruff automatically loads configuration from `pyproject.toml` or `.ruff.toml` if present in the `project_dir`.
+- **Reproducibility**: For consistent CI results, specify an explicit `ruff_version`.
+- **Local Testing**: Run `ruff check .` and `ruff format --check .` locally to validate changes before pushing.
+- **Fixing Issues**: Use `ruff check . --fix` and `ruff format .` to automatically fix linting and formatting issues.
 
-The job succeeds when:
+---
+## 🔗 References
 
-- all linting checks pass;
-- all files respect the configured formatting rules.
+- [Ruff Official Documentation](https://docs.astral.sh/ruff/)
+- [GitLab CI/CD Components](https://docs.gitlab.com/ee/ci/components/)
+- [Ruff GitHub Repository](https://github.com/astral-sh/ruff)
