@@ -2,37 +2,38 @@
 #
 # Reusable GitLab CI/CD component that mirrors selected branches
 # to a GitHub repository on every push.
-# Requires a masked/protected CI_PUSH_TOKEN variable (GitHub PAT, repo scope).
-# Inputs: branches (comma-separated, default "develop,main"), github_repo.
+# Requires a masked/protected CI_PUSH_TOKEN variable.
 
 spec:
   inputs:
     branches:
       default: "develop,main"
       description: "Comma-separated list of branches to sync to GitHub."
+
     github_repo:
       description: "Target GitHub repository in the form owner/repo."
+
     stage:
       default: deploy
       description: "CI stage used for the sync job."
 ---
 
-.sync_github_setup:
+.sync-github:
   image: alpine:latest
-  dependencies: []
-  # needs: []
 
   variables:
     GIT_DEPTH: "0"
+
   script:
   - apk add --no-cache git
-  - git fetch --unshallow || true
   - git remote remove github 2>/dev/null || true
-  - git remote add github "https://${CI_PUSH_TOKEN}@github.com/$[[ inputs.github_repo ]].git"
-  - git push github HEAD:${CI_COMMIT_REF_NAME}
+  - git remote add github "https://${GITHUB_TOKEN}@github.com/$[[ inputs.github_repo ]].git"
+  - git push github "HEAD:refs/heads/${CI_COMMIT_BRANCH}"
 
-sync-to-github:
+sync-github:
+  extends: .sync-github
+
   stage: $[[ inputs.stage ]]
-  extends: .sync_github_setup
+
   rules:
-  - if: '"$[[ inputs.branches ]]" =~ /(^|,)$CI_COMMIT_REF_NAME(,|$)/'
+  - if: '"$[[ inputs.branches ]]" =~ /(^|,)$CI_COMMIT_BRANCH(,|$)/'
