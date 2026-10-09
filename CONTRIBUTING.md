@@ -93,9 +93,7 @@ spec:
     stage:
       default: build
       description: "CI stage used for the job."
-
 ---
-
 .clang-template:
   stage: $[[ inputs.stage ]]
   variables:
@@ -118,7 +116,6 @@ In this example:
 - `clang` is the concrete job exposed to projects consuming the component.
 
 ---
-
 
 ## 📝 Template Headers
 
@@ -238,40 +235,47 @@ All component README files MUST use the same section names and order. This ensur
 Every component README MUST contain the following sections in this exact order:
 
 1. **Title and Description**
+
    - Use the format `# <Component Name>`.
    - Briefly describe the component's purpose and behavior.
 
 2. **📌 Features**
+
    - List the main features and capabilities of the component.
 
 3. **🔧 Prerequisites**
+
    - Describe required tools, software, repository configuration, permissions, and other dependencies.
    - Explicitly state when no prerequisites are required.
 
 4. **📥 Inputs**
+
    - Document all component inputs in a table with the following columns:
      `Input`, `Description`, `Default`, `Required`.
    - If the component has no inputs, explicitly state this.
 
 5. **🚀 Usage**
+
    - Provide a **Basic Example** showing how to include and use the component.
    - Provide an **Advanced Example** showing relevant customization options.
    - If no advanced configuration is applicable, explicitly state this.
 
    - **Important:** The include syntax must match how the component is consumed. Prefer `include: component` for published Catalog components and use file-based includes when the configuration is intentionally consumed directly from a repository. So far, the components are not published to the Catalog, so `include: project` is to prefer.
 
-
 6. **📂 Jobs**
+
    - Document all concrete jobs exposed by the component in a table with the following columns:
      `Job`, `Description`.
    - Describe each job's purpose and relevant execution conditions.
    - If the component does not expose any concrete jobs, explain how it is intended to be used.
 
 7. **🔐 Authentication**
+
    - Document authentication mechanisms, required tokens, CI/CD variables, permissions, and relevant GitLab settings.
    - Explicitly state when no additional authentication configuration is required.
 
 8. **⚠️ Notes**
+
    - Document important limitations, configuration details, branch requirements, compatibility considerations, and troubleshooting information.
    - If there are no specific notes, explicitly state this.
 
