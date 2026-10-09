@@ -4,11 +4,11 @@ GitLab CI/CD component that pushes selected GitLab branches to a GitHub reposito
 
 ## Inputs
 
-| Input         | Required | Default        | Description                                          |
-| ------------- | -------- | -------------- | ---------------------------------------------------- |
-| `branches`    | No       | `develop,main` | Comma-separated list of branches to synchronize.     |
-| `github_repo` | Yes      | —              | Target GitHub repository in the format `owner/repo`. |
-| `stage`       | No       | `deploy`       | GitLab CI stage used for the synchronization job.    |
+| Input         | Required | Default          | Description                                          |
+| ------------- | -------- | ---------------- | ---------------------------------------------------- |
+| `branches`    | No       | `develop` `main` | Pipe-separated list of branches to synchronize.      |
+| `github_repo` | Yes      | —                | Target GitHub repository in the format `owner/repo`. |
+| `stage`       | No       | `deploy`         | GitLab CI stage used for the synchronization job.    |
 
 ## Required CI/CD variable
 
@@ -29,7 +29,7 @@ include:
   - component: $CI_SERVER_FQDN/<group>/<project>/sync-github@<version>
     inputs:
       github_repo: "Julien-768/rfid-m0-wiki"
-      branches: "main,develop,test_github_sync"
+      branches: "main|develop|test"
       stage: deploy
 ```
 
@@ -53,4 +53,4 @@ When the current branch matches the configured `branches` input, the job:
 - The destination branch has the same name as the source GitLab branch.
 - The target GitHub repository must exist, and the token must have permission to push to it.
 - The component does not synchronize GitLab tags.
-- The `branches` input is a comma-separated list without spaces.
+- The `branches` input is a '|' list without spaces.
