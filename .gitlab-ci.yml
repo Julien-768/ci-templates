@@ -53,6 +53,8 @@ include:
     project_conf: "platformio.ini"
 
 - local: "templates/gcc/template.yml"
+  inputs:
+    gcc_make_dir: "src"
 
 - local: "templates/python-windows-installer/template.yml"
   inputs:

@@ -24,12 +24,12 @@ This component runs `ruff check` and `ruff format --check` to ensure code qualit
 
 ## 📥 Inputs
 
-| Input          | Description                                                                  | Default            | Required |
-|----------------|------------------------------------------------------------------------------|--------------------|----------|
-| `stage`        | CI stage used for the Ruff job.                                             | `lint`            | No       |
-| `image`        | Python Docker image used to run Ruff.                                       | `python:3.13-slim`| No       |
-| `project_dir`  | Root directory where Ruff commands are executed.                           | `.`               | No       |
-| `ruff_version` | Optional Ruff version to install. Leave empty to use the latest version.   | `""`              | No       |
+| Input          | Description                                                              | Default            | Required |
+| -------------- | ------------------------------------------------------------------------ | ------------------ | -------- |
+| `stage`        | CI stage used for the Ruff job.                                          | `lint`             | No       |
+| `image`        | Python Docker image used to run Ruff.                                    | `python:3.13-slim` | No       |
+| `project_dir`  | Root directory where Ruff commands are executed.                         | `.`                | No       |
+| `ruff_version` | Optional Ruff version to install. Leave empty to use the latest version. | `""`               | No       |
 
 ---
 
@@ -63,11 +63,12 @@ include:
 ```
 
 ---
+
 ## 📂 Jobs
 
-| Job   | Description                                      |
-|-------|--------------------------------------------------|
-| ruff  | Runs Ruff linting and formatting checks. Fails the pipeline if issues are detected. |
+| Job  | Description                                                                         |
+| ---- | ----------------------------------------------------------------------------------- |
+| ruff | Runs Ruff linting and formatting checks. Fails the pipeline if issues are detected. |
 
 ---
 
@@ -85,6 +86,7 @@ No additional authentication is required. The component relies solely on the Git
 - **Fixing Issues**: Use `ruff check . --fix` and `ruff format .` to automatically fix linting and formatting issues.
 
 ---
+
 ## 🔗 References
 
 - [Ruff Official Documentation](https://docs.astral.sh/ruff/)
