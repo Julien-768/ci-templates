@@ -1,60 +1,42 @@
-# gcc-embedded.gitlab-ci.yml
-#
-# Shared GitLab CI template for building embedded firmware using the
-# GNU Arm Embedded Toolchain (arm-none-eabi-gcc).
-#
-# The template installs the ARM GCC toolchain and runs a Makefile-based
-# build from a project-provided directory.
-#
-# Variables used by this template:
-# - GCC_MAKE_DIR (required):
-#   Directory containing the Makefile to build (passed to `make -C`).
-#
-# - SDK_PATH (optional):
-#   Value forwarded to Make as `SDK_PATH=...`.
-#
-# - EXTRA_MAKE_ARGS (optional):
-#   Additional arguments forwarded to Make# gcc-embedded.gitlab-ci.yml
-#
-# Shared GitLab CI template for building embedded firmware using the
-# GNU Arm Embedded Toolchain (arm-none-eabi-gcc).
-#
-# The template installs the ARM GCC toolchain and runs a Makefile-based
-# build from a project-provided directory.
-#
-# Variables used by this template:
-# - GCC_MAKE_DIR (required):
-#   Directory containing the Makefile to build (passed to `make -C`).
-#
-# - SDK_PATH (optional):
-#   Value forwarded to Make as `SDK_PATH=...`.
-#
-# - EXTRA_MAKE_ARGS (optional):
-#   Additional arguments forwarded to Make
-#   (e.g. "TARGET=foo VERBOSE=1").
-#
 
-.gcc-compile-template:
-  stage: build
+# template.yml
+#
+# Shared GitLab CI component for building embedded firmware
+# using the GNU Arm Embedded Toolchain (arm-none-eabi-gcc).
+
+spec:
+  inputs:
+    stage:
+      default: build
+      description: "CI stage used for the firmware build."
+    gcc_make_dir:
+      description: "Directory containing the Makefile to build."
+    sdk_path:
+      default: ""
+      description: "SDK path forwarded to Make as SDK_PATH."
+    extra_make_args:
+      default: ""
+      description: "Additional Make arguments (e.g. TARGET=foo VERBOSE=1)."
+
+---
+
+gcc-embedded:
+  stage: $[[ inputs.stage ]]
   image: debian:stable-slim
+
   dependencies: []
   needs: []
 
-  cache:
-    key: gcc-deps
-    paths:
-    - lib/
-
   script:
-  - apt-get update
-  - apt-get install -y --no-install-recommends ca-certificates git make findutils gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
-  - update-ca-certificates
-  - |
-    if [ -z "$GCC_MAKE_DIR" ]; then
-      echo "ERROR: GCC_MAKE_DIR not set"
-      exit 1
-    fi
-  - |
-    make -C "$GCC_MAKE_DIR" \
-      SDK_PATH="$SDK_PATH" \
-      $EXTRA_MAKE_ARGS
+    - apt-get update
+    - apt-get install -y --no-install-recommends ca-certificates make gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
+    - rm -rf /var/lib/apt/lists/*
+    - |
+      if [ ! -f "$[[ inputs.gcc_make_dir ]]/Makefile" ]; then
+        echo "ERROR: Makefile not found in $[[ inputs.gcc_make_dir ]]"
+        exit 1
+      fi
+    - |
+      make -C "$[[ inputs.gcc_make_dir ]]" \
+        "SDK_PATH=$[[ inputs.sdk_path ]]" \
+        $[[ inputs.extra_make_args ]]

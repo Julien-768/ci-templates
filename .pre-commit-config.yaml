@@ -49,3 +49,11 @@ repos:
   - id: prettier
     types_or: [ javascript, css, scss, html, json, yaml, markdown ]
     args: [ --write ]
+
+# Autoformat: C
+- repo: https://github.com/pocc/pre-commit-hooks
+  rev: v1.3.5
+  hooks:
+    - id: clang-format
+      args: ["--style=file:.clang-format.yml", "-i"]
+      files: ^src/.*\.(c|h)$

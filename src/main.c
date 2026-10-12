@@ -1,13 +1,9 @@
-#include <stdio.h>
-
 /**
- * @brief Prints "Hello, World!" to the console.
+ * @brief Minimal firmware build test.
  */
-void helloWorld(void) {
-    printf("Hello, World!\n");
-}
 
 int main(void) {
-    helloWorld();
-    return 0;
+    volatile int value = 42;
+
+    return value == 42 ? 0 : 1;
 }
