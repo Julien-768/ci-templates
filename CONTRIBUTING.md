@@ -1,6 +1,6 @@
 # Contributing to CI Templates
 
-Thank you for considering contributing to our CI Templates Component Catalog repository.
+Thank you for considering contributing to our **CI Templates Component Catalog** repository.
 
 This repository is structured as a **GitLab CI/CD Component Catalog** project. Please read the following guidelines carefully before contributing.
 
@@ -65,7 +65,7 @@ Other filenames, such as:
 - `clang.gitlab-ci.yml`
 - `component.yml`
 
-are NOT valid component entry-point filenames for the GitLab CI/CD Component Catalog structure described above.
+are **NOT** valid component entry-point filenames for the GitLab CI/CD Component Catalog structure described above.
 
 If this structure is not respected, GitLab may return an error such as:
 
@@ -83,9 +83,9 @@ Each `template.yml` must:
 4. Give each input a `description` field.
 5. Reference inputs declared under `spec:inputs` explicitly using the `$[[ inputs.<name> ]]` syntax whenever they are used in the component configuration.
 
-Inputs are not automatically available as regular CI/CD variables. When an input is used by a job, it must be explicitly referenced with `$[[ inputs.<name> ]]`.
+Inputs are **not** automatically available as regular CI/CD variables. When an input is used by a job, it must be explicitly referenced with `$[[ inputs.<name> ]]`.
 
-## ✅ Minimal Valid Example
+### ✅ Minimal Valid Example
 
 ```yaml
 spec:
@@ -93,9 +93,7 @@ spec:
     stage:
       default: build
       description: "CI stage used for the job."
-
 ---
-
 .clang-template:
   stage: $[[ inputs.stage ]]
   variables:
@@ -108,7 +106,7 @@ clang:
   extends: .clang-template
 ```
 
-If `spec:` is missing, the component will NOT be detected correctly by GitLab.
+If `spec:` is missing, the component will **NOT** be detected correctly by GitLab.
 
 In this example:
 
@@ -118,7 +116,6 @@ In this example:
 - `clang` is the concrete job exposed to projects consuming the component.
 
 ---
-
 
 ## 📝 Template Headers
 
@@ -150,7 +147,7 @@ Components SHOULD follow these principles:
 - **Plug-and-Play:** Including the component should be sufficient to expose its documented jobs.
 - **No Project-Specific Logic:** Components should avoid assumptions specific to one consuming project.
 
-Components must be generic and reusable across projects.
+Components must be **generic** and reusable across projects.
 
 ### Hidden Template Jobs
 
@@ -174,9 +171,9 @@ The hidden template job contains the reusable implementation, while the concrete
 
 ### Avoid `before_script`
 
-Do not use `before_script` in catalog templates unless there is a documented reason to do so.
+Do **not** use `before_script` in catalog templates unless there is a documented reason to do so.
 
-Why?
+**Why?**
 
 - It can introduce unexpected interactions with other configuration.
 - It may reduce flexibility and reusability.
@@ -194,7 +191,7 @@ Use explicit and meaningful names:
 - `CI_ACCESS_TOKEN` → for external services.
 - `CI_API_TOKEN` → for API-only access.
 
-Keep naming consistent and purpose-driven.
+Keep naming **consistent** and purpose-driven.
 
 ---
 
@@ -229,49 +226,53 @@ All templates must:
 
 ## 📚 Documentation
 
-Every component MUST have a `README.md` file following the standard structure defined below.
+Every component **MUST** have a `README.md` file following the standard structure defined below.
 
-All component README files MUST use the same section names and order. This ensures consistent documentation across the entire Component Catalog and makes components easier to understand, compare, and maintain.
+All component README files **MUST** use the same section names and order. This ensures consistent documentation across the entire Component Catalog and makes components easier to understand, compare, and maintain.
 
 ### Mandatory README Structure
 
-Every component README MUST contain the following sections in this exact order:
+Every component README **MUST** contain the following sections in this exact order:
 
 1. **Title and Description**
+
    - Use the format `# <Component Name>`.
    - Briefly describe the component's purpose and behavior.
 
 2. **📌 Features**
+
    - List the main features and capabilities of the component.
 
 3. **🔧 Prerequisites**
+
    - Describe required tools, software, repository configuration, permissions, and other dependencies.
    - Explicitly state when no prerequisites are required.
 
 4. **📥 Inputs**
-   - Document all component inputs in a table with the following columns:
-     `Input`, `Description`, `Default`, `Required`.
+
+   - Document all component inputs in a table with the following columns: `Input`, `Description`, `Default`, `Required`.
    - If the component has no inputs, explicitly state this.
 
 5. **🚀 Usage**
+
    - Provide a **Basic Example** showing how to include and use the component.
    - Provide an **Advanced Example** showing relevant customization options.
    - If no advanced configuration is applicable, explicitly state this.
-
-   - **Important:** The include syntax must match how the component is consumed. Prefer `include: component` for published Catalog components and use file-based includes when the configuration is intentionally consumed directly from a repository. So far, the components are not published to the Catalog, so `include: project` is to prefer.
-
+   - **Important:** The include syntax must match how the component is consumed. Prefer `include: component` for published Catalog components and use file-based includes when the configuration is intentionally consumed directly from a repository.
 
 6. **📂 Jobs**
-   - Document all concrete jobs exposed by the component in a table with the following columns:
-     `Job`, `Description`.
+
+   - Document all concrete jobs exposed by the component in a table with the following columns: `Job`, `Description`.
    - Describe each job's purpose and relevant execution conditions.
    - If the component does not expose any concrete jobs, explain how it is intended to be used.
 
 7. **🔐 Authentication**
+
    - Document authentication mechanisms, required tokens, CI/CD variables, permissions, and relevant GitLab settings.
    - Explicitly state when no additional authentication configuration is required.
 
 8. **⚠️ Notes**
+
    - Document important limitations, configuration details, branch requirements, compatibility considerations, and troubleshooting information.
    - If there are no specific notes, explicitly state this.
 
@@ -281,27 +282,25 @@ Every component README MUST contain the following sections in this exact order:
 
 ### Documentation Rules
 
-- All nine mandatory sections MUST be present in every component README, in the order specified above.
-- Section headings MUST use the exact names listed above.
-- Sections MUST NOT be renamed, reordered, or omitted.
-- Additional subsections MAY be added within a mandatory section when necessary.
-- Additional top-level sections MUST NOT be added without maintainer approval.
-- Information MUST be accurate and consistent with the actual implementation in `template.yml` and the component's CI configuration.
-- Input names, default values, required status, job names, authentication mechanisms, and execution rules MUST match the implementation.
-- Examples MUST be valid YAML and representative of actual usage.
-- Secrets MUST NEVER be included directly in examples. Use documented CI/CD variables instead.
-- Documentation MUST be concise, clear, and technically accurate.
-- All links MUST point to relevant and valid resources.
+- All nine mandatory sections **MUST** be present in every component README, in the order specified above.
+- Section headings **MUST** use the exact names listed above.
+- Sections **MUST NOT** be renamed, reordered, or omitted.
+- Additional subsections **MAY** be added within a mandatory section when necessary.
+- Additional top-level sections **MUST NOT** be added without maintainer approval.
+- Information **MUST** be accurate and consistent with the actual implementation in `template.yml` and the component's CI configuration.
+- Input names, default values, required status, job names, authentication mechanisms, and execution rules **MUST** match the implementation.
+- Examples **MUST** be valid YAML and representative of actual usage.
+- Secrets **MUST NEVER** be included directly in examples. Use documented CI/CD variables instead.
+- Documentation **MUST** be concise, clear, and technically accurate.
+- All links **MUST** point to relevant and valid resources.
 
 ### Standardization and Validation
 
-When adding a new component or modifying an existing one, contributors MUST create or update its `README.md` to comply with this standard.
+When adding a new component or modifying an existing one, contributors **MUST** create or update its `README.md` to comply with this standard.
 
-Merge requests SHOULD be checked for consistency with the standard README structure before approval.
+Merge requests **SHOULD** be checked for consistency with the standard README structure before approval.
 
-Keep documentation consistent across the entire Component Catalog.
-
-Keep documentation concise and clear.
+Keep documentation **consistent** across the entire Component Catalog.
 
 ---
 
