@@ -232,53 +232,98 @@ All component README files **MUST** use the same section names and order. This e
 
 ### Mandatory README Structure
 
-Every component README **MUST** contain the following sections in this exact order:
+Every component README **MUST** contain the following sections in the exact order listed below. Section headings, required content, and conditional requirements must be respected.
 
 1. **Title and Description**
 
    - Use the format `# <Component Name>`.
-   - Briefly describe the component's purpose and behavior.
+   - Briefly describe the component's purpose, behavior, and intended use.
 
 2. **📌 Features**
 
-   - List the main features and capabilities of the component.
+   - List the component's main features and capabilities.
+   - Focus on functionality relevant to users of the component.
 
 3. **🔧 Prerequisites**
 
-   - Describe required tools, software, repository configuration, permissions, and other dependencies.
+   - Document all required tools, software, repository configuration, permissions, and dependencies.
    - Explicitly state when no prerequisites are required.
 
 4. **📥 Inputs**
 
-   - Document all component inputs in a table with the following columns: `Input`, `Description`, `Default`, `Required`.
-   - If the component has no inputs, explicitly state this.
+   - Document all component inputs in a table with the following columns: `Input`, `Description`, `Default`, and `Required`.
+   - Include the input name, purpose, default value, and whether it is mandatory.
+   - Explicitly state when the component has no inputs.
 
 5. **🚀 Usage**
 
    - Provide a **Basic Example** showing how to include and use the component.
-   - Provide an **Advanced Example** showing relevant customization options.
+   - Provide an **Advanced Example** demonstrating relevant customization options.
    - If no advanced configuration is applicable, explicitly state this.
-   - **Important:** The include syntax must match how the component is consumed. Prefer `include: component` for published Catalog components and use file-based includes when the configuration is intentionally consumed directly from a repository.
+   - **Important:** The include syntax MUST match the component's intended distribution and consumption model. Use `include: component` for published GitLab CI/CD Catalog components and file-based includes when the component is intended to be consumed directly from a repository.
 
 6. **📂 Jobs**
 
-   - Document all concrete jobs exposed by the component in a table with the following columns: `Job`, `Description`.
-   - Describe each job's purpose and relevant execution conditions.
-   - If the component does not expose any concrete jobs, explain how it is intended to be used.
+   - Document all concrete jobs exposed by the component in a table with the following columns: `Job` and `Description`.
+   - Explain each job's purpose and relevant execution conditions, including applicable rules, stages, or dependencies.
+   - If the component does not expose any concrete jobs, explicitly explain how it integrates into the pipeline and how it is intended to be used.
 
 7. **🔐 Authentication**
 
    - Document authentication mechanisms, required tokens, CI/CD variables, permissions, and relevant GitLab settings.
+   - Explain how credentials must be configured and any applicable security considerations.
    - Explicitly state when no additional authentication configuration is required.
 
 8. **⚠️ Notes**
 
-   - Document important limitations, configuration details, branch requirements, compatibility considerations, and troubleshooting information.
-   - If there are no specific notes, explicitly state this.
+   - Document important limitations, configuration requirements, branch requirements, compatibility considerations, and troubleshooting guidance.
+   - Explicitly state when no specific notes apply.
 
-9. **🔗 References**
-   - Link to relevant official documentation, external tools, libraries, and related resources.
-   - If there are no external references, explicitly state this.
+9. **🪝 Pre-commit Configuration**
+
+   - If the component supports or benefits from pre-commit hooks, document how to install and configure them.
+   - Include installation instructions and a minimal `.pre-commit-config.yaml` example.
+   - Use only hooks relevant to the component and its development workflow.
+   - If pre-commit is not applicable, explicitly state this.
+
+   Example configuration:
+
+   ```yaml
+   repos:
+     - repo: https://github.com/pre-commit/pre-commit-hooks
+       rev: v4.4.0
+       hooks:
+         - id: trailing-whitespace
+         - id: end-of-file-fixer
+         - id: check-yaml
+   ```
+
+10. **💻 Local Usage**
+
+    - Explain how to use the component locally for development and testing outside GitLab CI/CD.
+    - Include the required tools, setup steps, and commands.
+    - Provide practical examples of local execution when applicable.
+    - If local execution is not supported, explain the limitation and describe available alternatives.
+
+11. **🔌 VS Code Extensions**
+
+    - List recommended VS Code extensions for developing, configuring, or testing the component.
+    - Provide links to the corresponding extensions in the VS Code Marketplace.
+    - Briefly explain the benefit of each extension.
+    - If no specific extensions are relevant, explicitly state this.
+
+12. **🔗 References**
+    - Link to relevant official documentation, external tools, libraries, standards, and related resources.
+    - Prefer authoritative and maintained sources.
+    - Explicitly state when no external references are relevant.
+
+#### General requirements
+
+- Preserve the exact section order and numbering defined above.
+- Use consistent Markdown formatting and valid code examples.
+- Ensure that examples reflect the component's actual implementation and supported configuration.
+- Do not document unsupported features, nonexistent jobs, or unverified configuration options.
+- Where a section is conditionally applicable, retain the heading and explicitly explain why the content is not applicable.
 
 ### Documentation Rules
 
