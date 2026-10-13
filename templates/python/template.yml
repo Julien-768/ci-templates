@@ -23,7 +23,7 @@ spec:
 
 .isort-template:
   stage: lint
-  image: python:latest
+  image: python:3.14-slim
 
   dependencies: []
   needs: []
@@ -36,7 +36,7 @@ spec:
 
 .black-template:
   stage: lint
-  image: python:latest
+  image: python:3.14-slim
 
   dependencies: []
   needs: []
@@ -50,7 +50,7 @@ spec:
 
 .flake8-template:
   stage: lint
-  image: python:latest
+  image: python:3.14-slim
 
   dependencies: []
   needs: []
@@ -64,7 +64,7 @@ spec:
 
 .pylint-template:
   stage: lint
-  image: python:latest
+  image: python:3.14-slim
 
   dependencies: []
   needs: []
