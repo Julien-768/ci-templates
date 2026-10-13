@@ -59,3 +59,4 @@ mike_pages:
   extends: .mike-pages-template
   rules:
   - if: '$CI_COMMIT_MESSAGE =~ /publication/'
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
