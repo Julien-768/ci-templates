@@ -36,4 +36,5 @@ mkdocs_pages:
   variables:
     SITE_DIR: public
   rules:
-  - if: $CI_COMMIT_MESSAGE=~ /publication/
+  - if: '$CI_COMMIT_MESSAGE =~ /publication/'
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
