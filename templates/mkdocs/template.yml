@@ -1,39 +1,66 @@
-# mkdocs.gitlab-ci.yml
+# templates/mkdocs/template.yml
+#
+# Shared GitLab CI component for building and publishing MkDocs documentation.
 
-# This GitLab CI configuration file sets up jobs to build and deploy documentation using MkDocs.
-# The mkdocs_test job builds the documentation and stores the output in the test directory.
-# The pages job builds the documentation and stores the output in the public directory for deployment to GitLab Pages.
+spec:
+  inputs:
+    mk_path:
+      type: string
+      default: "."
+      description: "Path to the directory containing the MkDocs project and requirements.txt."
+    mkdocs_config_file:
+      type: string
+      default: "mkdocs.yml"
+      description: "MkDocs configuration file, relative to mk_path."
+    test_stage:
+      type: string
+      default: "test"
+      description: "CI stage used to validate the documentation build."
+    pages_stage:
+      type: string
+      default: "deploy"
+      description: "CI stage used to publish the documentation with GitLab Pages."
+    publication_branch:
+      type: string
+      default: "develop"
+      description: "Branch on which a matching commit message can trigger publication."
+    publication_keyword:
+      type: string
+      default: "publication"
+      description: "Keyword that must appear in the commit message to trigger publication."
 
-.variables-mkdocs:
-  MKDOCS_CONFIG_FILE: 'mkdocs.yml' # optional path to the MkDocs configuration file
+---
 
 .mkdocs-template:
-  image: python:latest
-
-  needs: []
-
+  image: python:3.14-slim
+  variables:
+    MK_PATH: "$[[ inputs.mk_path ]]"
+    MKDOCS_CONFIG_FILE: "$[[ inputs.mkdocs_config_file ]]"
   script:
-  - cd ${MK_PATH:-.}
-  - echo "Running on ${MK_PATH:-.}"
-  - time pip install -r requirements.txt
-  - time mkdocs build --strict --verbose --site-dir ${SITE_DIR} -f ${MKDOCS_CONFIG_FILE:-mkdocs.yml}
-  - if [ -n "$MK_PATH" ]; then mv ${SITE_DIR} $CI_PROJECT_DIR/${SITE_DIR}; fi
+    - cd "$MK_PATH"
+    - echo "Building MkDocs documentation from $MK_PATH"
+    - python -m pip install -r requirements.txt
+    - python -m mkdocs build --strict --verbose --site-dir "$SITE_DIR" -f "$MKDOCS_CONFIG_FILE"
+    - |
+      if [ "$MK_PATH" != "." ]; then
+        mv "$SITE_DIR" "$CI_PROJECT_DIR/$SITE_DIR"
+      fi
   artifacts:
     paths:
-    - ${SITE_DIR}
+      - "$SITE_DIR"
     expire_in: 24 hours
 
 mkdocs_test:
   extends: .mkdocs-template
-  stage: test
+  stage: $[[ inputs.test_stage ]]
   variables:
-    SITE_DIR: test
+    SITE_DIR: "test"
 
 mkdocs_pages:
   extends: .mkdocs-template
-  stage: pages
+  stage: $[[ inputs.pages_stage ]]
   pages: true
   variables:
-    SITE_DIR: public
+    SITE_DIR: "public"
   rules:
-  - if: $CI_COMMIT_MESSAGE=~ /publication/
+    - if: '$CI_COMMIT_BRANCH == "$[[ inputs.publication_branch ]]" && $CI_COMMIT_MESSAGE =~ /$[[ inputs.publication_keyword ]]/'
