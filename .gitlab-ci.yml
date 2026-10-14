@@ -76,7 +76,15 @@ include:
 - local: "templates/doxygen/template.yml"
   inputs:
     doxyfile_path: "src"
+
 - local: "templates/mkdocs/template.yml"
+  inputs:
+    mk_path: "src"
+    test_stage: "test"
+    pages_stage: "pages"
+    publication_branch: "develop"
+    publication_keyword: "publication"
+
 - local: "templates/mike/template.yml"
   inputs:
     MK_PATH: "src" # MkDocs project directory (contains mkdocs.yml + requirements.txt)
