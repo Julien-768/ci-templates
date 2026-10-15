@@ -16,7 +16,7 @@ spec:
 ---
 .mike-pages-template:
   stage: pages
-  image: python:latest
+  image: python:3.14-slim
   when: on_success
   dependencies: []
   needs: []
