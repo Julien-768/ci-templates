@@ -110,5 +110,5 @@ variables:
 
 workflow:
   rules:
-  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # ensure maximal jobs on MR
   - if: '$CI_COMMIT_BRANCH'
