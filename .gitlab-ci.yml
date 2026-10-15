@@ -108,6 +108,31 @@ variables:
   ZIP_PREFIX: "release" # optional prefix for the release zip file
   PIO_ENV: "clangtidy" # optional PlatformIO environment for clang-tidy job
 
+mike_pages:
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "develop" && $CI_COMMIT_MESSAGE =~ /publication/'
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+doxygen:
+  extends: .doxygen-template
+  rules:
+  - if: '$CI_COMMIT_TAG'
+    when: never
+  - if: '$CI_COMMIT_MESSAGE =~ /publication/i'
+    when: on_success
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  - when: never
+
+mkdocs_pages:
+  extends: .mkdocs-template
+  stage: $[[ inputs.pages_stage ]]
+  pages: true
+  variables:
+    SITE_DIR: "public"
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "develop" && $CI_COMMIT_MESSAGE =~ /publication/'
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
 workflow:
   rules:
   - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # ensure maximal jobs on MR

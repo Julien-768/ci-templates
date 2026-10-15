@@ -45,5 +45,4 @@ doxygen:
     when: never
   - if: '$CI_COMMIT_MESSAGE =~ /publication/i'
     when: on_success
-  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   - when: never
