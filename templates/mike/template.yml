@@ -1,62 +1,140 @@
 # mike.gitlab-ci.yml
 #
-# Template for deploying documentation with MkDocs and Mike to GitLab Pages.
+# Shared GitLab CI component for deploying versioned MkDocs
+# documentation with Mike to GitLab Pages.
 
 spec:
   inputs:
-    MK_PATH:
-      description: "Path to the MkDocs project directory (default: current directory)."
+    mk_path:
+      type: string
       default: "."
-    GITLAB_USER_NAME:
-      description: "Git user name for commits."
+      description: "Path to the directory containing the MkDocs project and requirements.txt."
+
+    mkdocs_config_file:
+      type: string
+      default: "mkdocs.yml"
+      description: "MkDocs configuration file, relative to mk_path."
+
+    pages_stage:
+      type: string
+      default: "deploy"
+      description: "CI stage used to publish the documentation."
+
+    publication_branch:
+      type: string
+      default: "develop"
+      description: "Branch on which a matching commit message can trigger publication."
+
+    publication_keyword:
+      type: string
+      default: "publication"
+      description: "Keyword that must appear in the commit message to trigger publication."
+
+    mike_branch:
+      type: string
+      default: "pages/mike"
+      description: "Git branch used by Mike to store versioned documentation."
+
+    gitlab_user_name:
+      type: string
       default: "GitLab CI"
-    GITLAB_USER_EMAIL:
-      description: "Git user email for commits."
+      description: "Git user name for commits."
+
+    gitlab_user_email:
+      type: string
       default: "gitlab-ci@example.com"
+      description: "Git user email for commits."
 ---
-.mike-pages-template:
-  stage: pages
+
+.mike-template:
   image: python:3.14
-  when: on_success
-  dependencies: []
-  needs: []
 
   variables:
+    MK_PATH: "$[[ inputs.mk_path ]]"
+    MKDOCS_CONFIG_FILE: "$[[ inputs.mkdocs_config_file ]]"
+    MIKE_BRANCH: "$[[ inputs.mike_branch ]]"
+    GITLAB_USER_NAME: "$[[ inputs.gitlab_user_name ]]"
+    GITLAB_USER_EMAIL: "$[[ inputs.gitlab_user_email ]]"
     PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
-    PAGES_BRANCH: gl-pages
-    MK_PATH: "$[[ inputs.MK_PATH ]]"
-    GITLAB_USER_NAME: "$[[ inputs.GITLAB_USER_NAME ]]"
-    GITLAB_USER_EMAIL: "$[[ inputs.GITLAB_USER_EMAIL ]]"
 
   script:
-  - export HTTPS_REMOTE="https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
-  - cd "${MK_PATH}"
-  - echo "Running on ${MK_PATH}"
-  - pip install -r requirements.txt
-  - git config user.name "$GITLAB_USER_NAME"
-  - git config user.email "$GITLAB_USER_EMAIL"
-  - git fetch origin "$PAGES_BRANCH" || true
-  - git checkout "$CI_COMMIT_SHA"
-  - git branch -f "$PAGES_BRANCH" "origin/$PAGES_BRANCH" || true
-  - test -f mkdocs.yml || (echo "mkdocs.yml not found in $PWD" && exit 1)
-  - mike deploy -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" -u "${CI_COMMIT_TAG:-dev}" latest
-  - mike set-default -r "$HTTPS_REMOTE" -p -b "$PAGES_BRANCH" latest
+  - |
+    set -eu
 
-  # Retrieve the content pushed to gl-pages and expose it as the Pages artifact.
-  - cd "$CI_PROJECT_DIR"
-  - git fetch origin "$PAGES_BRANCH"
-  - rm -rf public
-  - mkdir public
-  - git --work-tree=public checkout "origin/$PAGES_BRANCH" -- .
+    echo "Deploying versioned MkDocs documentation"
+    echo "Project path: $MK_PATH"
+    echo "MkDocs config: $MKDOCS_CONFIG_FILE"
+    echo "Mike branch: $MIKE_BRANCH"
+
+    cd "$CI_PROJECT_DIR/$MK_PATH"
+
+    if [ ! -f "$MKDOCS_CONFIG_FILE" ]; then
+      echo "ERROR: MkDocs configuration not found: $MKDOCS_CONFIG_FILE"
+      exit 1
+    fi
+
+    if [ ! -f requirements.txt ]; then
+      echo "ERROR: requirements.txt not found in $PWD"
+      exit 1
+    fi
+
+    python -m pip install -r requirements.txt
+
+    git config user.name "$GITLAB_USER_NAME"
+    git config user.email "$GITLAB_USER_EMAIL"
+
+    HTTPS_REMOTE="https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+
+    git fetch origin
+
+    git checkout "$CI_COMMIT_SHA"
+
+    if git ls-remote --exit-code --heads origin "$MIKE_BRANCH" >/dev/null 2>&1; then
+        echo "Branch '$MIKE_BRANCH' already exists."
+        git branch -f "$MIKE_BRANCH" "origin/$MIKE_BRANCH"
+    else
+        echo "Branch '$MIKE_BRANCH' does not exist. Creating it."
+        git branch "$MIKE_BRANCH" "$CI_COMMIT_SHA"
+    fi
+
+    VERSION="${CI_COMMIT_TAG:-dev}"
+
+    echo "Publishing version: $VERSION"
+
+    mike deploy \
+      --config-file "$MKDOCS_CONFIG_FILE" \
+      --remote "$HTTPS_REMOTE" \
+      --push \
+      --branch "$MIKE_BRANCH" \
+      --update-aliases latest \
+      "$VERSION"
+
+    mike set-default \
+      --config-file "$MKDOCS_CONFIG_FILE" \
+      --remote "$HTTPS_REMOTE" \
+      --push \
+      --branch "$MIKE_BRANCH" \
+      latest
+
+    # Export the published documentation for GitLab Pages.
+    cd "$CI_PROJECT_DIR"
+
+    git fetch origin "$MIKE_BRANCH"
+
+    rm -rf public
+    mkdir public
+
+    git --work-tree=public checkout "origin/$MIKE_BRANCH" -- .
 
   artifacts:
     paths:
     - public
+    expire_in: 24 hours
 
   pages: true
 
 mike_pages:
-  extends: .mike-pages-template
+  extends: .mike-template
+  stage: $[[ inputs.pages_stage ]]
   rules:
-  - if: '$CI_COMMIT_MESSAGE =~ /publication/'
-  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  - if: '$CI_COMMIT_MESSAGE =~ /$[[ inputs.publication_keyword ]]/'
