@@ -108,7 +108,7 @@ To set up pre-commit for this template, follow these steps:
 
    ```yaml
    default_language_version:
-     python: python3.13
+     python: python3.14
 
    repos:
      # Python Linting Tools
@@ -116,7 +116,7 @@ To set up pre-commit for this template, follow these steps:
        rev: 23.12.1
        hooks:
          - id: black
-           language_version: python3.13
+           language_version: python3.14
 
      - repo: https://github.com/PyCQA/isort
        rev: 5.13.2
