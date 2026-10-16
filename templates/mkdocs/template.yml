@@ -63,4 +63,3 @@ mkdocs_pages:
     SITE_DIR: "public"
   rules:
   - if: '$CI_COMMIT_BRANCH == "$[[ inputs.publication_branch ]]" && $CI_COMMIT_MESSAGE =~ /$[[ inputs.publication_keyword ]]/'
-  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'

@@ -87,7 +87,12 @@ include:
 
 - local: "templates/mike/template.yml"
   inputs:
-    MK_PATH: "src" # MkDocs project directory (contains mkdocs.yml + requirements.txt)
+    mk_path: "src"
+    mkdocs_config_file: "mkdocs.yml"
+    pages_stage: "pages"
+    publication_branch: "develop"
+    publication_keyword: "publication"
+    mike_branch: "pages/mike"
 
 # --- Release stage ---
 - local: "templates/release/template.yml"
@@ -107,6 +112,31 @@ variables:
   MK_PATH: "src" # MkDocs project directory (contains mkdocs.yml + requirements.txt)
   ZIP_PREFIX: "release" # optional prefix for the release zip file
   PIO_ENV: "clangtidy" # optional PlatformIO environment for clang-tidy job
+
+mike_pages:
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "develop" && $CI_COMMIT_MESSAGE =~ /publication/'
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+doxygen:
+  extends: .doxygen-template
+  rules:
+  - if: '$CI_COMMIT_TAG'
+    when: never
+  - if: '$CI_COMMIT_MESSAGE =~ /publication/i'
+    when: on_success
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  - when: never
+
+mkdocs_pages:
+  extends: .mkdocs-template
+  stage: pages
+  pages: true
+  variables:
+    SITE_DIR: "public"
+  rules:
+  - if: '$CI_COMMIT_BRANCH == "develop" && $CI_COMMIT_MESSAGE =~ /publication/'
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 workflow:
   rules:
