@@ -87,7 +87,12 @@ include:
 
 - local: "templates/mike/template.yml"
   inputs:
-    MK_PATH: "src" # MkDocs project directory (contains mkdocs.yml + requirements.txt)
+    mk_path: "src"
+    mkdocs_config_file: "mkdocs.yml"
+    pages_stage: "pages"
+    publication_branch: "develop"
+    publication_keyword: "publication"
+    mike_branch: "pages/mike"
 
 # --- Release stage ---
 - local: "templates/release/template.yml"
@@ -125,7 +130,7 @@ doxygen:
 
 mkdocs_pages:
   extends: .mkdocs-template
-  stage: $[[ inputs.pages_stage ]]
+  stage: pages
   pages: true
   variables:
     SITE_DIR: "public"
