@@ -1,6 +1,6 @@
-# mike.gitlab-ci.yml
+# mike/template.yml
 #
-# Shared GitLab CI component for deploying versioned MkDocs
+# Shared GitLab CI configuration for deploying versioned MkDocs
 # documentation with Mike to GitLab Pages.
 
 spec:
@@ -107,8 +107,11 @@ spec:
         echo "Branch '$MIKE_BRANCH' already exists."
         git branch -f "$MIKE_BRANCH" "origin/$MIKE_BRANCH"
     else
-        echo "Branch '$MIKE_BRANCH' does not exist. Creating it."
-        git branch "$MIKE_BRANCH" "$CI_COMMIT_SHA"
+        echo "Branch '$MIKE_BRANCH' does not exist. Creating it from an empty commit."
+        # The branch must contain only the generated site, never the project sources.
+        EMPTY_TREE=$(git mktree </dev/null)
+        EMPTY_COMMIT=$(git commit-tree "$EMPTY_TREE" -m "Initialize $MIKE_BRANCH")
+        git branch "$MIKE_BRANCH" "$EMPTY_COMMIT"
     fi
 
     # Version: tag > merge request (mr-<iid>) > dev
@@ -176,6 +179,6 @@ mike_pages:
 
   # Mode "branch" / "both": push pipeline on the configured branch
   - if: '($JOB_EXECUTION_MODE == "branch" || $JOB_EXECUTION_MODE == "both") && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == "$[[ inputs.publication_branch ]]" && $CI_COMMIT_MESSAGE =~ /$[[ inputs.publication_keyword ]]/'
-    # Mode "merge_request" / "both": merge request pipeline
-    # Mode "merge_request" / "both": merge request pipeline
+
+  # Mode "merge_request" / "both": merge request pipeline
   - if: '($JOB_EXECUTION_MODE == "merge_request" || $JOB_EXECUTION_MODE == "both") && $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_COMMIT_MESSAGE =~ /$[[ inputs.publication_keyword ]]/ || $CI_MERGE_REQUEST_DESCRIPTION =~ /$[[ inputs.publication_keyword ]]/ || $CI_MERGE_REQUEST_TITLE =~ /$[[ inputs.publication_keyword ]]/)'

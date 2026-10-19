@@ -327,7 +327,7 @@ Every component README **MUST** contain the following sections in the exact orde
 
 ### Documentation Rules
 
-- All nine mandatory sections **MUST** be present in every component README, in the order specified above.
+- All twelve mandatory sections **MUST** be present in every component README, in the order specified above.
 - Section headings **MUST** use the exact names listed above.
 - Sections **MUST NOT** be renamed, reordered, or omitted.
 - Additional subsections **MAY** be added within a mandatory section when necessary.

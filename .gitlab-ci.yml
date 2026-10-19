@@ -134,13 +134,6 @@ mkdocs_pages:
   - if: '$CI_COMMIT_BRANCH == "develop" && $CI_COMMIT_MESSAGE =~ /publication/'
   - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
-# sync-github:
-#   extends: .sync-github
-#   stage: deploy
-#   rules:
-#   # Sync GitHub only on push pipelines to develop or main
-#   - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "main")'
-
 workflow:
   rules:
   # Always allow merge request pipelines
