@@ -10,6 +10,7 @@ This GitLab CI template automates the deployment of versioned documentation with
 
 - **Versioned Documentation**: Maintains multiple documentation versions in a dedicated Git branch.
 - **Selectable Execution Mode**: Choose whether the job runs on a branch, in merge request pipelines, or both, through `job_execution_mode`.
+- **Flexible Publication Trigger**: In merge request pipelines, the keyword can be placed in the commit message, the merge request title, or the merge request description.
 - **Automatic Default Version**: Updates the `latest` alias and sets it as the default version (never from a merge request pipeline).
 - **Merge Request Versions**: Publishes a dedicated `mr-<iid>` version for each merge request when the merge request mode is enabled.
 - **Branch Exclusion**: Never runs on a configurable excluded branch, whether in a branch pipeline or a merge request pipeline.
@@ -44,22 +45,24 @@ This GitLab CI template automates the deployment of versioned documentation with
 
 4. **Merge request pipelines** (only for the `merge_request` and `both` modes): If the project defines a `workflow:rules` section, it must allow pipelines triggered by `merge_request_event`.
 
+5. **GitLab 16.7 or later** (only to use the keyword in the merge request description): The `CI_MERGE_REQUEST_DESCRIPTION` variable is not available on older versions. On older versions, use the commit message or the merge request title.
+
 ---
 
 ## 📥 Inputs
 
-| Input                 | Description                                                                                                         | Default                 |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------- | ----------------------- |
-| `mk_path`             | Path to the MkDocs project directory, relative to `$CI_PROJECT_DIR`.                                                | `.`                     |
-| `mkdocs_config_file`  | MkDocs configuration filename, relative to `mk_path`.                                                               | `mkdocs.yml`            |
-| `pages_stage`         | CI/CD stage used by the deployment job.                                                                             | `deploy`                |
-| `job_execution_mode`  | Where the job can run: `branch` (on `publication_branch`), `merge_request` (in merge request pipelines), or `both`. | `branch`                |
-| `publication_branch`  | Branch on which a matching commit message triggers publication (modes `branch` and `both`).                         | `develop`               |
-| `publication_keyword` | Keyword required in the commit message to trigger publication.                                                      | `publication`           |
-| `exclusion_branch`    | Branch on which the job never runs (branch pipelines and merge requests whose source branch is this branch).        | `exclusion-branch`      |
-| `mike_branch`         | Git branch used to store versioned documentation.                                                                   | `pages/mike`            |
-| `gitlab_user_name`    | Git author name for generated commits.                                                                              | `GitLab CI`             |
-| `gitlab_user_email`   | Git author email for generated commits.                                                                             | `gitlab-ci@example.com` |
+| Input                 | Description                                                                                                                                                     | Default                 |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------- |
+| `mk_path`             | Path to the MkDocs project directory, relative to `$CI_PROJECT_DIR`.                                                                                            | `.`                     |
+| `mkdocs_config_file`  | MkDocs configuration filename, relative to `mk_path`.                                                                                                           | `mkdocs.yml`            |
+| `pages_stage`         | CI/CD stage used by the deployment job.                                                                                                                         | `deploy`                |
+| `job_execution_mode`  | Where the job can run: `branch` (on `publication_branch`), `merge_request` (in merge request pipelines), or `both`.                                             | `branch`                |
+| `publication_branch`  | Branch on which a matching commit message triggers publication (modes `branch` and `both`).                                                                     | `develop`               |
+| `publication_keyword` | Keyword (regular expression) that triggers publication. Looked for in the commit message and, in merge request pipelines, also in the MR title and description. | `publication`           |
+| `exclusion_branch`    | Branch on which the job never runs (branch pipelines and merge requests whose source branch is this branch).                                                    | `exclusion-branch`      |
+| `mike_branch`         | Git branch used to store versioned documentation.                                                                                                               | `pages/mike`            |
+| `gitlab_user_name`    | Git author name for generated commits.                                                                                                                          | `GitLab CI`             |
+| `gitlab_user_email`   | Git author email for generated commits.                                                                                                                         | `gitlab-ci@example.com` |
 
 All inputs are optional and have defaults.
 
@@ -95,11 +98,11 @@ Ensure that the `pages` stage exists in the main pipeline's `stages` list, or us
 
 The `job_execution_mode` input controls when the job `mike_pages` can run:
 
-| Mode            | The job runs...                                                                                      |
-| --------------- | ---------------------------------------------------------------------------------------------------- |
-| `branch`        | In branch pipelines on `publication_branch`, when the commit message contains `publication_keyword`. |
-| `merge_request` | In merge request pipelines, when the commit message contains `publication_keyword`.                  |
-| `both`          | In both cases above.                                                                                 |
+| Mode            | The job runs...                                                                                                                                |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `branch`        | In branch pipelines on `publication_branch`, when the commit message contains `publication_keyword`.                                           |
+| `merge_request` | In merge request pipelines, when the commit message, the merge request title, or the merge request description contains `publication_keyword`. |
+| `both`          | In both cases above.                                                                                                                           |
 
 In every mode, the job never runs on `exclusion_branch` (as a branch, or as the source branch of a merge request).
 
@@ -107,7 +110,21 @@ To restrict merge request publication to merge requests targeting a specific bra
 
 ### Publication trigger
 
-For example, a commit message containing `publication` triggers the job when the execution mode and the branch (or merge request) conditions are met.
+In branch pipelines, a commit message containing the keyword (e.g. `publication`) triggers the job when the execution mode and the branch conditions are met.
+
+In merge request pipelines, the keyword can be placed in any of the following:
+
+- the message of the last commit of the source branch;
+- the merge request title;
+- the merge request description.
+
+Notes on the merge request trigger:
+
+- The match is case-sensitive: `Publication` does not match `publication`.
+- The keyword is used as a regular expression. Escape special characters if you choose a keyword such as `[publish-docs]` (use `\[publish-docs\]`).
+- The variables are read when the pipeline is created. After adding the keyword to the title or description, click **Run pipeline** in the merge request or push a new commit.
+- The description is truncated by GitLab in the pipeline variable (2700 characters), so place the keyword near the beginning.
+- The keyword may appear in free text without the intent to publish. Use a more specific keyword if this is a risk.
 
 The documentation version is selected as follows:
 
@@ -201,8 +218,8 @@ Adapt this example to the MkDocs and Mike versions used by your project.
    This can be automated with a dedicated job, for example when a merge request is closed or merged.
 
 5. **Branch protection**: If the publication branch is protected, its rules must allow the CI job to push.
-6. **Publication rules**: The job checks the commit message for the configured keyword in all modes. Remove this condition from the rules of the template if merge request pipelines should publish without the keyword.
-7. **Debugging**: Inspect the job logs if dependency installation, Git authentication, or publication fails.
+6. **Publication rules**: In branch pipelines, the job checks the commit message for the configured keyword. In merge request pipelines, it checks the commit message, the merge request title, and the merge request description. Remove these conditions from the rules of the template if merge request pipelines should publish without the keyword.
+7. **Debugging**: Inspect the job logs if dependency installation, Git authentication, or publication fails. If the job does not appear in a merge request pipeline, check the keyword (case, location) and that the pipeline was created after the keyword was added.
 
 ---
 
