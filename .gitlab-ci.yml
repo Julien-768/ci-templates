@@ -93,6 +93,7 @@ include:
     publication_branch: "develop"
     publication_keyword: "publication"
     mike_branch: "pages/mike"
+    job_execution_mode: "merge_request"
 
 # --- Release stage ---
 - local: "templates/release/template.yml"
@@ -112,11 +113,6 @@ variables:
   MK_PATH: "src" # MkDocs project directory (contains mkdocs.yml + requirements.txt)
   ZIP_PREFIX: "release" # optional prefix for the release zip file
   PIO_ENV: "clangtidy" # optional PlatformIO environment for clang-tidy job
-
-mike_pages:
-  rules:
-  - if: '$CI_COMMIT_BRANCH == "develop" && $CI_COMMIT_MESSAGE =~ /publication/'
-  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 doxygen:
   extends: .doxygen-template
@@ -138,7 +134,21 @@ mkdocs_pages:
   - if: '$CI_COMMIT_BRANCH == "develop" && $CI_COMMIT_MESSAGE =~ /publication/'
   - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
+# sync-github:
+#   extends: .sync-github
+#   stage: deploy
+#   rules:
+#   # Sync GitHub only on push pipelines to develop or main
+#   - if: '$CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "develop" || $CI_COMMIT_BRANCH == "main")'
+
 workflow:
   rules:
-  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"' # ensure maximal jobs on MR
+  # Always allow merge request pipelines
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+  # Prevent duplicate branch pipelines when a merge request is open
+  - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'
+    when: never
+
+  # Allow branch pipelines when no merge request is open
   - if: '$CI_COMMIT_BRANCH'

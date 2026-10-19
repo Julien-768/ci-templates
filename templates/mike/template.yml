@@ -20,15 +20,29 @@ spec:
       default: "deploy"
       description: "CI stage used to publish the documentation."
 
+    job_execution_mode:
+      type: string
+      default: "branch"
+      options:
+      - "branch"
+      - "merge_request"
+      - "both"
+      description: "Where the job can run: on 'publication_branch' (branch), in merge request pipelines (merge_request), or both."
+
     publication_branch:
       type: string
       default: "develop"
-      description: "Branch on which a matching commit message can trigger publication."
+      description: "Branch on which a matching commit message can trigger publication (modes 'branch' and 'both')."
 
     publication_keyword:
       type: string
       default: "publication"
       description: "Keyword that must appear in the commit message to trigger publication."
+
+    exclusion_branch:
+      type: string
+      default: "exclusion-branch"
+      description: "Branch on which job won't run."
 
     mike_branch:
       type: string
@@ -97,24 +111,41 @@ spec:
         git branch "$MIKE_BRANCH" "$CI_COMMIT_SHA"
     fi
 
-    VERSION="${CI_COMMIT_TAG:-dev}"
+    # Version: tag > merge request (mr-<iid>) > dev
+    if [ -n "${CI_MERGE_REQUEST_IID:-}" ]; then
+      IS_MR=true
+      VERSION="${CI_COMMIT_TAG:-mr-$CI_MERGE_REQUEST_IID}"
+    else
+      IS_MR=false
+      VERSION="${CI_COMMIT_TAG:-dev}"
+    fi
 
-    echo "Publishing version: $VERSION"
+    echo "Publishing version: $VERSION (merge request: $IS_MR)"
 
-    mike deploy \
-      --config-file "$MKDOCS_CONFIG_FILE" \
-      --remote "$HTTPS_REMOTE" \
-      --push \
-      --branch "$MIKE_BRANCH" \
-      --update-aliases latest \
-      "$VERSION"
+    # The 'latest' alias is never moved by a merge request pipeline.
+    if [ "$IS_MR" = "true" ]; then
+      mike deploy \
+        --config-file "$MKDOCS_CONFIG_FILE" \
+        --remote "$HTTPS_REMOTE" \
+        --push \
+        --branch "$MIKE_BRANCH" \
+        "$VERSION"
+    else
+      mike deploy \
+        --config-file "$MKDOCS_CONFIG_FILE" \
+        --remote "$HTTPS_REMOTE" \
+        --push \
+        --branch "$MIKE_BRANCH" \
+        --update-aliases latest \
+        "$VERSION"
 
-    mike set-default \
-      --config-file "$MKDOCS_CONFIG_FILE" \
-      --remote "$HTTPS_REMOTE" \
-      --push \
-      --branch "$MIKE_BRANCH" \
-      latest
+      mike set-default \
+        --config-file "$MKDOCS_CONFIG_FILE" \
+        --remote "$HTTPS_REMOTE" \
+        --push \
+        --branch "$MIKE_BRANCH" \
+        latest
+    fi
 
     # Export the published documentation for GitLab Pages.
     cd "$CI_PROJECT_DIR"
@@ -136,5 +167,15 @@ spec:
 mike_pages:
   extends: .mike-template
   stage: $[[ inputs.pages_stage ]]
+  variables:
+    JOB_EXECUTION_MODE: "$[[ inputs.job_execution_mode ]]"
   rules:
-  - if: '$CI_COMMIT_MESSAGE =~ /$[[ inputs.publication_keyword ]]/'
+  # Never publish from the excluded branch (push pipeline or MR pipeline)
+  - if: '$CI_COMMIT_BRANCH == "$[[ inputs.exclusion_branch ]]" || $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "$[[ inputs.exclusion_branch ]]"'
+    when: never
+
+  # Mode "branch" / "both": push pipeline on the configured branch
+  - if: '($JOB_EXECUTION_MODE == "branch" || $JOB_EXECUTION_MODE == "both") && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH == "$[[ inputs.publication_branch ]]" && $CI_COMMIT_MESSAGE =~ /$[[ inputs.publication_keyword ]]/'
+    # Mode "merge_request" / "both": merge request pipeline
+    # Mode "merge_request" / "both": merge request pipeline
+  - if: '($JOB_EXECUTION_MODE == "merge_request" || $JOB_EXECUTION_MODE == "both") && $CI_PIPELINE_SOURCE == "merge_request_event" && ($CI_COMMIT_MESSAGE =~ /$[[ inputs.publication_keyword ]]/ || $CI_MERGE_REQUEST_DESCRIPTION =~ /$[[ inputs.publication_keyword ]]/ || $CI_MERGE_REQUEST_TITLE =~ /$[[ inputs.publication_keyword ]]/)'
