@@ -46,7 +46,7 @@ repos:
     language_version: python3.13
 
 - repo: https://github.com/PyCQA/isort
-  rev: 5.13.2
+  rev: 9.0.2
   hooks:
   - id: isort
     args: [ "--profile=black", "--line-length=120" ]
