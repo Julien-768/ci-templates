@@ -1,4 +1,14 @@
-site_name: My Docs
+# mkdocs.yml
+site_name: CI Templates Documentation
+site_description: "Test documentation to validate the MkDocs CI template."
+
 nav:
   - Home: index.md
   - Guide: guide.md
+
+plugins:
+  - git-revision-date-localized:
+      fallback_to_build_date: true
+      type: date
+      locale: fr
+  - search

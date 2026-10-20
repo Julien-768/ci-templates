@@ -31,7 +31,7 @@ spec:
 ---
 
 .mkdocs-template:
-  image: python:3.14-slim
+  image: python:3.14
   variables:
     MK_PATH: "$[[ inputs.mk_path ]]"
     MKDOCS_CONFIG_FILE: "$[[ inputs.mkdocs_config_file ]]"
